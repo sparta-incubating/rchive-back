@@ -30,7 +30,7 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.
                         basePackage("rchive"))
-                .paths(PathSelectors.ant("/v1/**")).build();
+                .paths(PathSelectors.ant("/api/v1/**")).build();
     }
 
     private SecurityContext securityContext() {
