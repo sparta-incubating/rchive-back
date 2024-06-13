@@ -20,3 +20,17 @@ spring:
         highlight_sql: 'true'   # SQL? ? ??
     hibernate:
       ddl-auto: update
+
+  # swagger
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    display-operation-id: true
+    tags-sorter: alpha
+#    operations-sorter: method
+#    doc-expansion: none
