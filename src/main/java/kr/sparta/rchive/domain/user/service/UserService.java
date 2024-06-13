@@ -1,9 +1,9 @@
 package kr.sparta.rchive.domain.user.service;
 
-import jakarta.transaction.Transactional;
 import kr.sparta.rchive.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
