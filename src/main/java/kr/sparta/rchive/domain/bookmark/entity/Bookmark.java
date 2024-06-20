@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_Bookmark")
+@Table(name = "tb_bookmark")
 @Getter
 @Builder
 @AllArgsConstructor
