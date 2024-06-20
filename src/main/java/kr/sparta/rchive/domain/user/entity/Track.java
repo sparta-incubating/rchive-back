@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import kr.sparta.rchive.domain.user.enums.GenderEnum;
 import kr.sparta.rchive.domain.user.enums.OauthTypeEnum;
+import kr.sparta.rchive.domain.user.enums.TrackEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,41 +22,22 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="tb_user")
+@Table(name="tb_track")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTimeEntity {
+public class Track extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255, unique = true)
-    private String oauthId;
-
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
-    private OauthTypeEnum oauthType;
-
-    @Column(nullable = false, length = 50, unique = true)
-    private String email;
-
-    @Column(nullable = false, length = 100)
-    private String password;
+    private TrackEnum track;
 
     @Column(nullable = false)
-    private LocalDate birth;
-
-    @Column(nullable = false, length = 20)
-    private String phone;
-
-    @Column(nullable = false, length = 20)
-    @Enumerated(value = EnumType.STRING)
-    private GenderEnum gender;
-
-    @Column(nullable = false, length = 20, unique = true)
-    private String nickname;
+    private int period;
 
     @Column(nullable = false)
     @ColumnDefault("false")
