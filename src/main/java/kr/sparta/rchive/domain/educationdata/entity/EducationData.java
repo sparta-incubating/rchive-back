@@ -36,7 +36,7 @@ public class EducationData extends BaseTimeEntity {
     @Column(name = "education_type", nullable = false)
     private EducationTypeEnum educationType;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     private String title;
 
     @Column(nullable = false, length = 20)
