@@ -11,6 +11,11 @@ on:
   pull_request:
     branches: [ "dev" ]
 
+env:
+  DB_URL: ${{secrets.DB_URL}}
+  DB_USER: ${{secrets.DB_USER}}
+  DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+
 jobs:
   test:
     runs-on: ubuntu-latest
