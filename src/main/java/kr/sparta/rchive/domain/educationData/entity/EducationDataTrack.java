@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @IdClass(EducationDataTrackId.class)
+
 public class EducationDataTrack extends BaseTimeEntity {
 
     @Id
