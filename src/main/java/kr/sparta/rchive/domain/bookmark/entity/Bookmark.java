@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.educationData.entity;
+package kr.sparta.rchive.domain.bookmark.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -6,7 +6,9 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kr.sparta.rchive.domain.user.entity.Track;
+import kr.sparta.rchive.domain.educationData.entity.EducationData;
+import kr.sparta.rchive.domain.educationData.entity.EducationDataTrackId;
+import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,23 +16,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_education_data_tag")
+@Table(name = "tb_bookmark")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@IdClass(EducationDataTrackId.class)
-
-public class EducationDataTrack extends BaseTimeEntity {
+@IdClass(BookmarkId.class)
+public class Bookmark extends BaseTimeEntity {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "educationData_id")
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "education_data_id")
     private EducationData educationData;
-
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "track_id")
-    private Track track;
-
 }

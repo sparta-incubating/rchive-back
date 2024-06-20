@@ -72,4 +72,5 @@ public class EducationData extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "educationData")
     List<Comment> commentList = new ArrayList<>();
+
 }
