@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.educationdata.entity;
+package kr.sparta.rchive.domain.educationData.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
