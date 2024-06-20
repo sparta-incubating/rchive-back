@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.educationdata.entity;
+package kr.sparta.rchive.domain.educationData.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,8 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import kr.sparta.rchive.domain.educationdata.enums.DataTypeEnum;
-import kr.sparta.rchive.domain.educationdata.enums.EducationTypeEnum;
+import kr.sparta.rchive.domain.educationData.enums.DataTypeEnum;
+import kr.sparta.rchive.domain.educationData.enums.EducationTypeEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
