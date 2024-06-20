@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.educationdata.entity;
+package kr.sparta.rchive.domain.educationData.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,11 +7,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import kr.sparta.rchive.domain.educationdata.enums.DataTypeEnum;
-import kr.sparta.rchive.domain.educationdata.enums.EducationTypeEnum;
+import java.util.ArrayList;
+import java.util.List;
+import kr.sparta.rchive.domain.comment.entity.Comment;
+import kr.sparta.rchive.domain.educationData.enums.DataTypeEnum;
+import kr.sparta.rchive.domain.educationData.enums.EducationTypeEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -65,4 +69,7 @@ public class EducationData extends BaseTimeEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "educationData")
+    List<Comment> commentList = new ArrayList<>();
 }

@@ -1,13 +1,12 @@
-package kr.sparta.rchive.domain.educationdata.entity;
+package kr.sparta.rchive.domain.educationData.entity;
 
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kr.sparta.rchive.global.entity.BaseTimeEntity;
+import kr.sparta.rchive.domain.user.entity.Track;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@IdClass(EducationDataTagId.class)
-public class EducationDataTag extends BaseTimeEntity {
+@IdClass(EducationDataTrackId.class)
+public class EducationDataTrack {
 
     @Id
     @ManyToOne
@@ -29,6 +28,7 @@ public class EducationDataTag extends BaseTimeEntity {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "tag_id")
-    private Tag tag;
+    @JoinColumn(name = "track_id")
+    private Track track;
+
 }

@@ -7,9 +7,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.user.enums.GenderEnum;
 import kr.sparta.rchive.domain.user.enums.OauthTypeEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
@@ -63,4 +67,10 @@ public class User extends BaseTimeEntity {
 
     @Column
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "user")
+    List<Role> roleList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    List<Comment> commentList = new ArrayList<>();
 }

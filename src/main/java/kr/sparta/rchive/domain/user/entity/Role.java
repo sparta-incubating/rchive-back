@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,4 +51,5 @@ public class Role extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
     private AuthEnum auth;
+
 }
