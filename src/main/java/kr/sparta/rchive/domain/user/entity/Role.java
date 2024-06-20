@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.user.entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,11 +8,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.GenderEnum;
-import kr.sparta.rchive.domain.user.enums.OauthTypeEnum;
+import kr.sparta.rchive.domain.user.enums.RoleEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,46 +26,28 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="tb_user")
+@Table(name="tb_role")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTimeEntity {
+@IdClass(RoleId.class)
+public class Role extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(length = 255, unique = true)
-    private String oauthId;
-
-    @Column(length = 20)
-    @Enumerated(value = EnumType.STRING)
-    private OauthTypeEnum oauthType;
-
-    @Column(nullable = false, length = 50, unique = true)
-    private String email;
-
-    @Column(nullable = false, length = 100)
-    private String password;
-
-    @Column(nullable = false)
-    private LocalDate birth;
-
-    @Column(nullable = false, length = 20)
-    private String phone;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "track_id")
+    private Track track;
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
-    private GenderEnum gender;
+    private RoleEnum role;
 
-    @Column(nullable = false, length = 20, unique = true)
-    private String nickname;
-
-    @Column(nullable = false)
-    @ColumnDefault("false")
-    private Boolean isDeleted;
-
-    @Column
-    private LocalDateTime deletedAt;
+    @Column(nullable = false, length = 20)
+    @Enumerated(value = EnumType.STRING)
+    private AuthEnum auth;
 }
