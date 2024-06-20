@@ -206,3 +206,5 @@ gradle-app.setting
 
 ### Query Dsl ###
 /src/main/generated
+
+.DS_Store
