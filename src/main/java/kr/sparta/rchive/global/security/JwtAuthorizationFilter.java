@@ -66,7 +66,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private Authentication createAuthentication(Claims claims) {
         HashMap<String,String> map = (HashMap<String, String>) claims.get("auth");
 
-        OAuthTypeEnum oAuthTypeEnum = OAuthTypeEnum.valueOf(map.get("oAuthTypeEnum"));
+        OAuthTypeEnum oAuthTypeEnum = OAuthTypeEnum.valueOf(map.get("oAuthType"));
 
         UserDetails userDetails = userDetailsService.loadUserByEmailAndPlatform(map.get("email"), oAuthTypeEnum);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
