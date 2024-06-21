@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/posts")
 @Tag(name = "2. Post API", description = "Post 관련 API입니다.")
 public class PostController {
+
     private final EducationDataService educationDataService;
     private final EducationDataTagCoreService educationDataTagCoreService;
     private final TagService tagService;
 
     @GetMapping("/tags")
-    @Operation(summary = "사용할 태그 검색", description = "게시물에 등록할 태그가 존재하는지 검색")
+    @Operation(operationId = "POST-008", summary = "사용할 태그 검색")
     public ResponseEntity<CommonResponseDto> searchTag(
             @RequestBody TagSearchReq request
     ) {

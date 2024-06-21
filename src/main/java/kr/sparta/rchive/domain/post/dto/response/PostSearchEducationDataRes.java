@@ -8,7 +8,7 @@ import lombok.Builder;
 public record PostSearchEducationDataRes(
         String title,
         String tutor,
-        LocalDate uploaded_at,
-        List<String> tag
+        LocalDate uploadedAt,
+        List<String> tagList
 ) {
 }
