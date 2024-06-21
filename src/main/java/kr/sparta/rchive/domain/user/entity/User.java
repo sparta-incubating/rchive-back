@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.user.enums.GenderEnum;
-import kr.sparta.rchive.domain.user.enums.OauthTypeEnum;
+import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -36,11 +37,11 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @Column(length = 255, unique = true)
-    private String oauthId;
+    private String oAuthId;
 
     @Column(length = 20)
     @Enumerated(value = EnumType.STRING)
-    private OauthTypeEnum oauthType;
+    private OAuthTypeEnum oAuthType;
 
     @Column(nullable = false, length = 50, unique = true)
     private String email;
@@ -60,6 +61,13 @@ public class User extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20, unique = true)
     private String nickname;
+
+    @Column(nullable = false, length = 20)
+    @Enumerated(value = EnumType.STRING)
+    private UserRoleEnum userRole;
+
+    @Column
+    private String refreshToken;
 
     @Column(nullable = false)
     @ColumnDefault("false")

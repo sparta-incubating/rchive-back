@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum RoleEnum {
+public enum TrackRoleEnum {
     STUDENT, TUTOR, PM, APM, ADMIN;
 }
