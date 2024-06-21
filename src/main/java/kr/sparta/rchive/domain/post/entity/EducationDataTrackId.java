@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.educationData.entity;
+package kr.sparta.rchive.domain.post.entity;
 
 import java.io.Serializable;
 import lombok.Getter;
