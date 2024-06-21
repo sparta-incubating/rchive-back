@@ -34,3 +34,7 @@ springdoc:
     tags-sorter: alpha
 #    operations-sorter: method
 #    doc-expansion: none
+
+jwt:
+  secret:
+    key: ${JWT_KEY}
