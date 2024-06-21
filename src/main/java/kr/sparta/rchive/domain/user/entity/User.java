@@ -39,7 +39,7 @@ public class User extends BaseTimeEntity {
     @Column(length = 255, unique = true)
     private String oAuthId;
 
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
     private OAuthTypeEnum oAuthType;
 
