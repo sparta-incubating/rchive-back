@@ -39,7 +39,7 @@ public class Role extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
-    private TrackRoleEnum role;
+    private TrackRoleEnum trackRole;
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
