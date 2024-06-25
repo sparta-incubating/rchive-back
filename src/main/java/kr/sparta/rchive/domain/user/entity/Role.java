@@ -11,7 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
-import kr.sparta.rchive.domain.user.enums.RoleEnum;
+import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,7 +39,7 @@ public class Role extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
-    private RoleEnum role;
+    private TrackRoleEnum trackRole;
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
