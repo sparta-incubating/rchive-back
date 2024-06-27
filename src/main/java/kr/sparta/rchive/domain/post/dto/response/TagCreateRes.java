@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record TagCreateRes(
         Long tagId,
-        String tag
+        String tagName
 ) {
 
 }

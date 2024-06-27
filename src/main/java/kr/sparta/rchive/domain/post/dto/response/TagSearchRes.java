@@ -5,6 +5,6 @@ import lombok.Builder;
 @Builder
 public record TagSearchRes(
         Long tagId,
-        String tag
+        String tagName
 ) {
 }

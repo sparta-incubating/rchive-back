@@ -36,7 +36,7 @@ public class PostController {
             @RequestBody TagSearchReq request
     ) {
 
-        List<TagSearchRes> responseList = tagService.searchTag(request.tag());
+        List<TagSearchRes> responseList = tagService.searchTag(request.tagName());
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TAG, responseList));
@@ -47,7 +47,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> createTag(
             @RequestBody TagCreateReq request
     ){
-        TagCreateRes response = tagService.createTag(request.tag());
+        TagCreateRes response = tagService.createTag(request.tagName());
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_TAG, response));
