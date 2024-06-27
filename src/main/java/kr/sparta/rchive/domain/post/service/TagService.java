@@ -40,7 +40,7 @@ public class TagService {
 
         Tag findTag = findTagBytagName(lowerName);
 
-        if(!tagExist(findTag)) {
+        if(tagExist(findTag)) {
             throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
         }
 
