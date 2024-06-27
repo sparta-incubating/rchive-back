@@ -2,8 +2,11 @@ package kr.sparta.rchive.domain.post.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
+import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,5 +31,22 @@ public class TagService {
         }
 
         return responseList;
+    }
+
+    @Transactional
+    public TagCreateRes createTag(String tag) {
+        if(findTagBytag(tag) != null) {
+            throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
+        }
+
+        Tag createTag = Tag.builder().tag(tag).build();
+
+        Tag savedTag = tagRepository.save(createTag);
+
+        return TagCreateRes.builder().tagId(savedTag.getId()).tag(savedTag.getTag()).build();
+    }
+
+    public Tag findTagBytag(String tag) {
+        return tagRepository.findByTag(tag);
     }
 }
