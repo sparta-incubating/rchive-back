@@ -23,7 +23,7 @@ public class TagService {
 
         List<TagSearchRes> responseList = new ArrayList<>();
 
-        List<Tag> tagList = tagRepository.findByTagContains(tag);
+        List<Tag> tagList = tagRepository.findByTagNameContains(tag);
 
         for(Tag t : tagList) {
             TagSearchRes tagSearchRes = TagSearchRes.builder().tagId(t.getId()).tagName(t.getTagName()).build();
@@ -52,7 +52,7 @@ public class TagService {
     }
 
     public Tag findTagBytagName(String tagName) {
-        return tagRepository.findByTag(tagName);
+        return tagRepository.findByTagName(tagName);
     }
 
     public Boolean tagExist(Tag tag) {
