@@ -26,7 +26,7 @@ public class TagService {
         List<Tag> tagList = tagRepository.findByTagContains(tag);
 
         for(Tag t : tagList) {
-            TagSearchRes tagSearchRes = TagSearchRes.builder().tagId(t.getId()).tag(t.getTag()).build();
+            TagSearchRes tagSearchRes = TagSearchRes.builder().tagId(t.getId()).tagName(t.getTagName()).build();
             responseList.add(tagSearchRes);
         }
 
@@ -34,19 +34,32 @@ public class TagService {
     }
 
     @Transactional
-    public TagCreateRes createTag(String tag) {
-        if(findTagBytag(tag) != null) {
+    public TagCreateRes createTag(String name) {
+
+        String lowerName = name.toLowerCase();
+
+        Tag findTag = findTagBytagName(lowerName);
+
+        if(!tagExist(findTag)) {
             throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
         }
 
-        Tag createTag = Tag.builder().tag(tag).build();
+        Tag createTag = Tag.builder().tagName(lowerName).build();
 
         Tag savedTag = tagRepository.save(createTag);
 
-        return TagCreateRes.builder().tagId(savedTag.getId()).tag(savedTag.getTag()).build();
+        return TagCreateRes.builder().tagId(savedTag.getId()).tagName(savedTag.getTagName()).build();
     }
 
-    public Tag findTagBytag(String tag) {
-        return tagRepository.findByTag(tag);
+    public Tag findTagBytagName(String tagName) {
+        return tagRepository.findByTag(tagName);
+    }
+
+    public Boolean tagExist(Tag tag) {
+        if(tag == null) {
+            return false;
+        }
+
+        return true;
     }
 }
