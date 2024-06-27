@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record TagSearchReq(
-        String tag
+        String tagName
 ) {
 
 }

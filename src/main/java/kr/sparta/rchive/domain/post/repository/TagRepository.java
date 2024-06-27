@@ -5,5 +5,7 @@ import kr.sparta.rchive.domain.post.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
-    List<Tag> findByTagContains(String tag);
+    List<Tag> findByTagNameContains(String tag);
+
+    Tag findByTagName(String tag);
 }

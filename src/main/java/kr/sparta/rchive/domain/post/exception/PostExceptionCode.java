@@ -17,8 +17,7 @@ public enum PostExceptionCode {
 
     /*  409 CONFLICT : Resource 중복  */
 
-    /*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
-    ;
+    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-001", "중복된 태그입니다.");
 
     private final HttpStatus httpStatus;
     private final String errorCode;
