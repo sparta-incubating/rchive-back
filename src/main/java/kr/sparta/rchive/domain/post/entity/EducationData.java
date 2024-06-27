@@ -63,6 +63,10 @@ public class EducationData extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer hits;
 
+    @Column(nullable = false)
+    @ColumnDefault("true")
+    private Boolean isOpened;
+
     @Column(name = "is_deleted", nullable = false)
     @ColumnDefault("false")
     private Boolean isDeleted;
