@@ -32,7 +32,8 @@ public class EducationDataTagCoreService {
     private final EducationDataTrackService educationDataTrackService;
 
     public List<PostSearchByTagRes> searchPostByTag(String tagName, User user) {
-        Long trackId = userService.findUserTrackId(user);   // 로그인한 유저의 트랙 ID 확인
+        Long trackId = userService.findUserTrackId(user);   // TODO: 로그인한 유저의 트랙 ID 확인 추후에 레디스와 연결하여
+                                                            // 마지막에 들어간 트랙 받아오는 로직으로 변경
         Track userTrack = trackService.findTrackById(trackId);
 
         UserCheckPermission(user.getUserRole(), trackId);   // 로그인한 유저의 권한과 트랙 ID를 통해 열람 권한 확인
