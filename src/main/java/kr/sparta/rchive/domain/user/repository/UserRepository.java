@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // User와 Role을 조인하여 트랙 ID를 검색하는 로직
+    // User와 Role을 조인하여 트랙 ID를 유저의 email로 검색하는 로직
     @Query("select r.track.id from User u join fetch Role r on u.id = r.user.id where u.email = :email")
-    Long findTrackId(String email);
+    Long findTrackIdByUserEmail(String email);
 }

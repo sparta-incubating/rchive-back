@@ -14,15 +14,15 @@ public class TrackService {
     private final TrackRepository trackRepository;
 
     // 트랙 안의 열람권한을 확인하는 로직
-    public boolean checkPermission(Long userTrackId) {
-        Track findTrack = findTrackById(userTrackId);
+    public boolean checkPermission(Long trackId) {
+        Track findTrack = findTrackById(trackId);
         return findTrack.getIsPermission();
     }
 
     // 트랙 ID로 트랙을 검색해오는 로직
-    public Track findTrackById(Long userTrackId) {
-        return trackRepository.findById(userTrackId).orElseThrow(
-                () -> new IllegalArgumentException() // 추후 커스텀 에러로 변경할 예정
+    public Track findTrackById(Long trackId) {
+        return trackRepository.findById(trackId).orElseThrow(
+                () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
         );
     }
 }

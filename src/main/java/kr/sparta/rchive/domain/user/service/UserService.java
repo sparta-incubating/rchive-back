@@ -14,6 +14,6 @@ public class UserService {
 
     // 유저의 Email로 트랙 ID 찾아오는 로직
     public Long findUserTrackId(User user) {
-        return userRepository.findTrackId(user.getEmail());
+        return userRepository.findTrackIdByUserEmail(user.getEmail());
     }
 }

@@ -18,16 +18,15 @@ public class EducationDataTagService {
 
     // 교육자료태그 테이블에서 태그 ID를 이용하여 태그가 붙어있는 교육자료들을 List로 가져오는 로직
     public List<Long> findEducationDataIdByTagId(Long tagId) {
-        return educationDataTagRepository.findByTag_Id(tagId)
+        return educationDataTagRepository.findEducationDataTagListByTagId(tagId)
                 .stream()
                 .map(educationDataTag -> educationDataTag.getEducationData().getId())
-                .distinct()
                 .toList();
     }
 
     // 교육자료에 붙어있는 모든 태그들을 가져오는 로직
     public List<EducationDataTag> findEducationDataTagByEducationDataIdList(List<Long> educationDataIdList) {
-        return educationDataTagRepository.findByEducationData_IdIn(educationDataIdList);
+        return educationDataTagRepository.findByEducationDataIdIn(educationDataIdList);
     }
 
     public Map<Long, List<Long>> findEducationDataTagListByTagId(List<Long> educationDataIdList) {

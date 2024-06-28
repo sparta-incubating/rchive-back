@@ -16,16 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class EducationDataService {
 
     private final EducationDataRepository educationDataRepository;
-
-    // 삭제여부에 따라 EducationDataIdList를 필터링하는 로직
-    public List<Long> filterEducationDataIdByIsDeleted(List<Long> educationDataIdList) {
-        return educationDataIdList.stream().filter(
-                educationDataId -> {
-                    EducationData educationData = findEducationDataById(educationDataId);
-                    return !educationData.getIsDeleted();
-                }
-        ).collect(Collectors.toList());
-    }
     
     // 교육자료 테이블에서 ID를 이용하여 검색하는 로직
     public EducationData findEducationDataById(Long educationDataId) {

@@ -16,7 +16,7 @@ public class RoleService {
 
     // 트랙 ID와 유저의 ID로 권한을 찾아오는 로직
     public TrackRoleEnum findTrackRoleByTrackIdAndUserId(Long userTrackId, Long userId) {
-        Role userRole = roleRepository.findByTrack_IdAndUser_Id(userTrackId, userId);
+        Role userRole = roleRepository.findByTrackIdAndUserId(userTrackId, userId);
 
         return userRole.getTrackRole();
     }
