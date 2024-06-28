@@ -2,8 +2,10 @@ package kr.sparta.rchive.domain.post.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
+import kr.sparta.rchive.domain.post.entity.EducationData;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
@@ -19,11 +21,12 @@ public class TagService {
 
     private final TagRepository tagRepository;
 
-    public List<TagSearchRes> searchTag(String tag) {
+    // 내가 원하는 태그로 검색해오는 기능
+    public List<TagSearchRes> searchTag(String tagName) {
 
         List<TagSearchRes> responseList = new ArrayList<>();
 
-        List<Tag> tagList = tagRepository.findByTagNameContains(tag);
+        List<Tag> tagList = tagRepository.findByTagNameContains(tagName);
 
         for(Tag t : tagList) {
             TagSearchRes tagSearchRes = TagSearchRes.builder().tagId(t.getId()).tagName(t.getTagName()).build();
@@ -33,6 +36,7 @@ public class TagService {
         return responseList;
     }
 
+    // 태그를 추가하는 로직
     @Transactional
     public TagCreateRes createTag(String name) {
 
@@ -51,15 +55,24 @@ public class TagService {
         return TagCreateRes.builder().tagId(savedTag.getId()).tagName(savedTag.getTagName()).build();
     }
 
+    // 태그 이름으로 태그 검색해오는 로직
     public Tag findTagBytagName(String tagName) {
         return tagRepository.findByTagName(tagName);
     }
 
+    // 태그가 존재하는지 체크하는 로직
     public Boolean tagExist(Tag tag) {
         if(tag == null) {
             return false;
         }
 
         return true;
+    }
+
+    // 태그 ID로 태그를 검색해오는 로직
+    public Tag findTagById(Long tagId) {
+        return tagRepository.findById(tagId).orElseThrow(
+                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG_NOT_EXIST)
+        );
     }
 }
