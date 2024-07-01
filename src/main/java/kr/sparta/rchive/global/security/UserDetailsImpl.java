@@ -1,31 +1,51 @@
 package kr.sparta.rchive.global.security;
 
+
+import java.util.ArrayList;
 import java.util.Collection;
 import kr.sparta.rchive.domain.user.entity.User;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@Getter
-@RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
     private final User user;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public UserDetailsImpl(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+
+        if(user.getOAuthType() == OAuthTypeEnum.LOCAL){
+            return user.getPassword();
+        }
+        return user.getOAuthType().toString();
     }
 
     @Override
     public String getUsername() {
         return user.getEmail();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        UserRoleEnum userRole = user.getUserRole();
+        String authority = userRole.getAuthority();
+
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(simpleGrantedAuthority);
+
+        return authorities;
     }
 
     @Override
