@@ -11,4 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
 
+    // 유저의 Email로 트랙 ID 찾아오는 로직
+    public Long findUserTrackIdByUserEmail(String userEmail) {
+        return userRepository.findTrackIdByUserEmail(userEmail);
+    }
 }
