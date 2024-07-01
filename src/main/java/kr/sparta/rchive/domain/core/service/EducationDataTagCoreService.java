@@ -18,6 +18,9 @@ import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +35,7 @@ public class EducationDataTagCoreService {
     private final EducationDataTrackService educationDataTrackService;
 
     // TODO : Redis 만들기, paging 적용하기
-    public List<PostSearchByTagRes> searchPostByTag(String tagName, User user) {
+    public Page<PostSearchByTagRes> searchPostByTag(String tagName, User user, Pageable pageable) {
         Long trackId = userService.findUserTrackIdByUserEmail(user.getEmail());   // TODO: 로그인한 유저의 트랙 ID 확인 추후에 레디스와 연결하여
                                                             // 마지막에 들어간 트랙 받아오는 로직으로 변경
         Track userTrack = trackService.findTrackById(trackId);
@@ -50,9 +53,8 @@ public class EducationDataTagCoreService {
         // 필터링이 끝난 EducationDataId를 키로 갖고 educationData에 달려있는 Tag들의 List를 value로 갖는 Map으로 변경하는 로직
         Map<Long, List<Long>> educationDataTagMap = educationDataTagService.findEducationDataTagListByTagId(educationDataIdList);
 
-
         // 위에서 Map으로 변경시켜놓은 EducationDataId / TagIdList를 실제 데이터들로 바꿔 responseList에 담는 로직
-        return educationDataTagMap.entrySet().stream()
+        List<PostSearchByTagRes> responseList = educationDataTagMap.entrySet().stream()
                 .map(response -> {
                     Long educationDataId = response.getKey();
                     List<Long> tagIdList = response.getValue();
@@ -65,6 +67,11 @@ public class EducationDataTagCoreService {
                     return PostSearchByTagRes.builder().title(educationData.getTitle()).tutor(educationData.getTutor())
                             .uploadedAt(educationData.getUploadedAt()).tagList(tagList).build();
                 }).toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), responseList.size());
+
+        return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
     // 유저가 속해있는 트랙의 열람권한을 체크하는 로직
