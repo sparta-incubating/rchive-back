@@ -17,8 +17,8 @@ public class EducationDataTagService {
     private final EducationDataTagRepository educationDataTagRepository;
 
     // 교육자료태그 테이블에서 태그 ID를 이용하여 태그가 붙어있는 교육자료들을 List로 가져오는 로직
-    public List<Long> findEducationDataIdByTagId(Long tagId) {
-        return educationDataTagRepository.findEducationDataTagListByTagId(tagId)
+    public List<Long> findEducationDataIdByTagIdAndIsDeletedFalse(Long tagId) {
+        return educationDataTagRepository.findEducationDataTagListByTagIdAndIsDeletedFalse(tagId)
                 .stream()
                 .map(educationDataTag -> educationDataTag.getEducationData().getId())
                 .toList();

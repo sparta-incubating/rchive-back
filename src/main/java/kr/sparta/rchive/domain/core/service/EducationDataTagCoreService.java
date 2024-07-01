@@ -31,6 +31,7 @@ public class EducationDataTagCoreService {
     private final RoleService roleService;
     private final EducationDataTrackService educationDataTrackService;
 
+    // TODO : Redis 만들기, paging 적용하기
     public List<PostSearchByTagRes> searchPostByTag(String tagName, User user) {
         Long trackId = userService.findUserTrackId(user);   // TODO: 로그인한 유저의 트랙 ID 확인 추후에 레디스와 연결하여
                                                             // 마지막에 들어간 트랙 받아오는 로직으로 변경
@@ -41,7 +42,7 @@ public class EducationDataTagCoreService {
         Tag tag = tagService.findTagBytagName(tagName); // 검색하려는 태그 찾아오는 로직
 
         // 검색하려는 태그가 달려있는 교육자료 ID를 리스트로 찾아오는 로직
-        List<Long> educationDataIdList = educationDataTagService.findEducationDataIdByTagId(tag.getId());
+        List<Long> educationDataIdList = educationDataTagService.findEducationDataIdByTagIdAndIsDeletedFalse(tag.getId());
 
         // 교육자료 ID 리스트 중 로그인한 User의 Track에 해당하는 자료만 가져오는 로직
         educationDataIdList = FilterEducationDataByTrackId(educationDataIdList, userTrack, trackId, user.getId());
@@ -70,7 +71,7 @@ public class EducationDataTagCoreService {
     public void UserCheckPermission(UserRoleEnum userRole, Long trackId) {
         if (UserRoleIsUser(userRole)) {
             if (!trackService.checkPermission(trackId)) {
-                throw new IllegalArgumentException(); // 추후 커스텀 에러로 변경할 예정
+                throw new IllegalArgumentException(); // TODO: 추후 커스텀 에러로 변경할 예정
             }
         }
     }
@@ -80,10 +81,10 @@ public class EducationDataTagCoreService {
         TrackRoleEnum trackRole = roleService.findTrackRoleByTrackIdAndUserId(userTrackId, userId);
 
         if(UserTrackRoleIsPM(trackRole)) {
-            return educationDataTrackService.filterEducationDataIdListBytrackId(educationDataIdList, userTrackId);
+            return educationDataTrackService.filterEducationDataIdListByTrackName(educationDataIdList, userTrack.getTrack());
         }
 
-        return educationDataTrackService.filterEducationDataIdListByTrackName(educationDataIdList, userTrack.getTrack());
+        return educationDataTrackService.filterEducationDataIdListByTrackId(educationDataIdList, userTrackId);
     }
 
     public boolean UserTrackRoleIsPM(TrackRoleEnum trackRole) {

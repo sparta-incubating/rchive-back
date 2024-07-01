@@ -12,7 +12,7 @@ public interface EducationDataTagRepository extends JpaRepository<EducationDataT
     @Query("select edt.educationData.id from EducationDataTag edt join fetch Tag t on edt.tag.Id = t.Id "
             + "join fetch EducationData e on edt.educationData.id = e.id "
             + "where t.Id = :tagId and e.isDeleted = false")
-    List<EducationDataTag> findEducationDataTagListByTagId(Long tagId);
+    List<EducationDataTag> findEducationDataTagListByTagIdAndIsDeletedFalse(Long tagId);
 
     @Query("select edt from EducationDataTag edt where edt.educationData.id in :educationDataList")
     List<EducationDataTag> findByEducationDataIdIn(List<Long> educationDataList);

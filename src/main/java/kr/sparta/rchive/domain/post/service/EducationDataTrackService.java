@@ -18,7 +18,7 @@ public class EducationDataTrackService {
     private final EducationDataTrackRepository educationDataTrackRepository;
 
     // 교육자료 List를 트랙 ID로 조회하여 필요한 데이터만 남기는 로직
-    public List<Long> filterEducationDataIdListBytrackId(List<Long> educationDataIdList, Long userTrackId) {
+    public List<Long> filterEducationDataIdListByTrackId(List<Long> educationDataIdList, Long userTrackId) {
         return educationDataIdList.stream().filter(
                 educationData -> {
                     EducationDataTrack edt = findByEducationDataId(educationData);
