@@ -3,21 +3,16 @@ package kr.sparta.rchive.global.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts.SIG;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.Key;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Map;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import kr.sparta.rchive.domain.user.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,53 +25,46 @@ public class JwtUtil {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String AUTHORIZATION_KEY = "auth";
     public static final String BEARER_PREFIX = "Bearer ";
-    private final long TOKEN_TIME = 60 * 60 * 1000L;
+    private static final long TOKEN_TIME = 60 * 60 * 1000L;
+    private final SecretKey secretKey;
 
-    @Value("${jwt.secret.key}")
-    private String secretKey;
-    private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
 
-    @PostConstruct
-    public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey);
-        key = Keys.hmacShaKeyFor(bytes);
+    public JwtUtil(@Value("${jwt.secret.key}")String secret) {
+        secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public String createToken(User user) {
-        Map<String, String> additionalClaims = createClaims(user);
+    public String getEmail(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
+    }
 
+    public String getRole(String token) {
+
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
+    }
+
+    public String getOAuthType(String token) {
+
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("oAuthType", String.class);
+    }
+
+    public Boolean isExpired(String token) {
+
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    }
+
+    public String createJwt(User user) {
         Date date = new Date();
-
         return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim(AUTHORIZATION_KEY, additionalClaims)
-                .setExpiration(new Date(date.getTime() + TOKEN_TIME))
-                .setIssuedAt(date)
-                .signWith(key, signatureAlgorithm)
+                .claim("email", user.getEmail())
+                .claim("role", user.getUserRole().toString())
+                .claim("oAuthType", user.getOAuthType().toString())
+                .issuedAt(date)
+                .expiration(new Date(date.getTime() + TOKEN_TIME))
+                .signWith(secretKey)
                 .compact();
-    }
-
-    private Map<String, String> createClaims(User user) {
-        return Map.of("email", user.getEmail(),
-                "role", user.getUserRole().toString(),
-                "oauthPlatform", user.getOAuthType().toString());
-    }
-
-    public void addJwtToCookie(String token, HttpServletResponse res) {
-        try {
-            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
-
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
-            cookie.setPath("/");
-
-            // Response 객체에 Cookie 추가
-            res.addCookie(cookie);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage());
-        }
     }
 
     public String substringToken(String tokenValue) {
@@ -89,7 +77,7 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().verifyWith(secretKey).build().parse(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
@@ -103,9 +91,8 @@ public class JwtUtil {
         return false;
     }
 
-
     public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 
     public String getTokenFromRequest(HttpServletRequest req) {

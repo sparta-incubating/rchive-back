@@ -1,20 +1,15 @@
 package kr.sparta.rchive.global.security;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j(topic = "JWT 검증 및 인가")
@@ -23,52 +18,42 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
-    public JwtAuthorizationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
+    public JwtAuthorizationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService){
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-        String tokenValue = jwtUtil.getTokenFromRequest(req);
-        if (StringUtils.hasText(tokenValue)) {
-            tokenValue = jwtUtil.substringToken(tokenValue);
-            log.info(tokenValue);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-            if (!jwtUtil.validateToken(tokenValue)) {
-                log.error("Token Error");
-                res.setStatus(401);
-                return;
-            }
+        String authorization = request.getHeader("Authorization");
 
-            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-            try {
-                setAuthentication(info);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                return;
-            }
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            System.out.println("token null");
+            filterChain.doFilter(request, response);
+
+            return;
         }
 
-        filterChain.doFilter(req, res);
-    }
+        String token = authorization.split(" ")[1];
 
+        if (jwtUtil.isExpired(token)) {
+            System.out.println("token expired");
+            filterChain.doFilter(request, response);
 
-    public void setAuthentication(Claims claims) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(claims);
-        context.setAuthentication(authentication);
+            return;
+        }
 
-        SecurityContextHolder.setContext(context);
-    }
+        String username = jwtUtil.getEmail(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-    private Authentication createAuthentication(Claims claims) {
-        HashMap<String,String> map = (HashMap<String, String>) claims.get("auth");
+        //스프링 시큐리티 인증 토큰 생성
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        //세션에 사용자 등록
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        OAuthTypeEnum oAuthTypeEnum = OAuthTypeEnum.valueOf(map.get("oAuthType"));
+        filterChain.doFilter(request, response);
 
-        UserDetails userDetails = userDetailsService.loadUserByEmailAndPlatform(map.get("email"), oAuthTypeEnum);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

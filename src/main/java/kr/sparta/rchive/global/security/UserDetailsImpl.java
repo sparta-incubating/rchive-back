@@ -4,7 +4,7 @@ package kr.sparta.rchive.global.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import kr.sparta.rchive.domain.user.entity.User;
-import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
+import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +24,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        if(user.getOAuthType()==null){
+        if(user.getOAuthType() == OAuthTypeEnum.LOCAL){
             return user.getPassword();
         }
         return user.getOAuthType().toString();

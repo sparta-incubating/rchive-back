@@ -55,11 +55,11 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private String phone;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     @Enumerated(value = EnumType.STRING)
     private GenderEnum gender;
 
-    @Column(nullable = false, length = 20, unique = true)
+    @Column(nullable = true, length = 20, unique = true)
     private String nickname;
 
     @Column(nullable = false, length = 20)
