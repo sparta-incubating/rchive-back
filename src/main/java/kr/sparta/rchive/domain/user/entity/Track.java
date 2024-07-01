@@ -40,6 +40,10 @@ public class Track extends BaseTimeEntity {
     private int period;
 
     @Column(nullable = false)
+    @ColumnDefault("true")
+    private Boolean isPermission;
+
+    @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean isDeleted;
 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.user.enums.GenderEnum;
+
 import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;

@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.educationData.entity;
+package kr.sparta.rchive.domain.post.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,5 +26,5 @@ public class Tag extends BaseTimeEntity {
     private Long Id;
 
     @Column(nullable = false, length = 20)
-    private String tag;
+    private String tagName;
 }

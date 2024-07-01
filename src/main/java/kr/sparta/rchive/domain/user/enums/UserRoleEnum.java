@@ -2,7 +2,6 @@ package kr.sparta.rchive.domain.user.enums;
 
 import lombok.Getter;
 
-
 @Getter
 public enum UserRoleEnum {
 

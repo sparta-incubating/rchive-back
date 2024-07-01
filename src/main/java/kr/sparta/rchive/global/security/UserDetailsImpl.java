@@ -24,6 +24,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
+
         if(user.getOAuthType() == OAuthTypeEnum.LOCAL){
             return user.getPassword();
         }
