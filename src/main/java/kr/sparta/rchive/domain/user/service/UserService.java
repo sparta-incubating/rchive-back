@@ -42,7 +42,8 @@ public class UserService {
 
         userRepository.save(user);
         return true;
-  
+    }
+    
     // 유저의 Email로 트랙 ID 찾아오는 로직
     public Long findUserTrackIdByUserEmail(String userEmail) {
         return userRepository.findTrackIdByUserEmail(userEmail);
