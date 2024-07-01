@@ -21,6 +21,11 @@ spring:
     hibernate:
       ddl-auto: update
 
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
   # swagger
   mvc:
     pathmatch:
