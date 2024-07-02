@@ -5,6 +5,7 @@ import kr.sparta.rchive.global.security.JwtAuthorizationFilter;
 import kr.sparta.rchive.global.security.JwtUtil;
 import kr.sparta.rchive.global.security.LoginFilter;
 import kr.sparta.rchive.global.security.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,17 +19,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
-
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration) {
-        this.authenticationConfiguration = authenticationConfiguration;
-        this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -63,7 +59,7 @@ public class WebSecurityConfig {
 
         http.addFilterBefore(new JwtAuthorizationFilter(jwtUtil,userDetailsService), LoginFilter.class);
 
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
+        http.addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

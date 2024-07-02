@@ -1,11 +1,13 @@
 package kr.sparta.rchive.global.security;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Iterator;
 import kr.sparta.rchive.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,6 +15,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+//@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -27,6 +30,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
         setFilterProcessesUrl("/api/v1/users/login");
     }
+
+//    @PostConstruct
+//    public void setup(){
+//        setFilterProcessesUrl("/api/v1/users/login");
+//    }
 
     @Override
     public Authentication attemptAuthentication(
