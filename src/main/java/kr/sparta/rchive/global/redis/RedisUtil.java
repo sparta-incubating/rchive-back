@@ -31,12 +31,12 @@ public class RedisUtil {
         return value;
     }
 
-    public void setList(String key, List<Long> value) {
+    public void setListTypeLong(String key, List<Long> value) {
         ListOperations<String, Object> listOps = listLongRedisTemplate.opsForList();
         listOps.rightPushAll(key, value);
     }
 
-    public List<Long> getList(String key) {
+    public List<Long> getListTypeLong(String key) {
             ListOperations<String, Object> listOps = listLongRedisTemplate.opsForList();
             List<Object> objects = listOps.range(key, 0, -1);
         assert objects != null;
@@ -59,7 +59,7 @@ public class RedisUtil {
         return hasKey;
     }
 
-    public String redisKeyEducationDataIdListByTagNameAndTrack(String tagName, Track track){
-        return String.format("tag-%s-%s-%d", tagName, track.getTrack(), track.getPeriod());
+    public String redisKeyPostIdListByTagNameAndTrack(String tagName, Track track){
+        return String.format("tag-%s-%s-%d", tagName, track.getTrackName(), track.getPeriod());
     }
 }

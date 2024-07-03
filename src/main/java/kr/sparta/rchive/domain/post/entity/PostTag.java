@@ -7,31 +7,28 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "tb_education_data_track")
 @Getter
+@Entity
+@Table(name = "tb_post_tag")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@IdClass(EducationDataTrackId.class)
-
-public class EducationDataTrack extends BaseTimeEntity {
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "educationData_id")
-    private EducationData educationData;
+@IdClass(PostTagId.class)
+public class PostTag extends BaseTimeEntity {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "track_id")
-    private Track track;
+    @JoinColumn(name = "post_id")
+    private Post post;
 
+    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id")
+    private Tag tag;
 }

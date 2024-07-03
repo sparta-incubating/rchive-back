@@ -6,7 +6,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kr.sparta.rchive.domain.post.entity.EducationData;
+import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AllArgsConstructor;
@@ -30,6 +30,6 @@ public class Bookmark extends BaseTimeEntity {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "education_data_id")
-    private EducationData educationData;
+    @JoinColumn(name = "post_id")
+    private Post post;
 }

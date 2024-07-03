@@ -1,14 +1,13 @@
 package kr.sparta.rchive.domain.post.dto.response;
 
 import java.time.LocalDate;
-import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record PostSearchEducationDataRes(
+public record PostRes(
         String title,
         String tutor,
-        LocalDate uploadedAt,
-        List<String> tagList
+        LocalDate uploadedAt
 ) {
+
 }

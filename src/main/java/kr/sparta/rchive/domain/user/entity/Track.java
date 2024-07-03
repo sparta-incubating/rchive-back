@@ -34,7 +34,7 @@ public class Track extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
-    private TrackEnum track;
+    private TrackEnum trackName;
 
     @Column(nullable = false)
     private int period;

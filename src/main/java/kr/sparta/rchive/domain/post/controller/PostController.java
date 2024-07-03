@@ -3,14 +3,14 @@ package kr.sparta.rchive.domain.post.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import kr.sparta.rchive.domain.core.service.EducationDataTagCoreService;
+import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagSearchReq;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
-import kr.sparta.rchive.domain.post.service.EducationDataService;
+import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.global.custom.CustomPageable;
 import kr.sparta.rchive.global.response.CommonResponseDto;
@@ -34,9 +34,18 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "2. Post API", description = "Post 관련 API입니다.")
 public class PostController {
 
-    private final EducationDataService educationDataService;
-    private final EducationDataTagCoreService educationDataTagCoreService;
+    private final PostService postService;
+    private final PostTagCoreService postTagCoreService;
     private final TagService tagService;
+
+//    @PostMapping
+//    @Operation(operationId = "POST-001", summary = "게시물 생성")
+//    public ResponseEntity<CommonResponseDto> createPost(
+//            @RequestBody PostCreateReq request
+//    ) {
+//        PostCreateRes response = educationDataTagCoreService.createPost(request);
+//    }
+
 
     @GetMapping("/tags")
     @Operation(operationId = "POST-010", summary = "사용할 태그 검색")
@@ -71,7 +80,7 @@ public class PostController {
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
 
-        Page<PostSearchByTagRes> responseList = educationDataTagCoreService
+        Page<PostSearchByTagRes> responseList = postTagCoreService
                 .searchPostByTag(tagName, userDetails.getUser(), pageable);
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())

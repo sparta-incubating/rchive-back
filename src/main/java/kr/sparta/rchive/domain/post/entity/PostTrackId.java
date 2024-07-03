@@ -4,7 +4,7 @@ import java.io.Serializable;
 import lombok.Getter;
 
 @Getter
-public class EducationDataTrackId implements Serializable {
-    private Long educationData;
+public class PostTrackId implements Serializable {
+    private Long post;
     private Long track;
 }

@@ -1,6 +1,6 @@
 package kr.sparta.rchive.domain.post.enums;
 
-public enum EducationTypeEnum {
+public enum PostTypeEnum {
     Sparta_Lecture,
     Special_Lecture,
     Level_Challenge,

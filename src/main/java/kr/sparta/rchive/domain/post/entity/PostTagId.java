@@ -4,7 +4,7 @@ import java.io.Serializable;
 import lombok.Getter;
 
 @Getter
-public class EducationDataTagId implements Serializable {
-    private Long educationData;
+public class PostTagId implements Serializable {
+    private Long postData;
     private Long tag;
 }
