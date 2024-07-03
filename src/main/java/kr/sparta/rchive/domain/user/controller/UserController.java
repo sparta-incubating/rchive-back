@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
@@ -21,10 +22,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
+    @Operation(operationId = "USER-001", summary = "회원가입")
     public ResponseEntity<CommonResponseDto> signup(UserSignupReq req){
         userService.signup(req);
         return ResponseEntity.status(UserResponseCode.OK_SIGNUP.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_SIGNUP, null));
-
     }
 }
