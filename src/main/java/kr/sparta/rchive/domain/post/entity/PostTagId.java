@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class PostTagId implements Serializable {
-    private Long postData;
+    private Long post;
     private Long tag;
 }
