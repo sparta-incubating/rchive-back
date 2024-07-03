@@ -46,7 +46,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginReq.email(),
+                            loginReq.username(),
                             loginReq.password(),
                             null
                     )

@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 @JsonIgnoreProperties
 public record UserLoginReq(
-        String email,
+        String username,
         String password
         ) {
 
