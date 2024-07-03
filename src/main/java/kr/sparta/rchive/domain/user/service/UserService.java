@@ -3,6 +3,8 @@ package kr.sparta.rchive.domain.user.service;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
+import kr.sparta.rchive.domain.user.exception.UserCustomException;
+import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,31 +19,29 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public boolean signup(UserSignupReq req){
+    public void signup(UserSignupReq req){
 
         if(userRepository.existsByEmail(req.email())){
-            return false;
+            throw new UserCustomException(UserExceptionCode.CONFLICT_EMAIL);
         }
 
-        if(userRepository.existsByNickname(req.nickname())){
-            return false;
+        if(req.nickname()!=null && userRepository.existsByNickname(req.nickname())){
+            throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
         }
 
         User user = User.builder()
                 .email(req.email())
                 .password(bCryptPasswordEncoder.encode(req.password()))
                 .oAuthType(req.oAuthType())
-//                .oAuthId(req.oAuthId())
+                .oAuthId(req.oAuthId())
                 .birth(req.birth())
                 .phone(req.phone())
                 .gender(req.gender())
                 .nickname(req.nickname())
                 .userRole(req.userRole())
-                .isDeleted(false)
                 .build();
 
         userRepository.save(user);
-        return true;
     }
     
     // 유저의 Email로 트랙 ID 찾아오는 로직

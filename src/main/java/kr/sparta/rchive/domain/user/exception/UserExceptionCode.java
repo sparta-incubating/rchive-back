@@ -16,6 +16,8 @@ public enum UserExceptionCode {
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 
     /*  409 CONFLICT : Resource 중복  */
+    CONFLICT_EMAIL(HttpStatus.CONFLICT, "USER-001", "이메일 중복"),
+    CONFLICT_NICKNAME(HttpStatus.CONFLICT, "USER-002", "닉네임 중복")
 
     /*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
     ;

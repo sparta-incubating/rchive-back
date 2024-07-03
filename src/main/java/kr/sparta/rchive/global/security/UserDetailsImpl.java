@@ -6,17 +6,15 @@ import java.util.Collection;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
     private final User user;
-
-    public UserDetailsImpl(User user) {
-        this.user = user;
-    }
 
     public User getUser() {
         return user;
