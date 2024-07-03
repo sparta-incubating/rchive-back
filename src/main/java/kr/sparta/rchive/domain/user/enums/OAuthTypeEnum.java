@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum OauthTypeEnum {
+public enum OAuthTypeEnum {
+    LOCAL,
     KAKAO;
 }

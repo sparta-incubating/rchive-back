@@ -33,9 +33,14 @@ spring:
 
 # swagger
 springdoc:
+  show-login-endpoint: true
   swagger-ui:
     path: /swagger-ui.html
     display-operation-id: true
     tags-sorter: alpha
 #    operations-sorter: method
 #    doc-expansion: none
+
+jwt:
+  secret:
+    key: ${JWT_KEY}

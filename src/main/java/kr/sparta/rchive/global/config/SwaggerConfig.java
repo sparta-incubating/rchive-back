@@ -28,9 +28,10 @@ public class SwaggerConfig {
                 .securitySchemes(List.of(this.apiKey()))
                 .groupName("testApi")
                 .select()
-                .apis(RequestHandlerSelectors.
-                        basePackage("rchive"))
-                .paths(PathSelectors.ant("/api/v1/**")).build();
+                .apis(RequestHandlerSelectors.basePackage("kr.sparta.rchive"))
+//                .paths(PathSelectors.ant("/api/v1/**"))
+                .paths(PathSelectors.any())
+                .build();
     }
 
     private SecurityContext securityContext() {
