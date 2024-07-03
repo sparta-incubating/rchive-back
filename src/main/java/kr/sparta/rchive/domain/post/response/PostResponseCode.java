@@ -10,10 +10,10 @@ import org.springframework.http.HttpStatus;
 public enum PostResponseCode implements ResponseCode {
 
     // OK 200
-    OK_SEARCH_EDUCATION_DATA(HttpStatus.OK, "SEARCH EDUCATION DATA"),
-    OK_SEARCH_TAG(HttpStatus.OK, "SEARCH TAG"),
-    OK_CREATE_TAG(HttpStatus.OK, "CREATE TAG"),
-    OK_SEARCH_POST_BY_TAG(HttpStatus.OK, "SEARCH POSTS BY TAG");
+    OK_SEARCH_EDUCATION_DATA(HttpStatus.OK, "교육자료 검색 성공"),
+    OK_SEARCH_TAG(HttpStatus.OK, "태그 검색 성공"),
+    OK_CREATE_TAG(HttpStatus.OK, "태그 생성 성공"),
+    OK_SEARCH_POST_BY_TAG(HttpStatus.OK, "태그를 이용한 교육자료 검색 성공");
 
     private final HttpStatus httpStatus;
     private final String message;

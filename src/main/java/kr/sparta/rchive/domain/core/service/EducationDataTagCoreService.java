@@ -17,6 +17,7 @@ import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
+import kr.sparta.rchive.global.redis.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,6 +34,7 @@ public class EducationDataTagCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final EducationDataTrackService educationDataTrackService;
+    private final RedisUtil redisUtil;
 
     // TODO : Redis 만들기, paging 적용하기
     public Page<PostSearchByTagRes> searchPostByTag(String tagName, User user, Pageable pageable) {
@@ -45,10 +47,10 @@ public class EducationDataTagCoreService {
         Tag tag = tagService.findTagBytagName(tagName); // 검색하려는 태그 찾아오는 로직
 
         // 검색하려는 태그가 달려있는 교육자료 ID를 리스트로 찾아오는 로직
-        List<Long> educationDataIdList = educationDataTagService.findEducationDataIdByTagIdAndIsDeletedFalse(tag.getId());
+        List<Long> educationDataIdList = findEducationDataIdInRedisByRedisIdUseTagAndTrack(tag, userTrack);
 
         // 교육자료 ID 리스트 중 로그인한 User의 Track에 해당하는 자료만 가져오는 로직
-        educationDataIdList = FilterEducationDataByTrackId(educationDataIdList, userTrack, trackId, user.getId());
+        educationDataIdList = filterEducationDataByTrackId(educationDataIdList, userTrack, trackId, user.getId());
 
         // 필터링이 끝난 EducationDataId를 키로 갖고 educationData에 달려있는 Tag들의 List를 value로 갖는 Map으로 변경하는 로직
         Map<Long, List<Long>> educationDataTagMap = educationDataTagService.findEducationDataTagListByTagId(educationDataIdList);
@@ -74,6 +76,20 @@ public class EducationDataTagCoreService {
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
+    private List<Long> findEducationDataIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {
+        String redisTagId = redisUtil.redisKeyEducationDataIdListByTagNameAndTrack(tag.getTagName(), userTrack);
+
+        if(redisUtil.hasKey(redisTagId)) {
+            return redisUtil.getList(redisTagId);
+        }
+
+        List<Long> educationDataIdList = educationDataTagService.findEducationDataIdByTagIdAndIsDeletedFalse(tag.getId());
+
+        redisUtil.setList(redisTagId, educationDataIdList);
+
+        return educationDataIdList;
+    }
+
     // 유저가 속해있는 트랙의 열람권한을 체크하는 로직
     public void UserCheckPermission(UserRoleEnum userRole, Long trackId) {
         if (UserRoleIsUser(userRole)) {
@@ -84,7 +100,7 @@ public class EducationDataTagCoreService {
     }
 
     // 로그인 한 유저가 속해있는 트랙의 데이터만 남기는 로직
-    private List<Long> FilterEducationDataByTrackId(List<Long> educationDataIdList, Track userTrack, Long userTrackId, Long userId) {
+    private List<Long> filterEducationDataByTrackId(List<Long> educationDataIdList, Track userTrack, Long userTrackId, Long userId) {
         TrackRoleEnum trackRole = roleService.findTrackRoleByTrackIdAndUserId(userTrackId, userId);
 
         if(UserTrackRoleIsPM(trackRole)) {

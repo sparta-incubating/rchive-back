@@ -1,8 +1,13 @@
 package kr.sparta.rchive.global.redis;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.user.entity.Track;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class RedisUtil {
 
     private final StringRedisTemplate stringRedisTemplate;
+    private final RedisTemplate<String, Object> listLongRedisTemplate;
 
     public void set(String key, String value, long ms) {
         log.info("[set] key : {}, value : {}, time : {} ms", key, value, ms);
@@ -23,6 +29,20 @@ public class RedisUtil {
         String value = stringRedisTemplate.opsForValue().get(key);
         log.info("[get] value : {}", value);
         return value;
+    }
+
+    public void setList(String key, List<Long> value) {
+        ListOperations<String, Object> listOps = listLongRedisTemplate.opsForList();
+        listOps.rightPushAll(key, value);
+    }
+
+    public List<Long> getList(String key) {
+            ListOperations<String, Object> listOps = listLongRedisTemplate.opsForList();
+            List<Object> objects = listOps.range(key, 0, -1);
+        assert objects != null;
+        return objects.stream()
+                .map(o -> (Long) o)
+                .collect(Collectors.toList());
     }
 
     public boolean delete(String key) {
@@ -39,4 +59,7 @@ public class RedisUtil {
         return hasKey;
     }
 
+    public String redisKeyEducationDataIdListByTagNameAndTrack(String tagName, Track track){
+        return String.format("tag-%s-%s-%d", tagName, track.getTrack(), track.getPeriod());
+    }
 }
