@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 public class BookmarkId implements Serializable {
     private Long user;
-    private Long educationData;
+    private Long post;
 }

@@ -18,19 +18,17 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
     private static final long TOKEN_TIME = 60 * 60 * 1000L;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil){
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-
+    @PostConstruct
+    public void setup() {
         setFilterProcessesUrl("/api/v1/users/login");
     }
 
@@ -44,7 +42,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                     request.getInputStream(),
                     UserLoginReq.class);
 
-            return authenticationManager.authenticate(
+            return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginReq.username(),
                             loginReq.password(),

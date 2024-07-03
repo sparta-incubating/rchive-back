@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.post.enums.DataTypeEnum;
-import kr.sparta.rchive.domain.post.enums.EducationTypeEnum;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,22 +23,24 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Getter
 @Entity
-@Table(name = "tb_education_data")
+@Table(name = "tb_post")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EducationData extends BaseTimeEntity {
+@DynamicInsert
+public class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "education_type", nullable = false)
-    private EducationTypeEnum educationType;
+    @Column(name = "post_type", nullable = false)
+    private PostTypeEnum postType;
 
     @Column(nullable = false, length = 50)
     private String title;
@@ -74,7 +76,7 @@ public class EducationData extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "educationData")
+    @OneToMany(mappedBy = "post")
     List<Comment> commentList = new ArrayList<>();
 
 }

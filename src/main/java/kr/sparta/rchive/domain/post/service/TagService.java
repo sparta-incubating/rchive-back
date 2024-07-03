@@ -2,10 +2,8 @@ package kr.sparta.rchive.domain.post.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
-import kr.sparta.rchive.domain.post.entity.EducationData;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
