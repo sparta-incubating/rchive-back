@@ -18,7 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-//@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -34,11 +33,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         setFilterProcessesUrl("/api/v1/users/login");
     }
-
-//    @PostConstruct
-//    public void setup(){
-//        setFilterProcessesUrl("/api/v1/users/login");
-//    }
 
     @Override
     public Authentication attemptAuthentication(
