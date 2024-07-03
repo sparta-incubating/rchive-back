@@ -37,6 +37,18 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public JwtAuthorizationFilter jwtAuthFilter() throws Exception {
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
+    }
+
+    @Bean
+    public LoginFilter loginFilter() throws Exception {
+        LoginFilter loginFilter = new LoginFilter(jwtUtil);
+        loginFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        return loginFilter;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 
         http.csrf((auth)->auth.disable());
@@ -57,10 +69,8 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
         );
 
-        http.addFilterBefore(new JwtAuthorizationFilter(jwtUtil,userDetailsService), LoginFilter.class);
-
-        http.addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-                UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthFilter(), LoginFilter.class);
+        http.addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
