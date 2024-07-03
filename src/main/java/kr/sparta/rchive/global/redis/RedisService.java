@@ -12,7 +12,7 @@ public class RedisService {
     private final RedisUtil redisUtil;
 
     public String redisKeyPostIdListByTagNameAndTrack(String tagName, Track track) {
-        return redisUtil.redisKeyPostIdListByTagNameAndTrack(tagName, track);
+        return String.format("tag-%s-%s-%d", tagName, track.getTrackName(), track.getPeriod());
     }
 
     public boolean redisKeyExist(String redisKey) {

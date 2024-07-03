@@ -58,8 +58,4 @@ public class RedisUtil {
         log.info("[hasKey] hasKey : {}", hasKey);
         return hasKey;
     }
-
-    public String redisKeyPostIdListByTagNameAndTrack(String tagName, Track track){
-        return String.format("tag-%s-%s-%d", tagName, track.getTrackName(), track.getPeriod());
-    }
 }
