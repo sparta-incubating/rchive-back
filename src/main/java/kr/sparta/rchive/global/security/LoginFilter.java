@@ -1,11 +1,14 @@
 package kr.sparta.rchive.global.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import kr.sparta.rchive.domain.user.dto.request.UserLoginReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +31,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil){
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+
         setFilterProcessesUrl("/api/v1/users/login");
     }
 
@@ -41,12 +45,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException{
 
-        String username = obtainUsername(request);
-        String password = obtainPassword(request);
+        try {
+            UserLoginReq loginReq = new ObjectMapper().readValue(
+                    request.getInputStream(),
+                    UserLoginReq.class);
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
-
-        return authenticationManager.authenticate(authToken);
+            return authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginReq.email(),
+                            loginReq.password(),
+                            null
+                    )
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override
