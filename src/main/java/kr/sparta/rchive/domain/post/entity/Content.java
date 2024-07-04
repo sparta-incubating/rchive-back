@@ -31,7 +31,7 @@ public class Content extends BaseTimeEntity {
     private String content;
 
     @Column
-    private int seq;
+    private Integer seq;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
