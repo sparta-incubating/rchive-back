@@ -6,11 +6,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Iterator;
 import kr.sparta.rchive.domain.user.dto.request.UserLoginReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -55,19 +57,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication)
+            throws UnsupportedEncodingException {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         User user = userDetails.getUser();
-
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
 
-        String accessToken = jwtUtil.createJwt(user);
+        String accessToken = jwtUtil.createAccessToken(user);
+        String refreshToken = jwtUtil.createRefreshToken(user);
 
-        response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
+        response.addHeader(AUTHORIZATION_HEADER, accessToken);
+        response.addCookie(jwtUtil.addRefreshTokenToCookie(refreshToken));
+        response.setStatus(HttpStatus.OK.value());
     }
 
     @Override

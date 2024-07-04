@@ -22,7 +22,7 @@ public enum GlobalExceptionCode {
     NOT_FOUND_ACCESS_DENIED(HttpStatus.NOT_FOUND,"GLOBAL-004","접근 권한이 없습니다."),
 
     /*  409 CONFLICT : Resource 중복  */
-    CONFLICT_ALREADY_EXIST_USERID(HttpStatus.CONFLICT,"GLOBAL-005", "이미 존재하는 USERID 입니다."),
+    CONFLICT_ALREADY_EXIST_USERID(HttpStatus.CONFLICT,"GLOBAL-005", "이미 존재하는 USER ID 입니다."),
 
     /*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"GLOBAL-006", "내부 서버 에러입니다.")
