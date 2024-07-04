@@ -18,8 +18,8 @@ public record PostCreateReq(
         String contentLink,
         String content,
         List<String> tagNameList,
-        TrackEnum track,
-        int period
+        TrackEnum trackName,
+        Integer period
 ) {
 
 }

@@ -1,5 +1,10 @@
 package kr.sparta.rchive.domain.post.dto.response;
 
-public record PostCreateRes() {
+import lombok.Builder;
+
+@Builder
+public record PostCreateRes(
+        Long postId
+) {
 
 }
