@@ -28,7 +28,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private static final long TOKEN_TIME = 60 * 60 * 1000L;
 
     @PostConstruct
-    public void setup() {
+    public void init() {
         setFilterProcessesUrl("/api/v1/users/login");
     }
 
