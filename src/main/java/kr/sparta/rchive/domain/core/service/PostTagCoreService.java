@@ -155,15 +155,15 @@ public class PostTagCoreService {
 
     private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {
 
-        String redisTagId = redisService.redisKeyPostIdListByTagNameAndTrack(tag.getTagName(), userTrack);
+        List<Long> postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
 
-        if(redisService.redisKeyExist(redisTagId)) {
-            return redisService.getListInRedisTypeLong(redisTagId);
+        if(!postIdList.isEmpty()) {
+            return postIdList;
         }
 
-        List<Long> postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
+        postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
 
-        redisService.setListInRedisTypeLong(redisTagId, postIdList);
+        redisService.setPostIdListInRedis(tag.getTagName(), userTrack, postIdList);
 
         return postIdList;
     }
