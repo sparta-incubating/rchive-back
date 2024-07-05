@@ -87,13 +87,13 @@ public class JwtUtil {
     public String createRefreshToken(User user) {
         Date date = new Date();
         return Jwts.builder()
-                    .claim("email", user.getEmail())
-                    .claim("role", user.getUserRole().toString())
-                    .claim("oAuthType", user.getOAuthType().toString())
-                    .issuedAt(date)
-                    .expiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))
-                    .signWith(secretKey)
-                    .compact();
+                .claim("email", user.getEmail())
+                .claim("role", user.getUserRole().toString())
+                .claim("oAuthType", user.getOAuthType().toString())
+                .issuedAt(date)
+                .expiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))
+                .signWith(secretKey)
+                .compact();
     }
 
 
