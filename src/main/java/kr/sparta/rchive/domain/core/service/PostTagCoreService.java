@@ -71,10 +71,15 @@ public class PostTagCoreService {
                     Post post = postService.findPostById(postId);
 
                     List<Tag> tagList = tagIdList.stream()
-                            .map(tagService::findTagById).collect(Collectors.toList());
+                            .map(tagService::findTagById)
+                            .collect(Collectors.toList());
 
-                    return PostSearchByTagRes.builder().title(post.getTitle()).tutor(post.getTutor())
-                            .uploadedAt(post.getUploadedAt()).tagList(tagList).build();
+                    return PostSearchByTagRes.builder()
+                            .title(post.getTitle())
+                            .tutor(post.getTutor())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagList(tagList)
+                            .build();
                 }).toList();
 
         int start = (int) pageable.getOffset();

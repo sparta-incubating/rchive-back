@@ -45,7 +45,12 @@ public class PostTagService {
 
     public void savePostTagByPostAndTagIdList(Post post, List<Tag> tagList) {
         List<PostTag> postTagList = tagList.stream()
-                .map(tag -> PostTag.builder().post(post).tag(tag).build())
+                .map(
+                        tag -> PostTag.builder()
+                                .post(post)
+                                .tag(tag)
+                                .build()
+                )
                 .toList();
 
         postTagRepository.saveAll(postTagList);

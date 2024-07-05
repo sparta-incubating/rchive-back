@@ -29,7 +29,10 @@ public class TagService {
         List<Tag> tagList = tagRepository.findByTagNameContains(tagName);
 
         for(Tag t : tagList) {
-            TagSearchRes tagSearchRes = TagSearchRes.builder().tagId(t.getId()).tagName(t.getTagName()).build();
+            TagSearchRes tagSearchRes = TagSearchRes.builder()
+                    .tagId(t.getId())
+                    .tagName(t.getTagName())
+                    .build();
             responseList.add(tagSearchRes);
         }
 
@@ -48,11 +51,16 @@ public class TagService {
             throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
         }
 
-        Tag createTag = Tag.builder().tagName(lowerName).build();
+        Tag createTag = Tag.builder()
+                .tagName(lowerName)
+                .build();
 
         Tag savedTag = tagRepository.save(createTag);
 
-        return TagCreateRes.builder().tagId(savedTag.getId()).tagName(savedTag.getTagName()).build();
+        return TagCreateRes.builder()
+                .tagId(savedTag.getId())
+                .tagName(savedTag.getTagName())
+                .build();
     }
 
     // 태그 이름으로 태그 검색해오는 로직

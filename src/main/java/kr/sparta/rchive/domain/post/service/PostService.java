@@ -25,17 +25,27 @@ public class PostService {
     }
 
     public Post createVideoPost(PostCreateReq request, DataTypeEnum dataType) {
-        Post createPost = Post.builder().postType(request.postType()).title(request.title())
-                .tutor(request.tutor()).uploadedAt(request.uploadedAt()).dataType(dataType)
-                .dataLink(request.videoLink()).build();
+        Post createPost = Post.builder()
+                .postType(request.postType())
+                .title(request.title())
+                .tutor(request.tutor())
+                .uploadedAt(request.uploadedAt())
+                .dataType(dataType)
+                .dataLink(request.videoLink())
+                .build();
 
         return postRepository.save(createPost);
     }
 
     public Post createContentPost(PostCreateReq request, DataTypeEnum dataType) {
-        Post createPost = Post.builder().postType(request.postType()).title(request.title())
-                .tutor(request.tutor()).uploadedAt(request.uploadedAt()).dataType(dataType)
-                .dataLink(request.contentLink()).build();
+        Post createPost = Post.builder()
+                .postType(request.postType())
+                .title(request.title())
+                .tutor(request.tutor())
+                .uploadedAt(request.uploadedAt())
+                .dataType(dataType)
+                .dataLink(request.contentLink())
+                .build();
 
         return postRepository.save(createPost);
     }

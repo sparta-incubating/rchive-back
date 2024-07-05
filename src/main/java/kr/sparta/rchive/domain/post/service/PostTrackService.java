@@ -45,7 +45,10 @@ public class PostTrackService {
     }
 
     public void savePostTrackByPostAndTrack(Post post, Track track) {
-        PostTrack postTrack = PostTrack.builder().post(post).track(track).build();
+        PostTrack postTrack = PostTrack.builder()
+                .post(post)
+                .track(track)
+                .build();
 
         postTrackRepository.save(postTrack);
     }
