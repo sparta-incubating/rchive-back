@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
@@ -33,7 +35,8 @@ public class UserController {
 
     @PostMapping("/reissue")
     @Operation(operationId = "USER-005", summary = "토큰 재발급")
-    public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req, HttpServletResponse res){
+    public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req, HttpServletResponse res)
+            throws UnsupportedEncodingException, ParseException {
         userService.reissue(req,res);
         return ResponseEntity.status(UserResponseCode.OK_REISSUE.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_REISSUE,null));

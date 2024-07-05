@@ -12,7 +12,8 @@ public enum GlobalExceptionCode {
     BAD_REQUEST_INVALID_VALUE(HttpStatus.BAD_REQUEST, "GLOBAL-001", "유효하지 않은 값"),
     BAD_REQUEST_INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "GLOBAL-002", "파라미터 누락"),
     BAD_REQUEST_REFRESH_TOKEN_NULL(HttpStatus.BAD_REQUEST,"GLOBAL-007","리프레시 토큰 없음"),
-    BAD_REQUEST_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST,"GLOBAL-007","토큰 시간 만료"),
+    BAD_REQUEST_REFRESH_NOT_MATCH(HttpStatus.BAD_REQUEST,"GLOBAL-008","리프레시 토큰이 일치하지 않음"),
+    BAD_REQUEST_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST,"GLOBAL-009","토큰 시간 만료"),
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 

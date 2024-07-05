@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import kr.sparta.rchive.domain.user.dto.request.UserLoginReq;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
+    private final RedisService redisService;
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
@@ -68,6 +69,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String accessToken = jwtUtil.createAccessToken(user);
         String refreshToken = jwtUtil.createRefreshToken(user);
+
+        redisService.setRefreshToken(user,refreshToken);
 
         response.addHeader(AUTHORIZATION_HEADER, accessToken);
         response.addCookie(jwtUtil.addRefreshTokenToCookie(refreshToken));
