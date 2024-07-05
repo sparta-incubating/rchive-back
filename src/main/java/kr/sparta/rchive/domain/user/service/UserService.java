@@ -82,7 +82,7 @@ public class UserService {
         }
 
         String email = jwtUtil.getEmail(refreshToken);
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(()-> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
 
         String redisRefresh = redisService.getRefreshToken(user);

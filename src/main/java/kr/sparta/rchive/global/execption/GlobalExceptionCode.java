@@ -17,7 +17,6 @@ public enum GlobalExceptionCode {
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 
-
     /*  403 FORBIDDEN : 권한 없음  */
     FORBIDDEN_DENIED_AUTHORITY(HttpStatus.FORBIDDEN, "GLOBAL-003" , "권한이 없음"),
 
