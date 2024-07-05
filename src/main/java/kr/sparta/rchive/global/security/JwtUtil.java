@@ -82,8 +82,7 @@ public class JwtUtil {
 
     public String createRefreshToken(User user) {
         Date date = new Date();
-        return BEARER_PREFIX
-                + Jwts.builder()
+        return Jwts.builder()
                     .claim("email", user.getEmail())
                     .claim("role", user.getUserRole().toString())
                     .claim("oAuthType", user.getOAuthType().toString())
@@ -127,7 +126,7 @@ public class JwtUtil {
     }
 
     public Cookie addRefreshTokenToCookie(String refreshToken) throws UnsupportedEncodingException {
-        refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
+        //refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
 
         Cookie cookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
         //cookie.setMaxAge(24*60*60);

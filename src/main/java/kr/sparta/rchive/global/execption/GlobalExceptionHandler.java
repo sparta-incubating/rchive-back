@@ -29,15 +29,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> httpMessageNotReadableExceptionHandler(
             HttpMessageNotReadableException exception) {
         log.error("HttpMessageNotReadableException: ", exception);
-        return ResponseEntity.status(GlobalExceptionCode.INVALID_PARAMETER.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalExceptionCode.INVALID_PARAMETER));
+        return ResponseEntity.status(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> IllegalArgumentHandler(IllegalArgumentException exception) {
         log.error("IllegalArgumentException: ", exception);
-        return ResponseEntity.status(GlobalExceptionCode.INVALID_VALUE.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalExceptionCode.INVALID_VALUE));
+        return ResponseEntity.status(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -49,8 +49,8 @@ public class GlobalExceptionHandler {
         bindingResult.getAllErrors().forEach(
                 error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
 
-        return ResponseEntity.status(GlobalExceptionCode.INVALID_VALUE.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalExceptionCode.INVALID_VALUE));
+        return ResponseEntity.status(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER));
     }
 
     @ExceptionHandler(CustomException.class)
