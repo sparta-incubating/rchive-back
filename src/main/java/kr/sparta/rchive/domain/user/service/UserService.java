@@ -10,17 +10,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
-import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.repository.UserRepository;
-import kr.sparta.rchive.global.execption.CustomException;
 import kr.sparta.rchive.global.execption.GlobalCustomException;
 import kr.sparta.rchive.global.execption.GlobalExceptionCode;
 import kr.sparta.rchive.global.redis.RedisService;
 import kr.sparta.rchive.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,11 +57,20 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void reissue(HttpServletRequest request, HttpServletResponse response)
+    public void logout(HttpServletResponse res, User user)
+            throws UnsupportedEncodingException {
+        redisService.deleteRefreshToken(user);
+
+        Cookie refresh = jwtUtil.addRefreshTokenToCookie("");
+        refresh.setMaxAge(0);
+        res.addCookie(refresh);
+    }
+
+    public void reissue(HttpServletRequest req, HttpServletResponse res)
             throws ParseException, UnsupportedEncodingException {
 
         String refreshToken = null;
-        Cookie[] cookies = request.getCookies();
+        Cookie[] cookies = req.getCookies();
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("Refresh")) {
                 refreshToken = cookie.getValue();
@@ -101,11 +107,11 @@ public class UserService {
         if(!issuedAt.equals(date)){
             String newRefresh = jwtUtil.createRefreshToken(user);
             redisService.setRefreshToken(user,newRefresh);
-            response.addCookie(jwtUtil.addRefreshTokenToCookie(newRefresh));
+            res.addCookie(jwtUtil.addRefreshTokenToCookie(newRefresh));
         }
 
         String newAccess = jwtUtil.createAccessToken(user);
-        response.setHeader("Authorization", newAccess);
+        res.setHeader("Authorization", newAccess);
     }
 
     // 유저의 Email로 트랙 ID 찾아오는 로직

@@ -10,8 +10,11 @@ import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.response.CommonResponseDto;
+import kr.sparta.rchive.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +34,16 @@ public class UserController {
         userService.signup(req);
         return ResponseEntity.status(UserResponseCode.OK_SIGNUP.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_SIGNUP, null));
+    }
+
+    @DeleteMapping("/logout")
+    @Operation(operationId = "USER-004", summary = "로그아웃")
+    public ResponseEntity<CommonResponseDto> logout(HttpServletResponse res,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+            throws UnsupportedEncodingException {
+        userService.logout(res,userDetails.getUser());
+        return ResponseEntity.status(UserResponseCode.OK_LOGOUT.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_LOGOUT,null));
     }
 
     @PostMapping("/reissue")

@@ -47,4 +47,9 @@ public class RedisService {
         redisUtil.set(key,refresh,REFRESH_TOKEN_TIME);
     }
 
+    public void deleteRefreshToken(User user){
+        String key = keyRefreshToken(user);
+        redisUtil.delete(key);
+    }
+
 }
