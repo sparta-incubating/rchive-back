@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
+import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagSearchReq;
+import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
@@ -38,22 +40,25 @@ public class PostController {
     private final PostTagCoreService postTagCoreService;
     private final TagService tagService;
 
-//    @PostMapping
-//    @Operation(operationId = "POST-001", summary = "게시물 생성")
-//    public ResponseEntity<CommonResponseDto> createPost(
-//            @RequestBody PostCreateReq request
-//    ) {
-//        PostCreateRes response = educationDataTagCoreService.createPost(request);
-//    }
+    @PostMapping
+    @Operation(operationId = "POST-001", summary = "게시물 생성")
+    public ResponseEntity<CommonResponseDto> createPost(
+            @RequestBody PostCreateReq request
+    ) {
+        PostCreateRes response = postTagCoreService.createPost(request);
+
+        return ResponseEntity.status(PostResponseCode.OK_CREATE_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_POST, response));
+    }
 
 
     @GetMapping("/tags")
     @Operation(operationId = "POST-010", summary = "사용할 태그 검색")
     public ResponseEntity<CommonResponseDto> searchTag(
-            @RequestBody TagSearchReq request
+            @RequestParam("tagName") String tagName
     ) {
 
-        List<TagSearchRes> responseList = tagService.searchTag(request.tagName());
+        List<TagSearchRes> responseList = tagService.searchTag(tagName);
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TAG, responseList));

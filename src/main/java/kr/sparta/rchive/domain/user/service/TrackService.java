@@ -28,6 +28,8 @@ public class TrackService {
     }
 
     public Track findTrackByTrackNameAndPeriod(TrackEnum trackName, Integer period) {
-        return trackRepository.findTrackByTrackNameAndPeriod(trackName, period);
+        return trackRepository.findTrackByTrackNameAndPeriod(trackName, period).orElseThrow(
+                () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
+        );
     }
 }
