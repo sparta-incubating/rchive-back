@@ -37,7 +37,7 @@ public class Track extends BaseTimeEntity {
     private TrackEnum trackName;
 
     @Column(nullable = false)
-    private int period;
+    private Integer period;
 
     @Column(nullable = false)
     @ColumnDefault("true")

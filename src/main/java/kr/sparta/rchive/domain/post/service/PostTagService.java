@@ -1,9 +1,12 @@
 package kr.sparta.rchive.domain.post.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
+import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.repository.PostTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,5 +41,18 @@ public class PostTagService {
                         postTag -> postTag.getPost().getId(),
                         Collectors.mapping(postTag -> postTag.getTag().getId(), Collectors.toList())
                 ));
+    }
+
+    public void savePostTagByPostAndTagIdList(Post post, List<Tag> tagList) {
+        List<PostTag> postTagList = tagList.stream()
+                .map(
+                        tag -> PostTag.builder()
+                                .post(post)
+                                .tag(tag)
+                                .build()
+                )
+                .toList();
+
+        postTagRepository.saveAll(postTagList);
     }
 }

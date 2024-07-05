@@ -2,6 +2,8 @@ package kr.sparta.rchive.domain.post.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.entity.Tag;
@@ -27,7 +29,10 @@ public class TagService {
         List<Tag> tagList = tagRepository.findByTagNameContains(tagName);
 
         for(Tag t : tagList) {
-            TagSearchRes tagSearchRes = TagSearchRes.builder().tagId(t.getId()).tagName(t.getTagName()).build();
+            TagSearchRes tagSearchRes = TagSearchRes.builder()
+                    .tagId(t.getId())
+                    .tagName(t.getTagName())
+                    .build();
             responseList.add(tagSearchRes);
         }
 
@@ -46,16 +51,23 @@ public class TagService {
             throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
         }
 
-        Tag createTag = Tag.builder().tagName(lowerName).build();
+        Tag createTag = Tag.builder()
+                .tagName(lowerName)
+                .build();
 
         Tag savedTag = tagRepository.save(createTag);
 
-        return TagCreateRes.builder().tagId(savedTag.getId()).tagName(savedTag.getTagName()).build();
+        return TagCreateRes.builder()
+                .tagId(savedTag.getId())
+                .tagName(savedTag.getTagName())
+                .build();
     }
 
     // 태그 이름으로 태그 검색해오는 로직
     public Tag findTagBytagName(String tagName) {
-        return tagRepository.findByTagName(tagName);
+        return tagRepository.findByTagName(tagName).orElseThrow(
+                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG_NOT_EXIST)
+        );
     }
 
     // 태그가 존재하는지 체크하는 로직
@@ -72,5 +84,13 @@ public class TagService {
         return tagRepository.findById(tagId).orElseThrow(
                 () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG_NOT_EXIST)
         );
+    }
+
+    public List<Tag> findTagIdListByTagNameList(List<String> tagNameList) {
+        return tagNameList.stream()
+                .map(tagRepository::findByTagName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 }

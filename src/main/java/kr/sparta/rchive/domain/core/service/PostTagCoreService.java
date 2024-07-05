@@ -3,15 +3,20 @@ package kr.sparta.rchive.domain.core.service;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.enums.DataTypeEnum;
+import kr.sparta.rchive.domain.post.service.ContentService;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
 import kr.sparta.rchive.domain.post.service.PostTrackService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.service.RoleService;
@@ -23,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +40,7 @@ public class PostTagCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final PostTrackService postTrackService;
+    private final ContentService contentService;
     private final RedisService redisService;
 
     // TODO : Redis 만들기, paging 적용하기
@@ -64,10 +71,15 @@ public class PostTagCoreService {
                     Post post = postService.findPostById(postId);
 
                     List<Tag> tagList = tagIdList.stream()
-                            .map(tagService::findTagById).collect(Collectors.toList());
+                            .map(tagService::findTagById)
+                            .collect(Collectors.toList());
 
-                    return PostSearchByTagRes.builder().title(post.getTitle()).tutor(post.getTutor())
-                            .uploadedAt(post.getUploadedAt()).tagList(tagList).build();
+                    return PostSearchByTagRes.builder()
+                            .title(post.getTitle())
+                            .tutor(post.getTutor())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagList(tagList)
+                            .build();
                 }).toList();
 
         int start = (int) pageable.getOffset();
@@ -76,17 +88,87 @@ public class PostTagCoreService {
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
-    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {
+    @Transactional
+    public PostCreateRes createPost(PostCreateReq request) {
 
-        String redisTagId = redisService.redisKeyPostIdListByTagNameAndTrack(tag.getTagName(), userTrack);
+        Post createPost;
 
-        if(redisService.redisKeyExist(redisTagId)) {
-            return redisService.getListInRedisTypeLong(redisTagId);
+        if(request.videoLink() != null && request.contentLink() != null) {
+            createPost = createPostVideoAndContent(request);
+        }
+        else {
+            createPost = createPostVideoOrContent(request);
         }
 
-        List<Long> postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
+        return PostCreateRes.builder().postId(createPost.getId()).build();
+    }
 
-        redisService.setListInRedisTypeLong(redisTagId, postIdList);
+    private Post createPostVideoOrContent(PostCreateReq request) {
+        DataTypeEnum dataType = checkDataTypeIsContentLinkNull(request.contentLink());
+
+        Post savePost;
+
+        if (dataType == DataTypeEnum.Video) {
+            savePost = createVideoPost(request, dataType);
+        } else {
+            savePost = createContentPost(request, dataType);
+        }
+
+        return savePost;
+    }
+
+    private Post createPostVideoAndContent(PostCreateReq request) {
+        Post contentPost = createContentPost(request, DataTypeEnum.Content);
+        Post videoPost = createVideoPost(request, DataTypeEnum.Video);
+
+        postService.updateConnectData(contentPost, videoPost);
+
+        return videoPost;
+    }
+
+    private Post createVideoPost(PostCreateReq request, DataTypeEnum dataType) {
+        Post videoPost = postService.createVideoPost(request, dataType);
+        savePostTrackTagByPostAndTrackAndTagIdList(videoPost, request.trackName(), request.period(), request.tagNameList());
+        return videoPost;
+    }
+
+    private Post createContentPost(PostCreateReq request, DataTypeEnum dataType) {
+        Post contentPost = postService.createContentPost(request, dataType);
+        contentService.createContent(request.content(), contentPost);
+        savePostTrackTagByPostAndTrackAndTagIdList(contentPost, request.trackName(), request.period(), request.tagNameList());
+        return contentPost;
+    }
+
+    private void savePostTrackTagByPostAndTrackAndTagIdList(Post post, TrackEnum trackName, Integer period, List<String> tagNameList) {
+        savePostTrackByPostAndTrack(post, trackName, period);
+        savePostTagByPostAndTagIdList(post, tagNameList);
+    }
+
+    private void savePostTagByPostAndTagIdList(Post post, List<String> tagNameList) {
+        List<Tag> tagList = tagService.findTagIdListByTagNameList(tagNameList);
+        postTagService.savePostTagByPostAndTagIdList(post, tagList);
+    }
+
+    private void savePostTrackByPostAndTrack(Post post, TrackEnum trackName, Integer period) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        postTrackService.savePostTrackByPostAndTrack(post, track);
+    }
+
+    private DataTypeEnum checkDataTypeIsContentLinkNull(String contentLink) {
+        return contentLink == null ? DataTypeEnum.Video : DataTypeEnum.Content;
+    }
+
+    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {
+
+        List<Long> postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
+
+        if(!postIdList.isEmpty()) {
+            return postIdList;
+        }
+
+        postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
+
+        redisService.setPostIdListInRedis(tag.getTagName(), userTrack, postIdList);
 
         return postIdList;
     }

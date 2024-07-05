@@ -3,8 +3,10 @@ package kr.sparta.rchive.domain.post.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTrack;
 import kr.sparta.rchive.domain.post.repository.PostTrackRepository;
+import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,5 +42,14 @@ public class PostTrackService {
     // 교육자료트랙 테이블에서 교육자료 ID를 이용하여 교육자료트랙 데이터를 검색해오는 로직
     public PostTrack findByPostId(Long postId) {
         return postTrackRepository.findByPostId(postId);
+    }
+
+    public void savePostTrackByPostAndTrack(Post post, Track track) {
+        PostTrack postTrack = PostTrack.builder()
+                .post(post)
+                .track(track)
+                .build();
+
+        postTrackRepository.save(postTrack);
     }
 }

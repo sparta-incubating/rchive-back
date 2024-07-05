@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Entity
@@ -32,6 +33,7 @@ import org.hibernate.annotations.DynamicInsert;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
+@DynamicUpdate
 public class Post extends BaseTimeEntity {
 
     @Id
@@ -55,8 +57,8 @@ public class Post extends BaseTimeEntity {
     @Column(name = "data_type", nullable = false)
     private DataTypeEnum dataType;
 
-    @Column(nullable = false)
-    private String content;
+    @Column(name = "data_Link", nullable = false)
+    private String dataLink;
 
     @Column(name = "connect_data_id")
     private Long connectDataId;
