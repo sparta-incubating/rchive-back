@@ -81,4 +81,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user")
     List<Comment> commentList = new ArrayList<>();
+
+    public void delete(){
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

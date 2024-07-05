@@ -113,6 +113,11 @@ public class UserService {
         res.setHeader("Authorization", newAccess);
     }
 
+    @Transactional
+    public void withdraw(User user) {
+        user.delete();
+        userRepository.save(user);
+    }
 
     public User findByEmailAlive(String email){
         return userRepository.findByEmailAndIsDeletedFalse(email)
