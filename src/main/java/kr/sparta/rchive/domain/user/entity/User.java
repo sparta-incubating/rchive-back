@@ -69,9 +69,6 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum userRole;
 
-    @Column
-    private String refreshToken;
-
     @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean isDeleted;

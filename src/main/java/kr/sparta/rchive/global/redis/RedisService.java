@@ -2,12 +2,15 @@ package kr.sparta.rchive.global.redis;
 
 import java.util.List;
 import kr.sparta.rchive.domain.user.entity.Track;
+import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class RedisService {
+
+    private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
 
     private final RedisUtil redisUtil;
 
@@ -27,6 +30,21 @@ public class RedisService {
     public void setPostIdListInRedis(String tagName, Track track, List<Long> postIdList) {
         String redisKey = keyPostIdListByTagNameAndTrack(tagName, track);
         redisUtil.setListTypeLong(redisKey, postIdList);
+    }
+
+    /** Refresh Token **/
+    private String keyRefreshToken(User user){
+        return String.format("refresh-user-%d",user.getId());
+    }
+
+    public String getRefreshToken(User user){
+        String key = keyRefreshToken(user);
+        return redisUtil.get(key);
+    }
+
+    public void setRefreshToken(User user, String refresh){
+        String key = keyRefreshToken(user);
+        redisUtil.set(key,refresh,REFRESH_TOKEN_TIME);
     }
 
 }

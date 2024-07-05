@@ -1,6 +1,7 @@
 package kr.sparta.rchive.global.config;
 
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
+import kr.sparta.rchive.global.redis.RedisService;
 import kr.sparta.rchive.global.security.JwtAuthorizationFilter;
 import kr.sparta.rchive.global.security.JwtUtil;
 import kr.sparta.rchive.global.security.LoginFilter;
@@ -25,6 +26,7 @@ public class WebSecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
+    private final RedisService redisService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -43,7 +45,7 @@ public class WebSecurityConfig {
 
     @Bean
     public LoginFilter loginFilter() throws Exception {
-        LoginFilter loginFilter = new LoginFilter(jwtUtil);
+        LoginFilter loginFilter = new LoginFilter(jwtUtil,redisService);
         loginFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return loginFilter;
     }

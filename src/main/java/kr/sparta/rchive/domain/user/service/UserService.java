@@ -1,12 +1,26 @@
 package kr.sparta.rchive.domain.user.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.repository.UserRepository;
+import kr.sparta.rchive.global.execption.CustomException;
+import kr.sparta.rchive.global.execption.GlobalCustomException;
+import kr.sparta.rchive.global.execption.GlobalExceptionCode;
+import kr.sparta.rchive.global.redis.RedisService;
+import kr.sparta.rchive.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtUtil jwtUtil;
+    private final RedisService redisService;
 
     @Transactional
     public void signup(UserSignupReq req){
@@ -43,7 +59,55 @@ public class UserService {
 
         userRepository.save(user);
     }
-    
+
+    public void reissue(HttpServletRequest request, HttpServletResponse response)
+            throws ParseException, UnsupportedEncodingException {
+
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("Refresh")) {
+                refreshToken = cookie.getValue();
+            }
+        }
+
+        if (refreshToken == null) {
+            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_REFRESH_TOKEN_NULL);
+        }
+
+        try {
+            jwtUtil.isExpired(refreshToken);
+        } catch (ExpiredJwtException e) {
+            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_TOKEN_EXPIRED);
+        }
+
+        String email = jwtUtil.getEmail(refreshToken);
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(()-> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
+
+        String redisRefresh = redisService.getRefreshToken(user);
+        if(!redisRefresh.equals(refreshToken)){
+            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_REFRESH_NOT_MATCH);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date issuedAt = jwtUtil.getIssuedAt(redisRefresh);
+        Date date = new Date();
+
+        issuedAt = sdf.parse(sdf.format(issuedAt));
+        date = sdf.parse(sdf.format(date));
+
+        if(!issuedAt.equals(date)){
+            String newRefresh = jwtUtil.createRefreshToken(user);
+            redisService.setRefreshToken(user,newRefresh);
+            response.addCookie(jwtUtil.addRefreshTokenToCookie(newRefresh));
+        }
+
+        String newAccess = jwtUtil.createAccessToken(user);
+        response.setHeader("Authorization", newAccess);
+    }
+
     // 유저의 Email로 트랙 ID 찾아오는 로직
     public Long findUserTrackIdByUserEmail(String userEmail) {
         return userRepository.findTrackIdByUserEmail(userEmail);
