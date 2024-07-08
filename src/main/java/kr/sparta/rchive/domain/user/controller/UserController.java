@@ -67,6 +67,20 @@ public class UserController {
                 .body(CommonResponseDto.of(UserResponseCode.OK_DELETE_USER,null));
     }
 
+    @GetMapping("overlap/email")
+    @Operation(operationId = "USER-009", summary = "이메일 중복 여부 조회")
+    public ResponseEntity<CommonResponseDto> overlapEmail(@RequestParam("email") String email){
+        boolean isOverlap = userService.overlapEmail(email);
+
+        if(isOverlap){
+            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, "이메일 사용 불가"));
+        }else{
+            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, "이메일 사용 가능"));
+        }
+    }
+  
     @GetMapping("/overlap/nickname")
     @Operation(operationId = "USER-010", summary = "닉네임 중복 여부 조회")
     public ResponseEntity<CommonResponseDto> withdraw(@RequestParam("nickname") String nickname){
