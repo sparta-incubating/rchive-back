@@ -16,7 +16,7 @@ import kr.sparta.rchive.domain.post.service.PostTrackService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
-import kr.sparta.rchive.domain.user.enums.TrackEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.service.RoleService;
@@ -139,7 +139,7 @@ public class PostTagCoreService {
         return contentPost;
     }
 
-    private void savePostTrackTagByPostAndTrackAndTagIdList(Post post, TrackEnum trackName, Integer period, List<String> tagNameList) {
+    private void savePostTrackTagByPostAndTrackAndTagIdList(Post post, TrackNameEnum trackName, Integer period, List<String> tagNameList) {
         savePostTrackByPostAndTrack(post, trackName, period);
         savePostTagByPostAndTagIdList(post, tagNameList);
     }
@@ -149,7 +149,7 @@ public class PostTagCoreService {
         postTagService.savePostTagByPostAndTagIdList(post, tagList);
     }
 
-    private void savePostTrackByPostAndTrack(Post post, TrackEnum trackName, Integer period) {
+    private void savePostTrackByPostAndTrack(Post post, TrackNameEnum trackName, Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         postTrackService.savePostTrackByPostAndTrack(post, track);
     }
