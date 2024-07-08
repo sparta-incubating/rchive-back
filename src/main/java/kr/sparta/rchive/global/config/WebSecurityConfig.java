@@ -1,6 +1,5 @@
 package kr.sparta.rchive.global.config;
 
-import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.global.redis.RedisService;
 import kr.sparta.rchive.global.security.JwtAuthorizationFilter;
 import kr.sparta.rchive.global.security.JwtUtil;
@@ -67,6 +66,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/api/v1/users/**").permitAll()
+                        .requestMatchers("/api/v1/role/**").permitAll()
 //                        .requestMatchers("/api/v1/**").permitAll()
 //                        .requestMatchers("/api/v1/admin").hasRole(UserRoleEnum.ADMIN.toString())
                         .anyRequest().authenticated()
