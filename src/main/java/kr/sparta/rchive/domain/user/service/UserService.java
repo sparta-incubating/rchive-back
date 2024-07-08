@@ -88,8 +88,7 @@ public class UserService {
         }
 
         String email = jwtUtil.getEmail(refreshToken);
-        User user = userRepository.findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(()-> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
+        User user = findByEmailAlive(email);
 
         String redisRefresh = redisService.getRefreshToken(user);
         if(!redisRefresh.equals(refreshToken)){
@@ -112,6 +111,17 @@ public class UserService {
 
         String newAccess = jwtUtil.createAccessToken(user);
         res.setHeader("Authorization", newAccess);
+    }
+
+    @Transactional
+    public void withdraw(User user) {
+        user.delete();
+        userRepository.save(user);
+    }
+
+    public User findByEmailAlive(String email){
+        return userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(()-> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
     }
 
     // 유저의 Email로 트랙 ID 찾아오는 로직

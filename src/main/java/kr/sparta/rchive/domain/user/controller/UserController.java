@@ -41,7 +41,7 @@ public class UserController {
     public ResponseEntity<CommonResponseDto> logout(HttpServletResponse res,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws UnsupportedEncodingException {
-        userService.logout(res,userDetails.getUser());
+        userService.logout(res, userDetails.getUser());
         return ResponseEntity.status(UserResponseCode.OK_LOGOUT.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_LOGOUT,null));
     }
@@ -53,5 +53,16 @@ public class UserController {
         userService.reissue(req,res);
         return ResponseEntity.status(UserResponseCode.OK_REISSUE.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_REISSUE,null));
+    }
+
+    @DeleteMapping
+    @Operation(operationId = "USER-006", summary = "회원 탈퇴")
+    public ResponseEntity<CommonResponseDto> withdraw(HttpServletResponse res,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+            throws UnsupportedEncodingException {
+        userService.logout(res, userDetails.getUser());
+        userService.withdraw(userDetails.getUser());
+        return ResponseEntity.status(UserResponseCode.OK_DELETE_USER.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_DELETE_USER,null));
     }
 }
