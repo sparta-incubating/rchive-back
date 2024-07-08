@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -64,5 +65,33 @@ public class UserController {
         userService.withdraw(userDetails.getUser());
         return ResponseEntity.status(UserResponseCode.OK_DELETE_USER.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_DELETE_USER,null));
+    }
+
+    @GetMapping("overlap/email")
+    @Operation(operationId = "USER-009", summary = "이메일 중복 여부 조회")
+    public ResponseEntity<CommonResponseDto> overlapEmail(@RequestParam("email") String email){
+        boolean isOverlap = userService.overlapEmail(email);
+
+        if(isOverlap){
+            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, "이메일 사용 불가"));
+        }else{
+            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, "이메일 사용 가능"));
+        }
+    }
+  
+    @GetMapping("/overlap/nickname")
+    @Operation(operationId = "USER-010", summary = "닉네임 중복 여부 조회")
+    public ResponseEntity<CommonResponseDto> withdraw(@RequestParam("nickname") String nickname){
+        boolean isOverlap = userService.overlapNickname(nickname);
+
+        if(isOverlap){
+            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, "닉네임 사용 불가"));
+        }else{
+            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, "닉네임 사용 가능"));
+        }
     }
 }

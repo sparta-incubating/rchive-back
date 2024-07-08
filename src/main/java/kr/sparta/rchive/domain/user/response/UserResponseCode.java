@@ -13,6 +13,8 @@ public enum UserResponseCode implements ResponseCode {
     OK_LOGOUT(HttpStatus.OK, "로그아웃 성공"),
     OK_REISSUE(HttpStatus.OK, "토큰 재발급 성공"),
     OK_DELETE_USER(HttpStatus.OK, "회원 탈퇴 성공"),
+    OK_OVERLAP_EMAIL(HttpStatus.OK, "이메일 중복 여부 조회 성공"),
+    OK_OVERLAP_NICKNAME(HttpStatus.OK, "닉네임 중복 여부 조회 성공"),
 
     OK_REQUEST_ROLE(HttpStatus.OK,"권한 요청 성공")
     ;

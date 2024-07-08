@@ -118,7 +118,15 @@ public class UserService {
         user.delete();
         userRepository.save(user);
     }
-
+  
+    public boolean overlapEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
+  
+    public boolean overlapNickname(String nickname){
+        return userRepository.existsByNickname(nickname);
+    }
+      
     public User findByEmailAlive(String email){
         return userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(()-> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
