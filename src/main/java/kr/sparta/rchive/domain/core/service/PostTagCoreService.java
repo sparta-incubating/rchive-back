@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
+import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
-import kr.sparta.rchive.domain.post.enums.DataTypeEnum;
 import kr.sparta.rchive.domain.post.service.ContentService;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -91,52 +92,20 @@ public class PostTagCoreService {
     @Transactional
     public PostCreateRes createPost(PostCreateReq request) {
 
-        Post createPost;
+        Post createPost = postService.createPost(request);
 
-        if(request.videoLink() != null && request.contentLink() != null) {
-            createPost = createPostVideoAndContent(request);
-        }
-        else {
-            createPost = createPostVideoOrContent(request);
-        }
+        savePostTrackTagByPostAndTrackAndTagIdList(createPost, request.trackName(), request.period(), request.tagNameList());
 
         return PostCreateRes.builder().postId(createPost.getId()).build();
     }
 
-    private Post createPostVideoOrContent(PostCreateReq request) {
-        DataTypeEnum dataType = checkDataTypeIsContentLinkNull(request.contentLink());
+    public PostModifyRes modifyPost(Long id, PostModifyReq request) {
+        Post findPost = postService.findPostById(id);
 
-        Post savePost;
 
-        if (dataType == DataTypeEnum.Video) {
-            savePost = createVideoPost(request, dataType);
-        } else {
-            savePost = createContentPost(request, dataType);
-        }
-
-        return savePost;
-    }
-
-    private Post createPostVideoAndContent(PostCreateReq request) {
-        Post contentPost = createContentPost(request, DataTypeEnum.Content);
-        Post videoPost = createVideoPost(request, DataTypeEnum.Video);
-
-        postService.updateConnectData(contentPost, videoPost);
-
-        return videoPost;
-    }
-
-    private Post createVideoPost(PostCreateReq request, DataTypeEnum dataType) {
-        Post videoPost = postService.createVideoPost(request, dataType);
-        savePostTrackTagByPostAndTrackAndTagIdList(videoPost, request.trackName(), request.period(), request.tagNameList());
-        return videoPost;
-    }
-
-    private Post createContentPost(PostCreateReq request, DataTypeEnum dataType) {
-        Post contentPost = postService.createContentPost(request, dataType);
-        contentService.createContent(request.content(), contentPost);
-        savePostTrackTagByPostAndTrackAndTagIdList(contentPost, request.trackName(), request.period(), request.tagNameList());
-        return contentPost;
+        return PostModifyRes.builder()
+                .postId(findPost.getId())
+                .build();
     }
 
     private void savePostTrackTagByPostAndTrackAndTagIdList(Post post, TrackEnum trackName, Integer period, List<String> tagNameList) {
@@ -152,10 +121,6 @@ public class PostTagCoreService {
     private void savePostTrackByPostAndTrack(Post post, TrackEnum trackName, Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         postTrackService.savePostTrackByPostAndTrack(post, track);
-    }
-
-    private DataTypeEnum checkDataTypeIsContentLinkNull(String contentLink) {
-        return contentLink == null ? DataTypeEnum.Video : DataTypeEnum.Content;
     }
 
     private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {

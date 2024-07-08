@@ -19,7 +19,8 @@ public record PostCreateReq(
         String content,
         List<String> tagNameList,
         TrackEnum trackName,
-        Integer period
+        Integer period,
+        Boolean isOpened
 ) {
 
 }
