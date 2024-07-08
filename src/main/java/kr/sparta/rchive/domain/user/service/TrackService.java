@@ -1,7 +1,7 @@
 package kr.sparta.rchive.domain.user.service;
 
 import kr.sparta.rchive.domain.user.entity.Track;
-import kr.sparta.rchive.domain.user.enums.TrackEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class TrackService {
         );
     }
 
-    public Track findTrackByTrackNameAndPeriod(TrackEnum trackName, Integer period) {
+    public Track findTrackByTrackNameAndPeriod(TrackNameEnum trackName, Integer period) {
         return trackRepository.findTrackByTrackNameAndPeriod(trackName, period).orElseThrow(
                 () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
         );
