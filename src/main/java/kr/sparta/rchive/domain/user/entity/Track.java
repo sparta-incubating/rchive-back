@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import kr.sparta.rchive.domain.user.enums.TrackEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class Track extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
-    private TrackEnum trackName;
+    private TrackNameEnum trackName;
 
     @Column(nullable = false)
     private Integer period;
