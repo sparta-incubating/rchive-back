@@ -20,7 +20,8 @@ public enum PostExceptionCode {
 
     /*  409 CONFLICT : Resource 중복  */
 
-    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-001", "중복된 태그");
+    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-001", "중복된 태그"), 
+    NOT_FOUND_CONTENT_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-005", "게시물 내용이 존재하지 않음");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

@@ -1,8 +1,7 @@
 package kr.sparta.rchive.domain.post.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
@@ -27,7 +26,7 @@ public class PostService {
 
     public void deletePost(Long postId) {
 
-        Post post = findPostById(postId);
+        Post post = findPostById(postId); // TODO: 추후에 softDelete로 수정
 
         postRepository.delete(post);
     }
@@ -44,5 +43,25 @@ public class PostService {
                 .build();
 
         return postRepository.save(createPost);
+    }
+
+    public Post updatePost(Long id, PostModifyReq request) {
+        Post findPost = findPostById(id);
+
+        Post updatePost = Post.builder()
+                .id(findPost.getId())
+                .postType(request.postType() == null? findPost.getPostType() : request.postType())
+                .title(request.title() == null? findPost.getTitle() : request.title())
+                .tutor(request.tutor() == null? findPost.getTutor() : request.tutor())
+                .uploadedAt(request.uploadedAt() == null? findPost.getUploadedAt() : request.uploadedAt())
+                .videoLink(request.videoLink() == null? findPost.getVideoLink() : request.videoLink())
+                .contentLink(request.content() == null? findPost.getContentLink() : request.contentLink())
+                .isOpened(request.isOpened() == null? findPost.getIsOpened() : request.isOpened())
+                .hits(findPost.getHits())
+                .isDeleted(findPost.getIsDeleted())
+                .deletedAt(findPost.getDeletedAt())
+                .build();
+
+        return postRepository.save(updatePost);
     }
 }

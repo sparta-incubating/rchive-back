@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.post.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,10 +52,10 @@ public class Post extends BaseTimeEntity {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
 
-    @Column(name = "video_link", nullable = false)
+    @Column(name = "video_link")
     private String videoLink;
 
-    @Column(name = "content_link", nullable = false)
+    @Column(name = "content_link")
     private String contentLink;
 
     @Column(nullable = false)
@@ -75,15 +74,15 @@ public class Post extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "post")
-    List<Comment> commentList = new ArrayList<>();
+    private List<Comment> commentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Content> contentList = new ArrayList<>();
+    @OneToMany(mappedBy = "post")
+    private List<Content> contentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<PostTag> postTagList = new ArrayList<>();
+    @OneToMany(mappedBy = "post")
+    private List<PostTag> postTagList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<PostTrack> postTrackList = new ArrayList<>();
+    @OneToMany(mappedBy = "post")
+    private List<PostTrack> postTrackList = new ArrayList<>();
 
 }

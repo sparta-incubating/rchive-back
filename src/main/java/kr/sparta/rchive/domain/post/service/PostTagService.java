@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.post.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,5 +53,15 @@ public class PostTagService {
                 .toList();
 
         postTagRepository.saveAll(postTagList);
+    }
+
+    public void updatePostTagByPostAndTag(Post updatePost, List<Tag> tagList) {
+        List<PostTag> existingPostTag = findPostTagByPostId(updatePost.getId());
+        postTagRepository.deleteAll(existingPostTag);
+        savePostTagByPostAndTagIdList(updatePost, tagList);
+    }
+
+    private List<PostTag> findPostTagByPostId(Long postId) {
+        return postTagRepository.findByPostId(postId);
     }
 }

@@ -45,7 +45,7 @@ public class TagService {
 
         String lowerName = name.toLowerCase();
 
-        Tag findTag = findTagBytagName(lowerName);
+        Tag findTag = tagRepository.findByTagNameNotOptional(lowerName);
 
         if(tagExist(findTag)) {
             throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);

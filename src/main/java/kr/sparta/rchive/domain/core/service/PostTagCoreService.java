@@ -94,52 +94,90 @@ public class PostTagCoreService {
 
         Post createPost = postService.createPost(request);
 
-        savePostTrackTagByPostAndTrackAndTagIdList(createPost, request.trackName(), request.period(), request.tagNameList());
+        if(request.contentLink() != null) {
+            createContentByPost(createPost, request.content());
+        }
+
+        savePostTrackByPostAndTrack(createPost, request.trackName(), request.period());
+        savePostTagByPostAndTagNameList(createPost, request.tagNameList());
 
         return PostCreateRes.builder().postId(createPost.getId()).build();
     }
 
-    public PostModifyRes modifyPost(Long id, PostModifyReq request) {
-        Post findPost = postService.findPostById(id);
+    @Transactional
+    public PostModifyRes updatePost(Long id, PostModifyReq request) {
+        Post updatePost = postService.updatePost(id, request);
 
+        if(request.content() != null) {
+            updateContent(updatePost, request.content());
+        }
+
+        if(request.trackName() != null || request.period() != null) {
+            updatePostTrackByPostAndTrack(updatePost, request.trackName(), request.period());
+        }
+
+        if(request.tagNameList() != null) {
+            updatePostTagByPostAndTagIdList(updatePost, request.tagNameList());
+        }
 
         return PostModifyRes.builder()
-                .postId(findPost.getId())
+                .postId(updatePost.getId())
                 .build();
     }
 
-    private void savePostTrackTagByPostAndTrackAndTagIdList(Post post, TrackNameEnum trackName, Integer period, List<String> tagNameList) {
-        savePostTrackByPostAndTrack(post, trackName, period);
-        savePostTagByPostAndTagIdList(post, tagNameList);
+    private void createContentByPost(Post createPost, String content) {
+        contentService.createContent(content, createPost);
     }
 
-    private void savePostTagByPostAndTagIdList(Post post, List<String> tagNameList) {
-        List<Tag> tagList = tagService.findTagIdListByTagNameList(tagNameList);
+    private void savePostTagByPostAndTagNameList(Post post, List<String> tagNameList) {
+        List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
         postTagService.savePostTagByPostAndTagIdList(post, tagList);
     }
 
     private void savePostTrackByPostAndTrack(Post post, TrackNameEnum trackName, Integer period) {
-        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        Track track = findTrackByTrackNameAndPeriod(trackName, period);
         postTrackService.savePostTrackByPostAndTrack(post, track);
+    }
+
+    private void updatePostTrackByPostAndTrack(Post updatePost, TrackNameEnum trackName, Integer period) {
+        Track track = findTrackByTrackNameAndPeriod(trackName, period);
+        postTrackService.updatePostTrackByPostAndTrack(updatePost, track);
+    }
+
+    private void updatePostTagByPostAndTagIdList(Post updatePost, List<String> tagNameList) {
+        List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
+        postTagService.updatePostTagByPostAndTag(updatePost, tagList);
+    }
+
+    private void updateContent(Post modifyPost, String content) {
+        contentService.updateContent(content, modifyPost);
+    }
+
+    private List<Tag> findTagIdListByTagNameList(List<String> tagNameList) {
+        return tagService.findTagIdListByTagNameList(tagNameList);
+    }
+    private Track findTrackByTrackNameAndPeriod(TrackNameEnum trackName, Integer period) {
+        return trackService.findTrackByTrackNameAndPeriod(trackName, period);
     }
 
     private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {
 
-        List<Long> postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
+        List<Long> postIdList;
+//        postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
 
-        if(!postIdList.isEmpty()) {
-            return postIdList;
-        }
+//        if(!postIdList.isEmpty()) {
+//            return postIdList;
+//        }
 
         postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
 
-        redisService.setPostIdListInRedis(tag.getTagName(), userTrack, postIdList);
+//        redisService.setPostIdListInRedis(tag.getTagName(), userTrack, postIdList);
 
         return postIdList;
     }
 
     // 유저가 속해있는 트랙의 열람권한을 체크하는 로직
-    public void UserCheckPermission(UserRoleEnum userRole, Long trackId) {
+    private void UserCheckPermission(UserRoleEnum userRole, Long trackId) {
         if (UserRoleIsUser(userRole)) {
             if (!trackService.checkPermission(trackId)) {
                 throw new IllegalArgumentException(); // TODO: 추후 커스텀 에러로 변경할 예정
@@ -158,11 +196,11 @@ public class PostTagCoreService {
         return postTrackService.filterPostIdListByTrackId(postIdList, userTrackId);
     }
 
-    public boolean UserTrackRoleIsPM(TrackRoleEnum trackRole) {
+    private boolean UserTrackRoleIsPM(TrackRoleEnum trackRole) {
         return trackRole == TrackRoleEnum.PM;
     }
 
-    public boolean UserRoleIsUser(UserRoleEnum userRole) {
+    private boolean UserRoleIsUser(UserRoleEnum userRole) {
         return userRole == UserRoleEnum.USER;
     }
 }

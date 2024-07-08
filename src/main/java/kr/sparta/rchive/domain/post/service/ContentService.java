@@ -14,9 +14,38 @@ public class ContentService {
     private final ContentRepository contentRepository;
 
     public void createContent(String content, Post post) {
-        Content createContent = Content.builder().content(content)
-                .seq(1).post(post).build();
+        Content createContent = Content.builder()
+                .content(content)
+                .seq(1)
+                .post(post)
+                .build();
 
         contentRepository.save(createContent);
+    }
+
+    public void updateContent(String content, Post modifyPost) {
+        Content findContent = findContentByPostId(modifyPost.getId());
+
+        if(isContentExist(findContent)) {
+            createContent(content, modifyPost);
+            return;
+        }
+
+        Content updateContent = Content.builder()
+                .id(findContent.getId())
+                .content(content)
+                .seq(1)
+                .post(modifyPost)
+                .build();
+
+        contentRepository.save(updateContent);
+    }
+
+    private Content findContentByPostId(Long postId) {
+        return contentRepository.findByPostId(postId);
+    }
+
+    private Boolean isContentExist(Content content) {
+        return content == null;
     }
 }
