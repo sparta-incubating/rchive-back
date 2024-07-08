@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum UserResponseCode implements ResponseCode {
     // OK 200
+    /* USER API */
     OK_SIGNUP(HttpStatus.OK, "회원가입 성공"),
     OK_LOGOUT(HttpStatus.OK, "로그아웃 성공"),
     OK_REISSUE(HttpStatus.OK, "토큰 재발급 성공"),
@@ -16,6 +17,7 @@ public enum UserResponseCode implements ResponseCode {
     OK_OVERLAP_EMAIL(HttpStatus.OK, "이메일 중복 여부 조회 성공"),
     OK_OVERLAP_NICKNAME(HttpStatus.OK, "닉네임 중복 여부 조회 성공"),
 
+    /* ROLE API */
     OK_REQUEST_ROLE(HttpStatus.OK,"권한 요청 성공")
     ;
 
