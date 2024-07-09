@@ -31,14 +31,9 @@ public class ContentService {
             return;
         }
 
-        Content updateContent = Content.builder()
-                .id(findContent.getId())
-                .content(content)
-                .seq(1)
-                .post(modifyPost)
-                .build();
+        findContent.update(content);
 
-        contentRepository.save(updateContent);
+        contentRepository.save(findContent);
     }
 
     private Content findContentByPostId(Long postId) {
