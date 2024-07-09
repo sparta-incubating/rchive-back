@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
-import kr.sparta.rchive.domain.post.enums.DataTypeEnum;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
@@ -54,15 +53,11 @@ public class Post extends BaseTimeEntity {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "data_type", nullable = false)
-    private DataTypeEnum dataType;
+    @Column(name = "video_link")
+    private String videoLink;
 
-    @Column(name = "data_Link", nullable = false)
-    private String dataLink;
-
-    @Column(name = "connect_data_id")
-    private Long connectDataId;
+    @Column(name = "content_link")
+    private String contentLink;
 
     @Column(nullable = false)
     @ColumnDefault("0")
@@ -81,7 +76,16 @@ public class Post extends BaseTimeEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "post")
-    List<Comment> commentList = new ArrayList<>();
+    private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<Content> contentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<PostTag> postTagList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<PostTrack> postTrackList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Content> contentList = new ArrayList<>();

@@ -3,8 +3,8 @@ package kr.sparta.rchive.domain.post.service;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.entity.Post;
-import kr.sparta.rchive.domain.post.enums.DataTypeEnum;
 import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
@@ -26,58 +26,45 @@ public class PostService {
         );
     }
 
-    public Post createVideoPost(PostCreateReq request, DataTypeEnum dataType) {
+    public void deletePost(Long postId) {
+
+        Post post = findPostById(postId); // TODO: 추후에 softDelete로 수정
+
+        postRepository.delete(post);
+    }
+
+    public Post createPost(PostCreateReq request) {
         Post createPost = Post.builder()
                 .postType(request.postType())
                 .title(request.title())
                 .tutor(request.tutor())
                 .uploadedAt(request.uploadedAt())
-                .dataType(dataType)
-                .dataLink(request.videoLink())
+                .videoLink(request.videoLink())
+                .contentLink(request.contentLink())
+                .isOpened(request.isOpened())
                 .build();
 
         return postRepository.save(createPost);
     }
 
-    public Post createContentPost(PostCreateReq request, DataTypeEnum dataType) {
-        Post createPost = Post.builder()
-                .postType(request.postType())
-                .title(request.title())
-                .tutor(request.tutor())
-                .uploadedAt(request.uploadedAt())
-                .dataType(dataType)
-                .dataLink(request.contentLink())
+    public Post updatePost(Long id, PostModifyReq request) {
+        Post findPost = findPostById(id);
+
+        Post updatePost = Post.builder()
+                .id(findPost.getId())
+                .postType(request.postType() == null? findPost.getPostType() : request.postType())
+                .title(request.title() == null? findPost.getTitle() : request.title())
+                .tutor(request.tutor() == null? findPost.getTutor() : request.tutor())
+                .uploadedAt(request.uploadedAt() == null? findPost.getUploadedAt() : request.uploadedAt())
+                .videoLink(request.videoLink() == null? findPost.getVideoLink() : request.videoLink())
+                .contentLink(request.content() == null? findPost.getContentLink() : request.contentLink())
+                .isOpened(request.isOpened() == null? findPost.getIsOpened() : request.isOpened())
+                .hits(findPost.getHits())
+                .isDeleted(findPost.getIsDeleted())
+                .deletedAt(findPost.getDeletedAt())
                 .build();
 
-        return postRepository.save(createPost);
-    }
-
-    public void updateConnectData(Post contentPost, Post videoPost) {
-
-        Post contentPostInsertConnectId = Post.builder()
-                .id(contentPost.getId())
-                .postType(contentPost.getPostType())
-                .title(contentPost.getTitle())
-                .tutor(contentPost.getTutor())
-                .uploadedAt(contentPost.getUploadedAt())
-                .dataType(contentPost.getDataType())
-                .dataLink(contentPost.getDataLink())
-                .connectDataId(videoPost.getId())
-                .build();
-
-        Post videoPostInsertConnectId = Post.builder()
-                .id(videoPost.getId())
-                .postType(videoPost.getPostType())
-                .title(videoPost.getTitle())
-                .tutor(videoPost.getTutor())
-                .uploadedAt(videoPost.getUploadedAt())
-                .dataType(videoPost.getDataType())
-                .dataLink(videoPost.getDataLink())
-                .connectDataId(contentPost.getId())
-                .build();
-
-        postRepository.save(contentPostInsertConnectId);
-        postRepository.save(videoPostInsertConnectId);
+        return postRepository.save(updatePost);
     }
 
     public void deletePost(Long postId) {

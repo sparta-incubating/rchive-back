@@ -5,11 +5,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-//import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
+import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.TagSearchReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
-//import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
+import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
@@ -56,17 +55,17 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_POST, response));
     }
 
-//    @PatchMapping("/{postId}")
-//    @Operation(operationId = "POST-002", summary = "게시물 관리 - 수정")
-//    public ResponseEntity<CommonResponseDto> modifyPost(
-//            @PathVariable Long postId,
-//            @RequestBody PostModifyReq request
-//    ) {
-//        PostModifyRes response = postTagCoreService.modifyPost(postId, request);
-//
-//        return ResponseEntity.status(PostResponseCode.OK_MODIFY_POST.getHttpStatus())
-//                .body(CommonResponseDto.of(PostResponseCode.OK_MODIFY_POST, response));
-//    }
+    @PatchMapping("/{postId}")
+    @Operation(operationId = "POST-002", summary = "게시물 관리 - 수정")
+    public ResponseEntity<CommonResponseDto> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostModifyReq request
+    ) {
+        PostModifyRes response = postTagCoreService.updatePost(postId, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_MODIFY_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_MODIFY_POST, response));
+    }
 
     @DeleteMapping("/{postId}")
     @Operation(operationId = "POST-003", summary = "게시물 관리 - 삭제")

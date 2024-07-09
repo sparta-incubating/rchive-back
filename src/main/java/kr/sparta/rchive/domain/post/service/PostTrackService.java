@@ -52,4 +52,11 @@ public class PostTrackService {
 
         postTrackRepository.save(postTrack);
     }
+
+    public void updatePostTrackByPostAndTrack(Post updatePost, Track track) {
+        PostTrack postTrack = findByPostId(updatePost.getId());
+        postTrackRepository.delete(postTrack);
+
+        savePostTrackByPostAndTrack(updatePost, track);
+    }
 }
