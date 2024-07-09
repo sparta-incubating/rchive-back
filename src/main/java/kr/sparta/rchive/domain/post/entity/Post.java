@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.post.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
+import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
@@ -87,13 +87,19 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     private List<PostTrack> postTrackList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Content> contentList = new ArrayList<>();
+    public void deletePost(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+        this.deletedAt = LocalDateTime.now();
+    }
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<PostTag> postTagList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<PostTrack> postTrackList = new ArrayList<>();
+    public void update(PostModifyReq request) {
+        this.postType = request.postType() == null ? this.postType : request.postType();
+        this.title = request.title() == null ? this.title : request.title();
+        this.tutor = request.tutor() == null ? this.tutor : request.tutor();
+        this.uploadedAt = request.uploadedAt() == null ? this.uploadedAt : request.uploadedAt();
+        this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
+        this.contentLink = request.contentLink() == null ? this.contentLink : request.contentLink();
+        this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();
+    }
 
 }
