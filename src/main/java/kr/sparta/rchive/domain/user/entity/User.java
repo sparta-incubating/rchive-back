@@ -76,9 +76,16 @@ public class User extends BaseTimeEntity {
     @Column
     private LocalDateTime deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     List<Role> roleList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     List<Comment> commentList = new ArrayList<>();
+
+    public void delete(){
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }
