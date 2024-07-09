@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import kr.sparta.rchive.domain.post.entity.PostTrack;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.post.entity.PostTrack;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
@@ -51,6 +52,7 @@ public class Track extends BaseTimeEntity {
     @Column
     private LocalDateTime deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "track")
     List<Role> roleList = new ArrayList<>();
 

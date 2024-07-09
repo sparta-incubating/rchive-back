@@ -1,5 +1,7 @@
 package kr.sparta.rchive.domain.post.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -63,5 +65,20 @@ public class PostService {
                 .build();
 
         return postRepository.save(updatePost);
+    }
+
+    public void deletePost(Long postId) {
+
+        List<Post> postList = new ArrayList<>();
+
+        Post post = findPostById(postId);
+
+        postList.add(post);
+
+        if(post.getConnectDataId() != null) {
+            postList.add(findPostById(post.getConnectDataId()));
+        }
+
+        postRepository.deleteAll(postList);
     }
 }
