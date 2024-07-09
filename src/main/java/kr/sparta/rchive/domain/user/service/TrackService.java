@@ -1,5 +1,8 @@
 package kr.sparta.rchive.domain.user.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListReq;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
@@ -13,6 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrackService {
 
     private final TrackRepository trackRepository;
+
+    public RoleGetTrackNameListReq getTrackNameList() {
+        List<String> trackNameList = new ArrayList<>();
+
+        for(TrackNameEnum trackName : TrackNameEnum.values()){
+            trackNameList.add(trackName.name());
+        }
+
+        return new RoleGetTrackNameListReq(trackNameList);
+    }
 
     // 트랙 안의 열람권한을 확인하는 로직
     public boolean checkPermission(Long trackId) {
