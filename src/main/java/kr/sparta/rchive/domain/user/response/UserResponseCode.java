@@ -19,7 +19,8 @@ public enum UserResponseCode implements ResponseCode {
 
     /* ROLE API */
     OK_REQUEST_ROLE(HttpStatus.OK, "권한 요청 성공"),
-    OK_GET_TRACK_NAME(HttpStatus.OK, "트랙명 조회 성공")
+    OK_GET_TRACK_NAME(HttpStatus.OK, "트랙명 조회 성공"),
+    OK_GET_TRACK_PERIOD(HttpStatus.OK, "트랙의 기수 조회 성공")
     ;
 
     private final HttpStatus httpStatus;
