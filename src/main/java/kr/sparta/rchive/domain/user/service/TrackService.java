@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.user.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
@@ -34,12 +35,9 @@ public class TrackService {
         List<Track> trackList = trackRepository.findAllByTrackName(trackName);
         List<Integer> trackPeriodList = trackList.stream()
                 .map(Track::getPeriod)
-                .sorted()
+                .filter(period -> period != 0)
+                .sorted(Comparator.reverseOrder())
                 .collect(Collectors.toList());
-
-        if(trackPeriodList.get(0)==0){
-            trackPeriodList.remove(0);
-        }
 
         return new RoleGetTrackPeriodListRes(trackPeriodList);
     }
