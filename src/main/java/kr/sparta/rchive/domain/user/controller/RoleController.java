@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
-import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListReq;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,9 +46,20 @@ public class RoleController {
     @GetMapping("/track")
     @Operation(operationId = "ROLE-005", summary = "트랙명 조회")
     public ResponseEntity<CommonResponseDto> getTrackNameList(){
-        RoleGetTrackNameListReq req = trackService.getTrackNameList();
+        RoleGetTrackNameListRes res = trackService.getTrackNameList();
 
         return ResponseEntity.status(UserResponseCode.OK_GET_TRACK_NAME.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_GET_TRACK_NAME, req));
+                .body(CommonResponseDto.of(UserResponseCode.OK_GET_TRACK_NAME, res));
+    }
+
+    @GetMapping("/track/period")
+    @Operation(operationId = "ROLE-006", summary = "트랙의 기수 조회")
+    public ResponseEntity<CommonResponseDto> getTrackPeriodList(
+            @RequestParam TrackNameEnum trackName
+    ){
+        RoleGetTrackPeriodListRes res = trackService.getTrackPeriodList(trackName);
+
+        return ResponseEntity.status(UserResponseCode.OK_GET_TRACK_PERIOD.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_GET_TRACK_PERIOD, res));
     }
 }

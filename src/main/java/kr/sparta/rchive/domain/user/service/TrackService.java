@@ -1,8 +1,11 @@
 package kr.sparta.rchive.domain.user.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListReq;
+import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
@@ -17,14 +20,26 @@ public class TrackService {
 
     private final TrackRepository trackRepository;
 
-    public RoleGetTrackNameListReq getTrackNameList() {
+    public RoleGetTrackNameListRes getTrackNameList() {
         List<String> trackNameList = new ArrayList<>();
 
         for(TrackNameEnum trackName : TrackNameEnum.values()){
             trackNameList.add(trackName.name());
         }
 
-        return new RoleGetTrackNameListReq(trackNameList);
+        return new RoleGetTrackNameListRes(trackNameList);
+    }
+
+
+    public RoleGetTrackPeriodListRes getTrackPeriodList(TrackNameEnum trackName) {
+        List<Track> trackList = trackRepository.findAllByTrackName(trackName);
+        List<Integer> trackPeriodList = trackList.stream()
+                .map(Track::getPeriod)
+                .filter(period -> period != 0)
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+
+        return new RoleGetTrackPeriodListRes(trackPeriodList);
     }
 
     // 트랙 안의 열람권한을 확인하는 로직
@@ -45,4 +60,5 @@ public class TrackService {
                 () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
         );
     }
+
 }
