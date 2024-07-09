@@ -50,6 +50,7 @@ public class Track extends BaseTimeEntity {
     @Column
     private LocalDateTime deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "track")
     List<Role> roleList = new ArrayList<>();
 
