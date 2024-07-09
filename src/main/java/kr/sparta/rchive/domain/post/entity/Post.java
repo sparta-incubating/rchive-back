@@ -78,6 +78,7 @@ public class Post extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post")
     List<Comment> commentList = new ArrayList<>();
 
