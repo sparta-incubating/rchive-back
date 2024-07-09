@@ -106,6 +106,7 @@ public class PostController {
     @Operation(operationId = "POST-011", summary = "태그를 이용하여 검색하는 기능")
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam("trackName") String trackName,
             @RequestParam("tagName") String tagName,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
@@ -113,7 +114,7 @@ public class PostController {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
 
         Page<PostSearchByTagRes> responseList = postTagCoreService
-                .searchPostByTag(tagName, userDetails.getUser(), pageable);
+                .searchPostByTag(tagName, trackName, userDetails.getUser(), pageable);
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));

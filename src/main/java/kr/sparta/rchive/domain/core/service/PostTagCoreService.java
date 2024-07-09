@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.ContentService;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PostTagCoreService {
+
     private final PostService postService;
     private final PostTagService postTagService;
     private final TrackService trackService;
@@ -45,14 +48,18 @@ public class PostTagCoreService {
     private final RedisService redisService;
 
     // TODO : Redis 만들기, paging 적용하기
-    public Page<PostSearchByTagRes> searchPostByTag(String tagName, User user, Pageable pageable) {
+    public Page<PostSearchByTagRes> searchPostByTag(String tagName, String trackName, User user, Pageable pageable) {
         Long trackId = userService.findUserTrackIdByUserEmail(user.getEmail());   // TODO: 로그인한 유저의 트랙 ID 확인 추후에 레디스와 연결하여
-                                                            // 마지막에 들어간 트랙 받아오는 로직으로 변경
+        // 마지막에 들어간 트랙 받아오는 로직으로 변경
         Track userTrack = trackService.findTrackById(trackId);
+
+        List<PostTypeEnum> postTypeEnumList = new ArrayList<>();
 
         UserCheckPermission(user.getUserRole(), trackId);   // 로그인한 유저의 권한과 트랙 ID를 통해 열람 권한 확인
 
-        Tag tag = tagService.findTagBytagName(tagName); // 검색하려는 태그 찾아오는 로직
+        String lowerCaseTagName = tagName.toLowerCase();
+
+        Tag tag = tagService.findTagBytagName(lowerCaseTagName); // 검색하려는 태그 찾아오는 로직
 
         // 검색하려는 태그가 달려있는 교육자료 ID를 리스트로 찾아오는 로직
         List<Long> postIdList = findPostIdInRedisByRedisIdUseTagAndTrack(tag, userTrack);
@@ -65,23 +72,30 @@ public class PostTagCoreService {
 
         // 위에서 Map으로 변경시켜놓은 EducationDataId / TagIdList를 실제 데이터들로 바꿔 responseList에 담는 로직
         List<PostSearchByTagRes> responseList = postTagMap.entrySet().stream()
-                .map(response -> {
-                    Long postId = response.getKey();
-                    List<Long> tagIdList = response.getValue();
+            .map(response -> {
+                Long postId = response.getKey();
+                List<Long> tagIdList = response.getValue();
 
-                    Post post = postService.findPostById(postId);
+                Long trackIdFindByPostId = postTrackService.findByPostId(postId).getTrack().getId();
+                Integer period = trackService.findPeriodByTrackId(trackIdFindByPostId);
 
-                    List<Tag> tagList = tagIdList.stream()
-                            .map(tagService::findTagById)
-                            .collect(Collectors.toList());
+                Post post = postService.findPostById(postId);
 
-                    return PostSearchByTagRes.builder()
-                            .title(post.getTitle())
-                            .tutor(post.getTutor())
-                            .uploadedAt(post.getUploadedAt())
-                            .tagList(tagList)
-                            .build();
-                }).toList();
+                List<String> tagNameList = tagIdList.stream()
+                    .map(tagService::findTagById)
+                    .map(Tag::getTagName)
+                    .collect(Collectors.toList());
+
+                return PostSearchByTagRes.builder()
+                    .title(post.getTitle())
+                    .tutor(post.getTutor())
+                    .uploadedAt(post.getUploadedAt())
+                    .postType(post.getPostType())
+                    .isOpened(post.getIsOpened())
+                    .period(period)
+                    .tagNameList(tagNameList)
+                    .build();
+            }).toList();
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), responseList.size());
@@ -94,7 +108,7 @@ public class PostTagCoreService {
 
         Post createPost = postService.createPost(request);
 
-        if(request.contentLink() != null) {
+        if (request.contentLink() != null) {
             createContentByPost(createPost, request.content());
         }
 
@@ -108,21 +122,21 @@ public class PostTagCoreService {
     public PostModifyRes updatePost(Long id, PostModifyReq request) {
         Post updatePost = postService.updatePost(id, request);
 
-        if(request.content() != null) {
+        if (request.content() != null) {
             updateContent(updatePost, request.content());
         }
 
-        if(request.trackName() != null || request.period() != null) {
+        if (request.trackName() != null || request.period() != null) {
             updatePostTrackByPostAndTrack(updatePost, request.trackName(), request.period());
         }
 
-        if(request.tagNameList() != null) {
+        if (request.tagNameList() != null) {
             updatePostTagByPostAndTagIdList(updatePost, request.tagNameList());
         }
 
         return PostModifyRes.builder()
-                .postId(updatePost.getId())
-                .build();
+            .postId(updatePost.getId())
+            .build();
     }
 
     private void createContentByPost(Post createPost, String content) {
@@ -156,11 +170,12 @@ public class PostTagCoreService {
     private List<Tag> findTagIdListByTagNameList(List<String> tagNameList) {
         return tagService.findTagIdListByTagNameList(tagNameList);
     }
+
     private Track findTrackByTrackNameAndPeriod(TrackNameEnum trackName, Integer period) {
         return trackService.findTrackByTrackNameAndPeriod(trackName, period);
     }
 
-    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) {
+    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
 
         List<Long> postIdList;
 //        postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
@@ -189,7 +204,7 @@ public class PostTagCoreService {
     private List<Long> filterPostByTrackId(List<Long> postIdList, Track userTrack, Long userTrackId, Long userId) {
         TrackRoleEnum trackRole = roleService.findTrackRoleByTrackIdAndUserId(userTrackId, userId);
 
-        if(UserTrackRoleIsPM(trackRole)) {
+        if (UserTrackRoleIsPM(trackRole)) {
             return postTrackService.filterPostIdListByTrackName(postIdList, userTrack.getTrackName());
         }
 

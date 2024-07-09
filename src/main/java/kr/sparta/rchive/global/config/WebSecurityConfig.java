@@ -33,7 +33,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -44,32 +44,33 @@ public class WebSecurityConfig {
 
     @Bean
     public LoginFilter loginFilter() throws Exception {
-        LoginFilter loginFilter = new LoginFilter(jwtUtil,redisService);
+        LoginFilter loginFilter = new LoginFilter(jwtUtil, redisService);
         loginFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return loginFilter;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf((auth)->auth.disable());
+        http.csrf((auth) -> auth.disable());
 
-        http.formLogin((auth)->auth.disable());
+        http.formLogin((auth) -> auth.disable());
 
-        http.httpBasic((auth)->auth.disable());
+        http.httpBasic((auth) -> auth.disable());
 
         http.sessionManagement((session)
-                ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
-        http.authorizeHttpRequests((authorizeHttpRequests)->
+        http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
-                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/api/v1/users/**").permitAll()
-                        .requestMatchers("/api/v1/role/**").permitAll()
+                    .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                    .requestMatchers("/api/v1/users/**").permitAll()
+                    .requestMatchers("/api/v1/role/**").permitAll()
+                    .requestMatchers("/api/v1/posts/**").permitAll()
 //                        .requestMatchers("/api/v1/**").permitAll()
 //                        .requestMatchers("/api/v1/admin").hasRole(UserRoleEnum.ADMIN.toString())
-                        .anyRequest().authenticated()
+                    .anyRequest().authenticated()
         );
 
         http.addFilterBefore(jwtAuthFilter(), LoginFilter.class);

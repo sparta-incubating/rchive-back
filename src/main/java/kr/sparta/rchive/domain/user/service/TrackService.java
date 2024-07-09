@@ -32,4 +32,8 @@ public class TrackService {
                 () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
         );
     }
+
+    public Integer findPeriodByTrackId(Long trackId) {
+        return findTrackById(trackId).getPeriod();
+    }
 }
