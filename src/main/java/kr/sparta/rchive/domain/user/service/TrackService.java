@@ -20,7 +20,7 @@ public class TrackService {
     public RoleGetTrackNameListReq getTrackNameList() {
         List<String> trackNameList = new ArrayList<>();
 
-        for(TrackNameEnum trackName:TrackNameEnum.values()){
+        for(TrackNameEnum trackName : TrackNameEnum.values()){
             trackNameList.add(trackName.name());
         }
 
