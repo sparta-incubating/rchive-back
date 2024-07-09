@@ -75,10 +75,10 @@ public class UserController {
 
         if(isOverlap){
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, "이메일 사용 불가"));
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, true));
         }else{
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, "이메일 사용 가능"));
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, false));
         }
     }
   
@@ -89,10 +89,10 @@ public class UserController {
 
         if(isOverlap){
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, "닉네임 사용 불가"));
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, true));
         }else{
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, "닉네임 사용 가능"));
+                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, false));
         }
     }
 }
