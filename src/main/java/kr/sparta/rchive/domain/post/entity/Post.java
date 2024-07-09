@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.post.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -81,5 +82,14 @@ public class Post extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post")
     List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<Content> contentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostTag> postTagList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostTrack> postTrackList = new ArrayList<>();
 
 }

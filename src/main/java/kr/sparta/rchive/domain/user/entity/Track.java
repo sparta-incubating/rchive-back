@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.user.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import kr.sparta.rchive.domain.post.entity.PostTrack;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
@@ -53,5 +55,8 @@ public class Track extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "track")
     List<Role> roleList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostTrack> postTrackList = new ArrayList<>();
 
 }
