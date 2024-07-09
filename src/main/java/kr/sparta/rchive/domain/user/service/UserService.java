@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.repository.UserRepository;
@@ -34,24 +35,38 @@ public class UserService {
     @Transactional
     public void signup(UserSignupReq req){
 
+        if(!req.termUserAge() || !req.termUseService() || !req.termPersonalInfo()){
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_DISAGREE_TERMS);
+        }
+
         if(userRepository.existsByEmail(req.email())){
             throw new UserCustomException(UserExceptionCode.CONFLICT_EMAIL);
         }
 
-        if(req.nickname()!=null && userRepository.existsByNickname(req.nickname())){
-            throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
+        if(req.userRole() == UserRoleEnum.USER){
+            if(userRepository.existsByNickname(req.nickname())){
+                throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
+            }
+        }else{
+            if(req.nickname()!=null){
+                throw new UserCustomException(UserExceptionCode.BAD_REQUEST_MANAGER_NICKNAME);
+            }
         }
 
         User user = User.builder()
                 .email(req.email())
                 .password(bCryptPasswordEncoder.encode(req.password()))
                 .oAuthType(req.oAuthType())
-                .oAuthId(req.oAuthId())
+                //.oAuthId(req.oAuthId())
                 .birth(req.birth())
                 .phone(req.phone())
                 .gender(req.gender())
                 .nickname(req.nickname())
                 .userRole(req.userRole())
+                .termUserAge(req.termUserAge())
+                .termUseService(req.termUseService())
+                .termPersonalInfo(req.termPersonalInfo())
+                .termAdvertisement(req.termAdvertisement())
                 .build();
 
         userRepository.save(user);
