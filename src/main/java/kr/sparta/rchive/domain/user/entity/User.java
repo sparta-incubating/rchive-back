@@ -70,6 +70,18 @@ public class User extends BaseTimeEntity {
     private UserRoleEnum userRole;
 
     @Column(nullable = false)
+    private Boolean termUserAge;
+
+    @Column(nullable = false)
+    private Boolean termUseService;
+
+    @Column(nullable = false)
+    private Boolean termPersonalInfo;
+
+    @Column(nullable = false)
+    private Boolean termAdvertisement;
+
+    @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean isDeleted;
 
