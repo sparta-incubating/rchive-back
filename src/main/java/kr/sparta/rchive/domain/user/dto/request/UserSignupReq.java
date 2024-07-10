@@ -10,7 +10,7 @@ import lombok.Builder;
 @Builder
 @JsonIgnoreProperties
 public record UserSignupReq (
-        String oAuthId,
+        //String oAuthId,
         OAuthTypeEnum oAuthType,
         String email,
         String password,
@@ -18,7 +18,12 @@ public record UserSignupReq (
         String phone,
         GenderEnum gender,
         String nickname,
-        UserRoleEnum userRole
+        UserRoleEnum userRole,
+        Boolean termUserAge,
+        Boolean termUseService,
+        Boolean termPersonalInfo,
+        Boolean termAdvertisement
+
         ) {
 
 }
