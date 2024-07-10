@@ -1,27 +1,14 @@
 package kr.sparta.rchive.domain.user.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.global.entity.BaseTimeEntity;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import kr.sparta.rchive.domain.post.entity.PostTrack;
-import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
-import kr.sparta.rchive.domain.post.entity.PostTrack;
-import kr.sparta.rchive.global.entity.BaseTimeEntity;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name="tb_track")
@@ -55,8 +42,4 @@ public class Track extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "track")
     List<Role> roleList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "track")
-    List<PostTrack> postTrackList = new ArrayList<>();
-
 }

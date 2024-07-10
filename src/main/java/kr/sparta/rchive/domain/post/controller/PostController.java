@@ -15,8 +15,10 @@ import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
+import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.global.custom.CustomPageable;
 import kr.sparta.rchive.global.response.CommonResponseDto;
+import kr.sparta.rchive.global.security.LoginUser;
 import kr.sparta.rchive.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -105,7 +107,7 @@ public class PostController {
     @GetMapping("/tags/search")
     @Operation(operationId = "POST-011", summary = "태그를 이용하여 검색하는 기능")
     public ResponseEntity<CommonResponseDto> searchPostByTag(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @LoginUser User user,
             @RequestParam("trackName") String trackName,
             @RequestParam("tagName") String tagName,
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -114,7 +116,7 @@ public class PostController {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
 
         Page<PostSearchByTagRes> responseList = postTagCoreService
-                .searchPostByTag(tagName, trackName, userDetails.getUser(), pageable);
+                .searchPostByTag(tagName, trackName, user, pageable);
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
