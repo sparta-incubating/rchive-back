@@ -32,6 +32,7 @@ public class Tag extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private String tagName;
 
+    @Builder.Default
     @OneToMany(mappedBy = "tag")
     List<PostTag> postTagList = new ArrayList<>();
 }

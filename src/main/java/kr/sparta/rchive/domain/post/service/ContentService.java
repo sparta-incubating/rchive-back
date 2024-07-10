@@ -27,13 +27,10 @@ public class ContentService {
         Content findContent = findContentByPostId(modifyPost.getId());
 
         if(isContentExist(findContent)) {
-            createContent(content, modifyPost);
-            return;
+            contentRepository.delete(findContent);
         }
 
-        findContent.update(content);
-
-        contentRepository.save(findContent);
+        createContent(content, modifyPost);
     }
 
     private Content findContentByPostId(Long postId) {
@@ -41,6 +38,6 @@ public class ContentService {
     }
 
     private Boolean isContentExist(Content content) {
-        return content == null;
+        return content != null;
     }
 }

@@ -84,7 +84,7 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "track_id")
     private Track track;
 
-    public void deletePost(Boolean isDeleted) {
+    public void delete(Boolean isDeleted) {
         this.isDeleted = isDeleted;
         this.deletedAt = LocalDateTime.now();
     }
