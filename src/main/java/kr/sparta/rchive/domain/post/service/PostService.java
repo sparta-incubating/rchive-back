@@ -23,13 +23,6 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    // 교육자료 테이블에서 ID를 이용하여 검색하는 로직
-    public Post findPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(
-                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
-        );
-    }
-
     public Post createPost(PostCreateReq request, Track track) {
         Post createPost = Post.builder()
                 .postType(request.postType())
@@ -72,5 +65,12 @@ public class PostService {
         return postIdList.stream().filter(
                 postId -> findPostById(postId).getTrack().getTrackName().equals(trackName)
         ).collect(Collectors.toList());
+    }
+
+    // 교육자료 테이블에서 ID를 이용하여 검색하는 로직
+    public Post findPostById(Long postId) {
+        return postRepository.findById(postId).orElseThrow(
+                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
+        );
     }
 }
