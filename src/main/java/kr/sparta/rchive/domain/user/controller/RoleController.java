@@ -6,6 +6,7 @@ import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
+import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.response.RoleResponseCode;
@@ -13,6 +14,7 @@ import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.global.response.CommonResponseDto;
+import kr.sparta.rchive.global.security.LoginUser;
 import kr.sparta.rchive.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +39,9 @@ public class RoleController {
     @PostMapping
     @Operation(operationId = "ROLE-002", summary = "내 권한(트랙 및 기수) 요청")
     public ResponseEntity<CommonResponseDto> requestRole(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @LoginUser User user,
             @RequestBody RoleRequestReq req){
-        userTrackRoleCoreService.requestRole(userDetails.getUser(), req);
+        userTrackRoleCoreService.requestRole(user, req);
 
         return ResponseEntity.status(RoleResponseCode.OK_REQUEST_ROLE.getHttpStatus())
                 .body(CommonResponseDto.of(RoleResponseCode.OK_REQUEST_ROLE, null));
@@ -68,9 +70,9 @@ public class RoleController {
     @GetMapping("/result")
     @Operation(operationId = "ROLE-007", summary = "권한 신청 결과 조회 - 최초 로그인")
     public ResponseEntity<CommonResponseDto> getResultRoleFirstLogin(
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @LoginUser User user
     ){
-        AuthEnum auth = roleService.getResultRoleFirstLogin(userDetails.getUser());
+        AuthEnum auth = roleService.getResultRoleFirstLogin(user);
 
         return ResponseEntity.status(RoleResponseCode.OK_GET_RESULT_ROLE_FIRST_LOGIN.getHttpStatus())
                 .body(CommonResponseDto.of(RoleResponseCode.OK_GET_RESULT_ROLE_FIRST_LOGIN, auth));
@@ -79,9 +81,9 @@ public class RoleController {
     @GetMapping("/request")
     @Operation(operationId = "ROLE-008", summary = "권한 신청 여부 조회 - 최초 로그인")
     public ResponseEntity<CommonResponseDto> getRequestRoleFirstLogin(
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @LoginUser User user
     ){
-        boolean isRequest = roleService.getRequestRoleFirstLogin(userDetails.getUser());
+        boolean isRequest = roleService.getRequestRoleFirstLogin(user);
 
         return ResponseEntity.status(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN.getHttpStatus())
                 .body(CommonResponseDto.of(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN, isRequest));
