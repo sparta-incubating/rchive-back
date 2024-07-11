@@ -30,7 +30,6 @@ public class TrackService {
         return new RoleGetTrackNameListRes(trackNameList);
     }
 
-
     public RoleGetTrackPeriodListRes getTrackPeriodList(TrackNameEnum trackName) {
         List<Track> trackList = trackRepository.findAllByTrackName(trackName);
         List<Integer> trackPeriodList = trackList.stream()
@@ -41,6 +40,7 @@ public class TrackService {
 
         return new RoleGetTrackPeriodListRes(trackPeriodList);
     }
+
 
     // 트랙 안의 열람권한을 확인하는 로직
     public boolean checkPermission(Long trackId) {
