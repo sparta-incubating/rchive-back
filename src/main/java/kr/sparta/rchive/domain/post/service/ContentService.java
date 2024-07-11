@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -24,20 +26,20 @@ public class ContentService {
     }
 
     public void updateContent(String content, Post modifyPost) {
-        Content findContent = findContentByPostId(modifyPost.getId());
+        List<Content> findContentList = findContentByPostId(modifyPost.getId());
 
-        if(isContentExist(findContent)) {
-            contentRepository.delete(findContent);
+        if(isContentExist(findContentList)) {
+            contentRepository.deleteAll(findContentList);
         }
 
         createContent(content, modifyPost);
     }
 
-    private Content findContentByPostId(Long postId) {
+    private List<Content> findContentByPostId(Long postId) {
         return contentRepository.findByPostId(postId);
     }
 
-    private Boolean isContentExist(Content content) {
-        return content != null;
+    private Boolean isContentExist(List<Content> contentList) {
+        return !contentList.isEmpty();
     }
 }

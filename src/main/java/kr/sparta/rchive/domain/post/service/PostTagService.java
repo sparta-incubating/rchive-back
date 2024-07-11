@@ -20,7 +20,7 @@ public class PostTagService {
 
     // 교육자료태그 테이블에서 태그 ID를 이용하여 태그가 붙어있는 교육자료들을 List로 가져오는 로직
     public List<Long> findPostIdByTagIdAndIsDeletedFalse(Long tagId) {
-        return postTagRepository.findPostTagListByTagIdAndALIVE(tagId);
+        return postTagRepository.findPostTagListByTagIdAlive(tagId);
     }
 
     // 교육자료에 붙어있는 모든 태그들을 가져오는 로직
