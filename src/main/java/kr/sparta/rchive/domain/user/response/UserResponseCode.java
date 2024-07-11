@@ -32,6 +32,10 @@ public enum UserResponseCode implements ResponseCode {
         return responseCode.getHttpStatus();
     }
 
+    public String getResponseCode(UserResponseCode responseCode) {
+        return responseCode.getResponseCode();
+    }
+
     public String getMessage(UserResponseCode responseCode) {
         return responseCode.getMessage();
     }
