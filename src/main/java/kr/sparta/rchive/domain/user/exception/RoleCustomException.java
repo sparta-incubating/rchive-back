@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class RoleCustomException extends CustomException {
-    public RoleCustomException(UserExceptionCode exceptionCode) {
+    public RoleCustomException(RoleExceptionCode exceptionCode) {
         super(exceptionCode.getHttpStatus(), exceptionCode.getErrorCode(),
                 exceptionCode.getMessage());
     }
