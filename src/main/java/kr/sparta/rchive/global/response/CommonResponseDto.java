@@ -19,42 +19,23 @@ public class CommonResponseDto<T> {
     private String responseCode;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String exceptionCode;
+    private String errorCode;
 
     private String message;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
-    public CommonResponseDto(int value, String message) {
-        this.status = value;
-        this.message = message;
-    }
-
     public CommonResponseDto (int status, String message, T data){
         this.status = status;
         this.message = message;
+        this.data = data;
     }
 
     public CommonResponseDto(int value, String exceptionCode, String message) {
         this.status = value;
-        this.exceptionCode = exceptionCode;
+        this.errorCode = exceptionCode;
         this.message = message;
-    }
-
-    public CommonResponseDto (int status, String exceptionCode, String message, T data){
-        this.status = status;
-        this.exceptionCode = exceptionCode;
-        this.message = message;
-    }
-
-
-    public static <T> CommonResponseDto<T> of(int status, String message, T data) {
-        return new CommonResponseDto<T>(status,message,data);
-    }
-
-    public static <T> CommonResponseDto<T> of(int status, String exceptionCode, String message, T data) {
-        return new CommonResponseDto<T>(status,exceptionCode,message,data);
     }
 
     public static <T> CommonResponseDto<T> of(ResponseCode responseCode, T data) {
@@ -62,13 +43,6 @@ public class CommonResponseDto<T> {
                 responseCode.getHttpStatus().value(),
                 responseCode.getMessage(),
                 data
-        );
-    }
-
-    public static <T> CommonResponseDto<T> of(ResponseCode responseCode) {
-        return new CommonResponseDto<T>(
-                responseCode.getHttpStatus().value(),
-                responseCode.getMessage()
         );
     }
 
