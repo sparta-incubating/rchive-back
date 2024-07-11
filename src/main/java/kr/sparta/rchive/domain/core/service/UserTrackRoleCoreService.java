@@ -29,10 +29,6 @@ public class UserTrackRoleCoreService {
     }
 
     public RoleGetLastSelectRoleRes getLastSelectRoleBackoffice(User user){
-        if(user.getUserRole() == UserRoleEnum.USER){
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_USER_ROLE_USER);
-        }
-
         List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
         Role role = null;
         for(Role r : roleList){
