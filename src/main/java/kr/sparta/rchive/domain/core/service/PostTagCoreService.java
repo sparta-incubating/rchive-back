@@ -45,7 +45,7 @@ public class PostTagCoreService {
     private final RedisService redisService;
 
     // TODO : Redis 만들기, paging 적용하기
-    public Page<PostSearchByTagRes> searchPostByTag(String tagName, String trackName, User user, Pageable pageable) {
+    public Page<PostSearchByTagRes> searchPostByTag(String tagName, User user, Pageable pageable) {
         Long trackId = userService.findUserTrackIdByUserEmail(user.getEmail());   // TODO: 로그인한 유저의 트랙 ID 확인 추후에 레디스와 연결하여
         // 마지막에 들어간 트랙 받아오는 로직으로 변경
         Track userTrack = trackService.findTrackById(trackId);
