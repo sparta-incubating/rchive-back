@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoleRepository extends JpaRepository<Role, RoleId> {
 
+    Optional<Role> findFirstByUserIdOrderByCreatedAtAsc(Long userId);
+
     boolean existsRoleByUserId(Long userId);
 
     Role findByTrackIdAndUserId(Long trackId, Long userId);
