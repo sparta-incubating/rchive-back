@@ -116,12 +116,10 @@ public class PostTagCoreService {
     @Transactional
     public PostModifyRes updatePost(Long id, PostModifyReq request) {
 
-        Track track;
+        Track track = null;
 
         if(request.period() != null) {
             track = findTrackByTrackNameAndPeriod(request.trackName(), request.period());
-        } else {
-            track = null;
         }
 
         Post updatePost = postService.updatePost(id, request, track);
