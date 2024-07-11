@@ -30,6 +30,10 @@ public class RoleService {
         roleRepository.save(role);
     }
 
+    public boolean getRequestRole(User user){
+        return roleRepository.existsRoleByUser(user);
+    }
+
     // 트랙 ID와 유저의 ID로 권한을 찾아오는 로직
     public TrackRoleEnum findTrackRoleByTrackIdAndUserId(Long userTrackId, Long userId) {
         Role userRole = roleRepository.findByTrackIdAndUserId(userTrackId, userId);

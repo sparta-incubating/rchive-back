@@ -62,4 +62,15 @@ public class RoleController {
         return ResponseEntity.status(UserResponseCode.OK_GET_TRACK_PERIOD.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_GET_TRACK_PERIOD, res));
     }
+
+    @GetMapping("/request")
+    @Operation(operationId = "ROLE-008", summary = "권한 신청 여부 조회 - 최초 로그인")
+    public ResponseEntity<CommonResponseDto> getRequestRole(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        boolean isRequest = roleService.getRequestRole(userDetails.getUser());
+
+        return ResponseEntity.status(UserResponseCode.OK_GET_REQUEST_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_GET_REQUEST_ROLE, isRequest));
+    }
 }
