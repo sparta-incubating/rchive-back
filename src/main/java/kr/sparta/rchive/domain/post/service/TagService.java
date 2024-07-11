@@ -93,4 +93,11 @@ public class TagService {
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
+
+    public List<String> findTagNameListBytagIdList(List<Long> tagIdList) {
+        List<Tag> tagList = tagRepository.findAllByIdIn(tagIdList);
+        return tagList.stream()
+                .map(Tag::getTagName)
+                .collect(Collectors.toList());
+    }
 }

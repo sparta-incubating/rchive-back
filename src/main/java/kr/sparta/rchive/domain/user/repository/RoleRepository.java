@@ -4,6 +4,8 @@ import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.RoleId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface RoleRepository extends JpaRepository<Role, RoleId> {
-    Role findByTrackIdAndUserId(Long trackId, Long userId);
+    Optional<Role> findByUserIdAndTrackId(Long trackId, Long userId);
 }

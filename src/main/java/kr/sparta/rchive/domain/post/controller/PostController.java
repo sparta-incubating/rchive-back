@@ -2,39 +2,27 @@ package kr.sparta.rchive.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
-import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
-import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
-import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
+import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.global.custom.CustomPageable;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
-import kr.sparta.rchive.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -80,17 +68,18 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_POST, null));
     }
 
-
-    @GetMapping("/tags")
-    @Operation(operationId = "POST-010", summary = "사용할 태그 검색")
-    public ResponseEntity<CommonResponseDto> searchTag(
-            @RequestParam("tagName") String tagName
+    @GetMapping("/{postId}")
+    @Operation(operationId = "POST-006", summary = "게시물 단건 조회")
+    public ResponseEntity<CommonResponseDto> getPost(
+            @LoginUser User user,
+            @PathVariable Long postId,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period
     ) {
+        PostGetSinglePostRes response = postTagCoreService.getPost(user, postId, trackName, period);
 
-        List<TagSearchRes> responseList = tagService.searchTag(tagName);
-
-        return ResponseEntity.status(PostResponseCode.OK_SEARCH_TAG.getHttpStatus())
-                .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TAG, responseList));
+        return ResponseEntity.status(PostResponseCode.OK_GET_SINGLE_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_GET_SINGLE_POST, response));
     }
 
     @PostMapping("/tags")
@@ -102,6 +91,18 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_TAG, response));
+    }
+
+    @GetMapping("/tags")
+    @Operation(operationId = "POST-010", summary = "사용할 태그 검색")
+    public ResponseEntity<CommonResponseDto> searchTag(
+            @RequestParam("tagName") String tagName
+    ) {
+
+        List<TagSearchRes> responseList = tagService.searchTag(tagName);
+
+        return ResponseEntity.status(PostResponseCode.OK_SEARCH_TAG.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TAG, responseList));
     }
 
     @GetMapping("/tags/search")

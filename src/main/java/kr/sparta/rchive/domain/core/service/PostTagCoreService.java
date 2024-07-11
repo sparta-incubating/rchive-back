@@ -1,16 +1,21 @@
 package kr.sparta.rchive.domain.core.service;
 
+import kr.sparta.rchive.domain.comment.dto.response.CommentRes;
+import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
 import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
+import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.service.ContentService;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
 import kr.sparta.rchive.domain.post.service.TagService;
+import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -29,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +48,7 @@ public class PostTagCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final ContentService contentService;
+    private final CommentService commentService;
     private final RedisService redisService;
 
     // TODO : Redis 만들기, paging 적용하기
@@ -137,6 +144,31 @@ public class PostTagCoreService {
                 .build();
     }
 
+    public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        Post post = postService.findPostById(postId);
+        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), track.getId());
+
+        if(isTrackMismatchOrRoleNotPM(post, track.getId(), role.getTrackRole())) {
+            throw new IllegalArgumentException();   // TODO : 추후에 커스텀 익셉션으로 변경할 예정
+        }
+
+        String content = findContentByPostId(postId);
+
+        List<Long> tagIdList = postTagService.findTagIdListByPostId(post.getId());
+        List<String> tagNameList = tagService.findTagNameListBytagIdList(tagIdList);
+
+        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId);
+
+        return PostGetSinglePostRes.builder()
+                .title(post.getTitle())
+                .videoLink(post.getVideoLink())
+                .content(content)
+                .tagList(tagNameList)
+                .commentResList(commentResList)
+                .build();
+    }
+
     private void createContentByPost(Post createPost, String content) {
         contentService.createContent(content, createPost);
     }
@@ -205,5 +237,24 @@ public class PostTagCoreService {
 
     private boolean UserRoleIsUser(UserRoleEnum userRole) {
         return userRole == UserRoleEnum.USER;
+    }
+
+    private String findContentByPostId(Long postId) {
+        StringBuilder sb = new StringBuilder();
+
+        List<String> contentList =  contentService.findContentByPostId(postId).stream()
+                .filter(content -> content.getId() == 1)
+                .map(Content::getContent)
+                .toList();
+
+        for(String s : contentList) {
+            sb.append(s);
+        }
+
+        return sb.toString();
+    }
+
+    private boolean isTrackMismatchOrRoleNotPM(Post post, Long trackId, TrackRoleEnum trackRole) {
+        return !(Objects.equals(post.getTrack().getId(), trackId) || trackRole.equals(TrackRoleEnum.PM));
     }
 }

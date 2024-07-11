@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.user.service;
 
-import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -32,8 +31,14 @@ public class RoleService {
 
     // 트랙 ID와 유저의 ID로 권한을 찾아오는 로직
     public TrackRoleEnum findTrackRoleByTrackIdAndUserId(Long userTrackId, Long userId) {
-        Role userRole = roleRepository.findByTrackIdAndUserId(userTrackId, userId);
+        Role userRole = findRoleByUserIdAndTrackId(userId, userTrackId);
 
         return userRole.getTrackRole();
+    }
+
+    public Role findRoleByUserIdAndTrackId(Long userId, Long trackId) {
+        return roleRepository.findByUserIdAndTrackId(userId, trackId).orElseThrow(
+                        IllegalArgumentException::new   // TODO: 추후에 커스텀 익셉션으로 변경할 예정
+                );
     }
 }

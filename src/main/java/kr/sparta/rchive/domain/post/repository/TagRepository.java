@@ -13,4 +13,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     @Query("select t from Tag t where t.tagName = :tagName")
     Tag findByTagNameNotOptional(String tagName);
+
+    List<Tag> findAllByIdIn(List<Long> tagIdList);
 }

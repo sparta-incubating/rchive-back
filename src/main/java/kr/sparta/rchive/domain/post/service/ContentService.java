@@ -35,7 +35,7 @@ public class ContentService {
         createContent(content, modifyPost);
     }
 
-    private List<Content> findContentByPostId(Long postId) {
+    public List<Content> findContentByPostId(Long postId) {
         return contentRepository.findByPostId(postId);
     }
 
