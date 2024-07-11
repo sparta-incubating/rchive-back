@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoleRepository extends JpaRepository<Role, RoleId> {
 
-    boolean existsRoleByUser(User user);
+    boolean existsRoleByUserId(Long userId);
 
     Role findByTrackIdAndUserId(Long trackId, Long userId);
 }

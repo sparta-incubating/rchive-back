@@ -31,7 +31,7 @@ public class RoleService {
     }
 
     public boolean getRequestRole(User user){
-        return roleRepository.existsRoleByUser(user);
+        return roleRepository.existsRoleByUserId(user.getId());
     }
 
     // 트랙 ID와 유저의 ID로 권한을 찾아오는 로직
