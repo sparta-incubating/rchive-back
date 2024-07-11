@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.user.service;
 
+import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
@@ -47,5 +48,9 @@ public class RoleService {
         Role userRole = roleRepository.findByTrackIdAndUserId(userTrackId, userId);
 
         return userRole.getTrackRole();
+    }
+
+    public List<Role> findAllByUserIdApprove(Long userId){
+        return roleRepository.findAllByUserIdAndAuth(userId,AuthEnum.APPROVE);
     }
 }

@@ -4,21 +4,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.response.RoleResponseCode;
-import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
-import kr.sparta.rchive.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -87,5 +85,16 @@ public class RoleController {
 
         return ResponseEntity.status(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN.getHttpStatus())
                 .body(CommonResponseDto.of(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN, isRequest));
+    }
+
+    @GetMapping("/select/backoffice")
+    @Operation(operationId = "ROLE-010", summary = "마지막에 선택한 권한 조회 - 백오피스")
+    public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
+            @LoginUser User user
+    ){
+        RoleGetLastSelectRoleRes res = userTrackRoleCoreService.getLastSelectRoleBackoffice(user);
+
+        return ResponseEntity.status(RoleResponseCode.OK_GET_LAST_SELECT_ROLE_BACKOFFICE.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_LAST_SELECT_ROLE_BACKOFFICE, res));
     }
 }
