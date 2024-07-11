@@ -1,21 +1,15 @@
 package kr.sparta.rchive.domain.post.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
-import kr.sparta.rchive.domain.post.enums.DataTypeEnum;
+import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,15 +47,11 @@ public class Post extends BaseTimeEntity {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "data_type", nullable = false)
-    private DataTypeEnum dataType;
+    @Column(name = "video_link")
+    private String videoLink;
 
-    @Column(name = "data_Link", nullable = false)
-    private String dataLink;
-
-    @Column(name = "connect_data_id")
-    private Long connectDataId;
+    @Column(name = "content_link")
+    private String contentLink;
 
     @Column(nullable = false)
     @ColumnDefault("0")
@@ -80,6 +70,34 @@ public class Post extends BaseTimeEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "post")
-    List<Comment> commentList = new ArrayList<>();
+    private List<Comment> commentList = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "post")
+    private List<Content> contentList = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "post")
+    private List<PostTag> postTagList = new ArrayList<>();
+
+    @ManyToOne()
+    @JoinColumn(name = "track_id")
+    private Track track;
+
+    public void delete(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public void update(PostModifyReq request, Track track) {
+        this.postType = request.postType() == null ? this.postType : request.postType();
+        this.title = request.title() == null ? this.title : request.title();
+        this.tutor = request.tutor() == null ? this.tutor : request.tutor();
+        this.uploadedAt = request.uploadedAt() == null ? this.uploadedAt : request.uploadedAt();
+        this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
+        this.contentLink = request.contentLink() == null ? this.contentLink : request.contentLink();
+        this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();
+        this.track = track == null ? this.track : track;
+    }
 
 }

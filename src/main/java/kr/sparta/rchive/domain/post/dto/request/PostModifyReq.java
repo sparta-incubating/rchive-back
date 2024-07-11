@@ -9,7 +9,7 @@ import lombok.Builder;
 
 @Builder
 @JsonIgnoreProperties
-public record PostCreateReq(
+public record PostModifyReq(
         PostTypeEnum postType,
         String title,
         String tutor,

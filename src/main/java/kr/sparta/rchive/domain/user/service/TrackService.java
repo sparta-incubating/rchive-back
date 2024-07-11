@@ -61,4 +61,7 @@ public class TrackService {
         );
     }
 
+    public Integer findPeriodByTrackId(Long trackId) {
+        return findTrackById(trackId).getPeriod();
+    }
 }

@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.post.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,10 +20,7 @@ public class PostTagService {
 
     // 교육자료태그 테이블에서 태그 ID를 이용하여 태그가 붙어있는 교육자료들을 List로 가져오는 로직
     public List<Long> findPostIdByTagIdAndIsDeletedFalse(Long tagId) {
-        return postTagRepository.findPostTagListByTagIdAndIsDeletedFalse(tagId)
-                .stream()
-                .map(postTag -> postTag.getPost().getId())
-                .toList();
+        return postTagRepository.findPostTagListByTagIdAlive(tagId);
     }
 
     // 교육자료에 붙어있는 모든 태그들을 가져오는 로직
@@ -54,5 +50,15 @@ public class PostTagService {
                 .toList();
 
         postTagRepository.saveAll(postTagList);
+    }
+
+    public void updatePostTagByPostAndTag(Post updatePost, List<Tag> tagList) {
+        List<PostTag> existingPostTag = findPostTagByPostId(updatePost.getId());
+        postTagRepository.deleteAll(existingPostTag);
+        savePostTagByPostAndTagIdList(updatePost, tagList);
+    }
+
+    private List<PostTag> findPostTagByPostId(Long postId) {
+        return postTagRepository.findByPostId(postId);
     }
 }
