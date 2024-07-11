@@ -89,7 +89,7 @@ public class RoleController {
 
     @GetMapping("/select/backoffice")
     @Operation(operationId = "ROLE-010", summary = "마지막에 선택한 권한 조회 - 백오피스")
-    public ResponseEntity<CommonResponseDto> getLastSelectRole(
+    public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
             @LoginUser User user
     ){
         RoleGetLastSelectRoleRes res = userTrackRoleCoreService.getLastSelectRoleBackoffice(user);
