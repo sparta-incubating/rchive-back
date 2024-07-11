@@ -6,7 +6,9 @@ import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
+import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.response.RoleResponseCode;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
@@ -39,8 +41,8 @@ public class RoleController {
             @RequestBody RoleRequestReq req){
         userTrackRoleCoreService.requestRole(userDetails.getUser(), req);
 
-        return ResponseEntity.status(UserResponseCode.OK_REQUEST_ROLE.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_REQUEST_ROLE, null));
+        return ResponseEntity.status(RoleResponseCode.OK_REQUEST_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_REQUEST_ROLE, null));
     }
 
     @GetMapping("/track")
@@ -48,8 +50,8 @@ public class RoleController {
     public ResponseEntity<CommonResponseDto> getTrackNameList(){
         RoleGetTrackNameListRes res = trackService.getTrackNameList();
 
-        return ResponseEntity.status(UserResponseCode.OK_GET_TRACK_NAME.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_GET_TRACK_NAME, res));
+        return ResponseEntity.status(RoleResponseCode.OK_GET_TRACK_NAME.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_TRACK_NAME, res));
     }
 
     @GetMapping("/track/period")
@@ -59,18 +61,29 @@ public class RoleController {
     ){
         RoleGetTrackPeriodListRes res = trackService.getTrackPeriodList(trackName);
 
-        return ResponseEntity.status(UserResponseCode.OK_GET_TRACK_PERIOD.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_GET_TRACK_PERIOD, res));
+        return ResponseEntity.status(RoleResponseCode.OK_GET_TRACK_PERIOD.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_TRACK_PERIOD, res));
+    }
+
+    @GetMapping("/result")
+    @Operation(operationId = "ROLE-007", summary = "권한 신청 결과 조회 - 최초 로그인")
+    public ResponseEntity<CommonResponseDto> getResultRoleFirstLogin(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        AuthEnum auth = roleService.getResultRoleFirstLogin(userDetails.getUser());
+
+        return ResponseEntity.status(RoleResponseCode.OK_GET_RESULT_ROLE_FIRST_LOGIN.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_RESULT_ROLE_FIRST_LOGIN, auth));
     }
 
     @GetMapping("/request")
     @Operation(operationId = "ROLE-008", summary = "권한 신청 여부 조회 - 최초 로그인")
-    public ResponseEntity<CommonResponseDto> getRequestRole(
+    public ResponseEntity<CommonResponseDto> getRequestRoleFirstLogin(
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        boolean isRequest = roleService.getRequestRole(userDetails.getUser());
+        boolean isRequest = roleService.getRequestRoleFirstLogin(userDetails.getUser());
 
-        return ResponseEntity.status(UserResponseCode.OK_GET_REQUEST_ROLE.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_GET_REQUEST_ROLE, isRequest));
+        return ResponseEntity.status(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN, isRequest));
     }
 }
