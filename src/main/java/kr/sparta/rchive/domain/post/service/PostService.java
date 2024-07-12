@@ -90,4 +90,12 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
+    public void closePost(Long postId) {
+        Post post = findPostById(postId);
+
+        post.closePost();
+
+        postRepository.save(post);
+    }
 }

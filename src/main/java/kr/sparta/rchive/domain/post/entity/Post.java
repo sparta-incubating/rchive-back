@@ -103,4 +103,8 @@ public class Post extends BaseTimeEntity {
     public void openPost() {
         this.isOpened = true;
     }
+
+    public void closePost() {
+        this.isOpened = false;
+    }
 }

@@ -149,4 +149,16 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_OPEN_POST, null));
     }
 
+    @PatchMapping("/{postId}/close")
+    @Operation(operationId = "POST-015", summary = "게시물 공개 여부 변경 - 비공개")
+    public ResponseEntity<CommonResponseDto> closePost(
+            @PathVariable Long postId
+    ) {
+        postService.closePost(postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_CLOSE_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_CLOSE_POST, null));
+    }
+
+
 }
