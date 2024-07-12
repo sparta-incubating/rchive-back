@@ -143,7 +143,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> openPost(
             @PathVariable Long postId
     ) {
-        postService.openedPost(postId);
+        postService.openPost(postId);
 
         return ResponseEntity.status(PostResponseCode.OK_OPEN_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_OPEN_POST, null));
