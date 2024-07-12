@@ -14,6 +14,7 @@ public enum RoleExceptionCode {
 
     /*  403 FORBIDDEN : 권한 없음  */
     FORBIDDEN_USER_ROLE_USER(HttpStatus.FORBIDDEN, "ROLE-002", "일반 유저 접근 불가"),
+    FORBIDDEN_ROLE_NOT_ACCESS(HttpStatus.FORBIDDEN, "ROLE-004", "해당 권한 접근 불가"),
 
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
     NOT_FOUND_ROLE_REQUEST(HttpStatus.NOT_FOUND, "ROLE-001", "권한 신청 없음")

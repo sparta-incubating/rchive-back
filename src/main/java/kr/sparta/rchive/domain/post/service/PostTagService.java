@@ -61,4 +61,8 @@ public class PostTagService {
     private List<PostTag> findPostTagByPostId(Long postId) {
         return postTagRepository.findByPostId(postId);
     }
+
+    public List<Long> findTagIdListByPostId(Long postId) {
+        return postTagRepository.findTagIdListByPostId(postId);
+    }
 }

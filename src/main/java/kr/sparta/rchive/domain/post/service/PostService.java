@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.post.service;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
@@ -72,5 +73,11 @@ public class PostService {
         return postRepository.findById(postId).orElseThrow(
                 () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
         );
+    }
+
+    public List<Long> findPostIdListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
+        return postRepository.findAllByPostTypeAndTrackId(postType, trackId).stream()
+                .map(Post::getId)
+                .collect(Collectors.toList());
     }
 }
