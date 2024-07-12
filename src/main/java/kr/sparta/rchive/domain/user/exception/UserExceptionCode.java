@@ -11,6 +11,7 @@ public enum UserExceptionCode {
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST,"USER-003","존재하지 않는 이메일"),
     BAD_REQUEST_MANAGER_NICKNAME(HttpStatus.BAD_REQUEST,"USER-004","매니저 닉네임 입력 불가"),
     BAD_REQUEST_DISAGREE_TERMS(HttpStatus.BAD_REQUEST,"USER-005","이용약관 미동의"),
+    BAD_REQUEST_NO_MATCH_PASSWORD(HttpStatus.BAD_REQUEST,"USER-006","비밀번호가 일치하지 않음"),
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 
