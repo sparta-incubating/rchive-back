@@ -58,6 +58,7 @@ public class UserService {
                 .password(bCryptPasswordEncoder.encode(req.password()))
                 .oAuthType(req.oAuthType())
                 //.oAuthId(req.oAuthId())
+                .username(req.username())
                 .birth(req.birth())
                 .phone(req.phone())
                 .gender(req.gender())

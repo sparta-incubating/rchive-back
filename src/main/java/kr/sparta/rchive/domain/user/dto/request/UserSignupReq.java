@@ -14,6 +14,7 @@ public record UserSignupReq (
         OAuthTypeEnum oAuthType,
         String email,
         String password,
+        String username,
         LocalDate birth,
         String phone,
         GenderEnum gender,
