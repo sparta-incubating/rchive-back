@@ -80,4 +80,14 @@ public class PostService {
                 .map(Post::getId)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void openPost(Long postId) {
+        Post post = findPostById(postId);
+
+        post.openPost();
+
+        postRepository.save(post);
+    }
+
 }

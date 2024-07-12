@@ -138,4 +138,15 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
     }
 
+    @PatchMapping("/{postId}/open")
+    @Operation(operationId = "POST-014", summary = "게시물 공개 여부 변경 - 공개")
+    public ResponseEntity<CommonResponseDto> openPost(
+            @PathVariable Long postId
+    ) {
+        postService.openPost(postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_OPEN_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_OPEN_POST, null));
+    }
+
 }
