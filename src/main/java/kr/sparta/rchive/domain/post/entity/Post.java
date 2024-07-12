@@ -100,4 +100,8 @@ public class Post extends BaseTimeEntity {
         this.track = track == null ? this.track : track;
     }
 
+    public void openClose(Boolean status) {
+        this.isOpened = status;
+    }
+
 }
