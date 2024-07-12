@@ -66,10 +66,10 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/api/v1/role/select/backoffice").hasRole(UserRoleEnum.MANAGER.toString())
                         .requestMatchers("/api/v1/users/**").permitAll()
                         .requestMatchers("/api/v1/role/**").permitAll()
                         .requestMatchers("/api/v1/posts/**").permitAll()
+                        .requestMatchers("/api/v1/backoffice/**").hasRole(UserRoleEnum.MANAGER.toString())
 //                        .requestMatchers("/api/v1/**").permitAll()
 //                        .requestMatchers("/api/v1/admin").hasRole(UserRoleEnum.ADMIN.toString())
                         .anyRequest().authenticated()

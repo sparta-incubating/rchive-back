@@ -26,14 +26,5 @@ public class ProfileController {
     private final UserService userService;
     private final UserTrackRoleCoreService userTrackRoleCoreService;
 
-    @GetMapping("/backoffice")
-    @Operation(operationId = "PROFILE-010", summary = "프로필 조회 - 백오피스")
-    public ResponseEntity<CommonResponseDto> getProfile(
-            @LoginUser User user
-    ){
-        UserRes res = userTrackRoleCoreService.getProfile(user);
 
-        return ResponseEntity.status(ProfileResponseCode.OK_GET_PROFILE_BACKOFFICE.getHttpStatus())
-                .body(CommonResponseDto.of(ProfileResponseCode.OK_GET_PROFILE_BACKOFFICE, res));
-    }
 }
