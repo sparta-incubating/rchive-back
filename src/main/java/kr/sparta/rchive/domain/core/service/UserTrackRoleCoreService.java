@@ -1,11 +1,15 @@
 package kr.sparta.rchive.domain.core.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
 import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
@@ -29,31 +33,32 @@ public class UserTrackRoleCoreService {
     }
 
     public RoleGetLastSelectRoleRes getLastSelectRoleBackoffice(User user){
-        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
-        Role role = null;
-        for(Role r : roleList){
-            if (r.getTrackRole() == TrackRoleEnum.PM){
-                role = r;
-                break;
-            }else if(r.getTrackRole() == TrackRoleEnum.APM){
-                role = r;
-                break;
-            }
-        }
 
-        if(role == null){
-            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
-        }
-
+        Role role = roleService.getRoleByManager(user);
         Track track = role.getTrack();
 
-        RoleGetLastSelectRoleRes res = RoleGetLastSelectRoleRes.builder()
+        return RoleGetLastSelectRoleRes.builder()
                 .trackRole(role.getTrackRole())
                 .trackName(track.getTrackName())
                 .period(track.getPeriod())
                 .build();
+    }
 
-        return res;
+    public UserRes getProfile(User user) {
+
+        Role role = roleService.getRoleByManager(user);
+        Track track = role.getTrack();
+
+        return UserRes.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .birth(user.getBirth())
+                .phone(user.getPhone())
+                .trackRole(role.getTrackRole())
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
     }
 
 }

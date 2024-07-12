@@ -33,7 +33,28 @@ public class RoleService {
         roleRepository.save(role);
     }
 
+    public Role getRoleByManager(User user){
+        List<Role> roleList = findAllByUserIdApprove(user.getId());
+        Role role = null;
+        for(Role r : roleList){
+            if (r.getTrackRole() == TrackRoleEnum.PM){
+                role = r;
+                break;
+            }else if(r.getTrackRole() == TrackRoleEnum.APM){
+                role = r;
+                break;
+            }
+        }
+
+        if(role == null){
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
+        }
+
+        return role;
+    }
+
     public AuthEnum getResultRoleFirstLogin(User user) {
+
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
                 () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE_REQUEST));
         return role.getAuth();
