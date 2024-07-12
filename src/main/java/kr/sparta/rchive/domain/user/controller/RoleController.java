@@ -87,14 +87,5 @@ public class RoleController {
                 .body(CommonResponseDto.of(RoleResponseCode.OK_GET_REQUEST_ROLE_FIRST_LOGIN, isRequest));
     }
 
-    @GetMapping("/select/backoffice")
-    @Operation(operationId = "ROLE-010", summary = "마지막에 선택한 권한 조회 - 백오피스")
-    public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
-            @LoginUser User user
-    ){
-        RoleGetLastSelectRoleRes res = userTrackRoleCoreService.getLastSelectRoleBackoffice(user);
 
-        return ResponseEntity.status(RoleResponseCode.OK_GET_LAST_SELECT_ROLE_BACKOFFICE.getHttpStatus())
-                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_LAST_SELECT_ROLE_BACKOFFICE, res));
-    }
 }

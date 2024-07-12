@@ -1,0 +1,51 @@
+package kr.sparta.rchive.domain.backoffice.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.sparta.rchive.domain.backoffice.respoonse.BackofficeResponseCode;
+import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.UserRes;
+import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.response.ProfileResponseCode;
+import kr.sparta.rchive.domain.user.response.RoleResponseCode;
+import kr.sparta.rchive.domain.user.service.RoleService;
+import kr.sparta.rchive.domain.user.service.TrackService;
+import kr.sparta.rchive.global.response.CommonResponseDto;
+import kr.sparta.rchive.global.security.LoginUser;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/backoffice")
+@Tag(name = "5. BackOffice API", description = "BackOffice 관련 API 입니다.")
+public class BackofficeController {
+
+    private final UserTrackRoleCoreService userTrackRoleCoreService;
+
+    @GetMapping("/role/select")
+    @Operation(operationId = "BACKOFFICE-008", summary = "마지막에 선택한 권한 조회 - 백오피스")
+    public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
+            @LoginUser User user
+    ){
+        RoleGetLastSelectRoleRes res = userTrackRoleCoreService.getLastSelectRoleBackoffice(user);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_GET_LAST_SELECT_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_LAST_SELECT_ROLE, res));
+    }
+
+    @GetMapping("/profile")
+    @Operation(operationId = "BACKOFFICE-009", summary = "프로필 조회 - 백오피스")
+    public ResponseEntity<CommonResponseDto> getProfile(
+            @LoginUser User user
+    ){
+        UserRes res = userTrackRoleCoreService.getProfile(user);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_GET_PROFILE.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_PROFILE, res));
+    }
+}

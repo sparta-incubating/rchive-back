@@ -14,7 +14,6 @@ public enum RoleResponseCode implements ResponseCode {
     OK_GET_TRACK_PERIOD(HttpStatus.OK, "ROLE-006", "트랙의 기수 조회 성공"),
     OK_GET_RESULT_ROLE_FIRST_LOGIN(HttpStatus.OK, "ROLE-007", "권한 신청 결과 조회 성공"),
     OK_GET_REQUEST_ROLE_FIRST_LOGIN(HttpStatus.OK, "ROLE-008", "권한 신청 여부 조회 성공"),
-    OK_GET_LAST_SELECT_ROLE_BACKOFFICE(HttpStatus.OK, "ROLE-010", "백오피스에서 마지막으로 선택한 권한 조회 성공")
     ;
 
     private final HttpStatus httpStatus;
