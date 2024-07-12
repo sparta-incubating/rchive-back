@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.core.service;
 
-import kr.sparta.rchive.domain.comment.dto.response.CommentRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
@@ -166,7 +165,7 @@ public class PostTagCoreService {
                 .build();
     }
 
-    public List<PostGetCategoryPostRes> getCategoryPost(
+    public List<PostGetCategoryPostRes> getPostListByCategory(
             User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType
     ) {
 

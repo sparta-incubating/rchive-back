@@ -78,7 +78,7 @@ public class PostController {
             @RequestParam("category") PostTypeEnum postType
     ){
         List<PostGetCategoryPostRes> responseList =
-                postTagCoreService.getCategoryPost(user, trackName, period, postType);
+                postTagCoreService.getPostListByCategory(user, trackName, period, postType);
 
         return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_CATEGORY_POST, responseList));
