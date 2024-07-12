@@ -155,14 +155,14 @@ public class PostTagCoreService {
         List<Long> tagIdList = postTagService.findTagIdListByPostId(post.getId());
         List<String> tagNameList = tagService.findTagNameListBytagIdList(tagIdList);
 
-        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId);
+//        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
 
         return PostGetSinglePostRes.builder()
                 .title(post.getTitle())
                 .videoLink(post.getVideoLink())
                 .content(content)
                 .tagList(tagNameList)
-                .commentResList(commentResList)
+//                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
                 .build();
     }
 
