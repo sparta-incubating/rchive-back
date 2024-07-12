@@ -4,13 +4,11 @@ import kr.sparta.rchive.domain.comment.dto.response.CommentRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
-import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
-import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
-import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
+import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.ContentService;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -21,6 +19,8 @@ import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
+import kr.sparta.rchive.domain.user.exception.RoleCustomException;
+import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
@@ -147,11 +147,8 @@ public class PostTagCoreService {
     public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Post post = postService.findPostById(postId);
-        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), track.getId());
 
-        if(isTrackMismatchOrRoleNotPM(post, track.getId(), role.getTrackRole())) {
-            throw new IllegalArgumentException();   // TODO : 추후에 커스텀 익셉션으로 변경할 예정
-        }
+        userRoleAndTrackCheck(user, track);
 
         String content = findContentByPostId(postId);
 
@@ -167,6 +164,42 @@ public class PostTagCoreService {
                 .tagList(tagNameList)
                 .commentResList(commentResList)
                 .build();
+    }
+
+    public List<PostGetCategoryPostRes> getCategoryPost(
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType
+    ) {
+
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        userRoleAndTrackCheck(user, track);
+
+        List<Long> postIdList = postService.findPostIdListByPostTypeAndTrackId(postType, track.getId());
+
+        Map<Long, List<Long>> postTagMap = postTagService.findPostTagListByTagId(postIdList);
+
+        List<PostGetCategoryPostRes> responseList = postTagMap.entrySet().stream()
+                .map(response -> {
+                    Long postId = response.getKey();
+                    List<Long> tagIdList = response.getValue();
+
+                    Post post = postService.findPostById(postId);
+
+
+                    List<String> tagNameList = tagIdList.stream()
+                            .map(tagService::findTagById)
+                            .map(Tag::getTagName)
+                            .collect(Collectors.toList());
+
+                    return PostGetCategoryPostRes.builder()
+                            .title(post.getTitle())
+                            .tutor(post.getTutor())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagNameList(tagNameList)
+                            .build();
+                }).toList();
+
+        return responseList;
     }
 
     private void createContentByPost(Post createPost, String content) {
@@ -254,7 +287,25 @@ public class PostTagCoreService {
         return sb.toString();
     }
 
-    private boolean isTrackMismatchOrRoleNotPM(Post post, Long trackId, TrackRoleEnum trackRole) {
-        return !(Objects.equals(post.getTrack().getId(), trackId) || trackRole.equals(TrackRoleEnum.PM));
+    private void userRoleAndTrackCheck(User user, Track track) {
+        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+        Role role = null;
+
+        for(Role r : roleList) {
+            if(r.getTrackRole().equals(TrackRoleEnum.PM)) {
+                return;
+            }
+
+            role = r;
+        }
+
+        if(role == null) {
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
+        }
+
+        if(!Objects.equals(role.getTrack().getId(), track.getId())) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS); //TODO: 추후에 커스텀 에러 위치 정할 예정
+
+        }
     }
 }

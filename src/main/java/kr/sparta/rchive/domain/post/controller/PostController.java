@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
@@ -68,6 +69,21 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_POST, null));
     }
 
+    @GetMapping("/category")
+    @Operation(operationId = "POST-005", summary = "게시물 목록 조회")
+    public ResponseEntity<CommonResponseDto> getPostCategory(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
+            @RequestParam("category") PostTypeEnum postType
+    ){
+        List<PostGetCategoryPostRes> responseList =
+                postTagCoreService.getCategoryPost(user, trackName, period, postType);
+
+        return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_GET_CATEGORY_POST, responseList));
+    }
+
     @GetMapping("/{postId}")
     @Operation(operationId = "POST-006", summary = "게시물 단건 조회")
     public ResponseEntity<CommonResponseDto> getPost(
@@ -86,7 +102,7 @@ public class PostController {
     @Operation(operationId = "POST-009", summary = "사용할 태그 생성")
     public ResponseEntity<CommonResponseDto> createTag(
             @RequestBody TagCreateReq request
-    ){
+    ) {
         TagCreateRes response = tagService.createTag(request.tagName());
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_TAG.getHttpStatus())
