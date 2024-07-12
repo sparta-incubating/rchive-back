@@ -22,7 +22,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
     @Transactional
-    public void requestRole(User user, Track track, TrackRoleEnum trackRole){
+    public void requestRole(User user, Track track, TrackRoleEnum trackRole) {
         Role role = Role.builder()
                 .user(user)
                 .track(track)
@@ -53,24 +53,31 @@ public class RoleService {
         return role;
     }
 
-    public AuthEnum getResultRoleFirstLogin(User user){
+    public AuthEnum getResultRoleFirstLogin(User user) {
+
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
-                ()-> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE_REQUEST));
+                () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE_REQUEST));
         return role.getAuth();
     }
 
-    public boolean getRequestRoleFirstLogin(User user){
+    public boolean getRequestRoleFirstLogin(User user) {
         return roleRepository.existsRoleByUserId(user.getId());
     }
 
     // 트랙 ID와 유저의 ID로 권한을 찾아오는 로직
     public TrackRoleEnum findTrackRoleByTrackIdAndUserId(Long userTrackId, Long userId) {
-        Role userRole = roleRepository.findByTrackIdAndUserId(userTrackId, userId);
+        Role userRole = findRoleByUserIdAndTrackId(userId, userTrackId);
 
         return userRole.getTrackRole();
     }
 
-    public List<Role> findAllByUserIdApprove(Long userId){
-        return roleRepository.findAllByUserIdAndAuth(userId,AuthEnum.APPROVE);
+    public Role findRoleByUserIdAndTrackId(Long userId, Long trackId) {
+        return roleRepository.findByUserIdAndTrackId(userId, trackId).orElseThrow(
+                () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE_REQUEST)
+        );
+    }
+
+    public List<Role> findAllByUserIdApprove(Long userId) {
+        return roleRepository.findAllByUserIdAndAuth(userId, AuthEnum.APPROVE);
     }
 }

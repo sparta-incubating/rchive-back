@@ -1,21 +1,25 @@
 package kr.sparta.rchive.domain.core.service;
 
+import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
-import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
-import kr.sparta.rchive.domain.post.dto.response.PostSearchByTagRes;
+import kr.sparta.rchive.domain.post.dto.response.*;
+import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.ContentService;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
 import kr.sparta.rchive.domain.post.service.TagService;
+import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
+import kr.sparta.rchive.domain.user.exception.RoleCustomException;
+import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +47,7 @@ public class PostTagCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final ContentService contentService;
+    private final CommentService commentService;
     private final RedisService redisService;
 
     // TODO : Redis 만들기, paging 적용하기
@@ -137,6 +143,64 @@ public class PostTagCoreService {
                 .build();
     }
 
+    public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        Post post = postService.findPostById(postId);
+
+        userRoleAndTrackCheck(user, track);
+
+        String content = findContentByPostId(postId);
+
+        List<Long> tagIdList = postTagService.findTagIdListByPostId(post.getId());
+        List<String> tagNameList = tagService.findTagNameListBytagIdList(tagIdList);
+
+//        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
+
+        return PostGetSinglePostRes.builder()
+                .title(post.getTitle())
+                .videoLink(post.getVideoLink())
+                .content(content)
+                .tagList(tagNameList)
+//                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
+                .build();
+    }
+
+    public List<PostGetCategoryPostRes> getPostListByCategory(
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType
+    ) {
+
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        userRoleAndTrackCheck(user, track);
+
+        List<Long> postIdList = postService.findPostIdListByPostTypeAndTrackId(postType, track.getId());
+
+        Map<Long, List<Long>> postTagMap = postTagService.findPostTagListByTagId(postIdList);
+
+        List<PostGetCategoryPostRes> responseList = postTagMap.entrySet().stream()
+                .map(response -> {
+                    Long postId = response.getKey();
+                    List<Long> tagIdList = response.getValue();
+
+                    Post post = postService.findPostById(postId);
+
+
+                    List<String> tagNameList = tagIdList.stream()
+                            .map(tagService::findTagById)
+                            .map(Tag::getTagName)
+                            .collect(Collectors.toList());
+
+                    return PostGetCategoryPostRes.builder()
+                            .title(post.getTitle())
+                            .tutor(post.getTutor())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagNameList(tagNameList)
+                            .build();
+                }).toList();
+
+        return responseList;
+    }
+
     private void createContentByPost(Post createPost, String content) {
         contentService.createContent(content, createPost);
     }
@@ -205,5 +269,42 @@ public class PostTagCoreService {
 
     private boolean UserRoleIsUser(UserRoleEnum userRole) {
         return userRole == UserRoleEnum.USER;
+    }
+
+    private String findContentByPostId(Long postId) {
+        StringBuilder sb = new StringBuilder();
+
+        List<String> contentList =  contentService.findContentByPostId(postId).stream()
+                .filter(content -> content.getId() == 1)
+                .map(Content::getContent)
+                .toList();
+
+        for(String s : contentList) {
+            sb.append(s);
+        }
+
+        return sb.toString();
+    }
+
+    private void userRoleAndTrackCheck(User user, Track track) {
+        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+        Role role = null;
+
+        for(Role r : roleList) {
+            if(r.getTrackRole().equals(TrackRoleEnum.PM)) {
+                return;
+            }
+
+            role = r;
+        }
+
+        if(role == null) {
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
+        }
+
+        if(!Objects.equals(role.getTrack().getId(), track.getId())) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS); //TODO: 추후에 커스텀 에러 위치 정할 예정
+
+        }
     }
 }
