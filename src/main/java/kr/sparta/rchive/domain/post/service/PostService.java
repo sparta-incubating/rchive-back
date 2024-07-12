@@ -82,11 +82,12 @@ public class PostService {
     }
 
     @Transactional
-    public void openPost(Long postId) {
+    public void openedPost(Long postId) {
         Post post = findPostById(postId);
 
-        post.openClose(true);
+        post.openedPost();
 
         postRepository.save(post);
     }
+
 }

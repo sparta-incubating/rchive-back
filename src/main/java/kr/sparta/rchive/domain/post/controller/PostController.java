@@ -139,11 +139,11 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/open")
-    @Operation(operationId = "POST-14", summary = "게시물 공개 여부 변경 - 공개")
+    @Operation(operationId = "POST-014", summary = "게시물 공개 여부 변경 - 공개")
     public ResponseEntity<CommonResponseDto> openPost(
             @PathVariable Long postId
     ) {
-        postService.openPost(postId);
+        postService.openedPost(postId);
 
         return ResponseEntity.status(PostResponseCode.OK_OPEN_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_OPEN_POST, null));
