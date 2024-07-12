@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
@@ -134,6 +135,15 @@ public class UserService {
         user.delete();
         userRepository.save(user);
     }
+
+    @Transactional
+    public void updatePassword(User user, ProfileUpdatePasswordReq req) {
+        if(!bCryptPasswordEncoder.matches(req.originPassword(), user.getPassword())){
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NO_MATCH_PASSWORD);
+        }
+        user.updatePassword(bCryptPasswordEncoder.encode(req.newPassword()));
+        userRepository.save(user);
+    }
   
     public boolean overlapEmail(String email){
         return userRepository.existsByEmail(email);
@@ -153,4 +163,6 @@ public class UserService {
         return userRepository.findTrackIdByUserEmail(userEmail);
 
     }
+
+
 }
