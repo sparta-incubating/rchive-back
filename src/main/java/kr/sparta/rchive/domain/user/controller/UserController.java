@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
+import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.response.CommonResponseDto;
+import kr.sparta.rchive.global.security.LoginUser;
 import kr.sparta.rchive.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +43,9 @@ public class UserController {
     @DeleteMapping("/logout")
     @Operation(operationId = "USER-004", summary = "로그아웃")
     public ResponseEntity<CommonResponseDto> logout(HttpServletResponse res,
-            @AuthenticationPrincipal UserDetailsImpl userDetails)
+            @LoginUser User user)
             throws UnsupportedEncodingException {
-        userService.logout(res, userDetails.getUser());
+        userService.logout(res, user);
         return ResponseEntity.status(UserResponseCode.OK_LOGOUT.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_LOGOUT,null));
     }
@@ -60,10 +62,10 @@ public class UserController {
     @DeleteMapping
     @Operation(operationId = "USER-006", summary = "회원 탈퇴")
     public ResponseEntity<CommonResponseDto> withdraw(HttpServletResponse res,
-            @AuthenticationPrincipal UserDetailsImpl userDetails)
+            @LoginUser User user)
             throws UnsupportedEncodingException {
-        userService.logout(res, userDetails.getUser());
-        userService.withdraw(userDetails.getUser());
+        userService.logout(res, user);
+        userService.withdraw(user);
         return ResponseEntity.status(UserResponseCode.OK_DELETE_USER.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_DELETE_USER,null));
     }
