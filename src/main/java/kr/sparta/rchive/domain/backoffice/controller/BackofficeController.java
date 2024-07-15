@@ -17,6 +17,7 @@ import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +33,7 @@ public class BackofficeController {
     private final UserTrackRoleCoreService userTrackRoleCoreService;
 
     @PostMapping("/role/approve")
-    @Operation(operationId = "BACKOFFICE-002", summary = "유저 권한 수락 - 백오피스")
+    @Operation(operationId = "BACKOFFICE-002", summary = "유저의 트랙 권한 수락 - 백오피스")
     public ResponseEntity<CommonResponseDto> userTrackRoleApprove(
             @LoginUser User user,
             @RequestBody List<RoleRequestListReq> reqList
@@ -41,6 +42,18 @@ public class BackofficeController {
 
         return ResponseEntity.status(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE, null));
+    }
+
+    @DeleteMapping("/role/reject")
+    @Operation(operationId = "BACKOFFICE-003", summary = "유저의 트랙 권한 거절 - 백오피스")
+    public ResponseEntity<CommonResponseDto> userTrackRoleReject(
+            @LoginUser User user,
+            @RequestBody List<RoleRequestListReq> reqList
+    ){
+        userTrackRoleCoreService.userTrackRoleReject(user,reqList);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE, null));
     }
 
     @GetMapping("/role/select")
