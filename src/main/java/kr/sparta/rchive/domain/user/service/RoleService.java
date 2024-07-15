@@ -1,11 +1,14 @@
 package kr.sparta.rchive.domain.user.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
@@ -53,6 +56,14 @@ public class RoleService {
         return role;
     }
 
+    public void approveRoleRequest(List<RoleRequestListReq> reqList){
+        List<Role> roleList = findRoleListByEmailAndTrackNameAndPeriodAndTrackRole(reqList);
+        for(Role role: roleList){
+            role.approveAuth();
+        }
+        roleRepository.saveAll(roleList);
+    }
+
     public AuthEnum getResultRoleFirstLogin(User user) {
 
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
@@ -79,5 +90,19 @@ public class RoleService {
 
     public List<Role> findAllByUserIdApprove(Long userId) {
         return roleRepository.findAllByUserIdAndAuth(userId, AuthEnum.APPROVE);
+    }
+
+    public List<Role> findRoleListByEmailAndTrackNameAndPeriodAndTrackRole(List<RoleRequestListReq> reqList) {
+        List<Role> roleList = new ArrayList<>();
+        for(RoleRequestListReq req : reqList){
+            roleList.add(findRoleByEmailAndTrackNameAndPeriodAndTrackRole(req.email(), req.trackName(), req.period(), req.trackRole()));
+        }
+        return roleList;
+    }
+
+    public Role findRoleByEmailAndTrackNameAndPeriodAndTrackRole(String email, TrackNameEnum trackName, int period, TrackRoleEnum trackRole) {
+        return roleRepository.findByEmailAndTrackNameAndPeriodAndTrackRole(email, trackName, period, trackRole).orElseThrow(
+                () -> new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE_REQUEST_LIST)
+        );
     }
 }

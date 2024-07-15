@@ -1,8 +1,10 @@
 package kr.sparta.rchive.domain.user.repository;
 
+import java.util.List;
 import java.util.Optional;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.OAuthTypeEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
