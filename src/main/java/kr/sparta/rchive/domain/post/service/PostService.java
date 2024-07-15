@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -98,4 +99,29 @@ public class PostService {
 
         postRepository.save(post);
     }
+
+    public List<Long> findPostIdListInBackOffice(PostTypeEnum postType, LocalDate uploadedAt,
+                                                 Integer period, String tutor, Boolean isOpened) {
+        if(period == 0) {
+            return findPostIdListInBackOfficeUserRolePM(postType, uploadedAt, tutor, isOpened);
+        }
+
+        return postRepository.findPostIdListByOption(postType, uploadedAt, period, tutor, isOpened);
+    }
+
+    private List<Long> findPostIdListInBackOfficeUserRolePM(PostTypeEnum postType, LocalDate uploadedAt,
+                                                            String tutor, Boolean isOpened) {
+        return postRepository.findPostIdListInBackOfficeByPM(postType, uploadedAt, tutor, isOpened);
+    }
+
+    public List<Long> findPostIdListByTrack(Track track) {
+        if(track.getPeriod() == 0) {
+            return postRepository.findAllByTrackName(track.getTrackName());
+        }
+        return postRepository.findAllByTrackId(track.getId());
+    }
+
+//    public Post findTest(Long postId) {
+//        return postRepository.findtestpostid(postId);
+//    }
 }
