@@ -76,12 +76,6 @@ public class PostService {
         );
     }
 
-    public List<Long> findPostIdListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
-        return postRepository.findAllByPostTypeAndTrackId(postType, trackId).stream()
-                .map(Post::getId)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
     public void openPost(Long postId) {
         Post post = findPostById(postId);
@@ -119,6 +113,10 @@ public class PostService {
             return postRepository.findAllByTrackName(track.getTrackName());
         }
         return postRepository.findAllByTrackId(track.getId());
+    }
+
+    public List<Post> findPostListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
+        return postRepository.findAllByPostTypeAndTrackId2(postType, trackId);
     }
 
 //    public Post findTest(Long postId) {
