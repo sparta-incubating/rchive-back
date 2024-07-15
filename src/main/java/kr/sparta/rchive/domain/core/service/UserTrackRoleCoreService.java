@@ -65,6 +65,8 @@ public class UserTrackRoleCoreService {
         Track managaerTrack = roleService.getRoleByManager(manager).getTrack();
         managerTrackRoleInvalid(managaerTrack, reqList);
 
+        // TODO: 전에 Reject 한 내역 강한 삭제
+
         roleService.approveRoleRequest(reqList);
     }
 
