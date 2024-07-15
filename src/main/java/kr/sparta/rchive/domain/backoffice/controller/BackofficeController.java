@@ -28,7 +28,7 @@ public class BackofficeController {
     private final UserTrackRoleCoreService userTrackRoleCoreService;
 
     @GetMapping("/role/select")
-    @Operation(operationId = "BACKOFFICE-008", summary = "마지막에 선택한 권한 조회 - 백오피스")
+    @Operation(operationId = "BACKOFFICE-007", summary = "마지막에 선택한 권한 조회 - 백오피스")
     public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
             @LoginUser User user
     ){
@@ -39,7 +39,7 @@ public class BackofficeController {
     }
 
     @GetMapping("/profile")
-    @Operation(operationId = "BACKOFFICE-009", summary = "프로필 조회 - 백오피스")
+    @Operation(operationId = "BACKOFFICE-008", summary = "프로필 조회 - 백오피스")
     public ResponseEntity<CommonResponseDto> getProfile(
             @LoginUser User user
     ){
