@@ -48,4 +48,8 @@ public class Role extends BaseTimeEntity {
     public void approveAuth(){
         this.auth = AuthEnum.APPROVE;
     }
+
+    public void rejectAuth(){
+        this.auth = AuthEnum.REJECT;
+    }
 }
