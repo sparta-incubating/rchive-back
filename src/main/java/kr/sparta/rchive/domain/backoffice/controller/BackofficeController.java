@@ -2,8 +2,10 @@ package kr.sparta.rchive.domain.backoffice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import kr.sparta.rchive.domain.backoffice.respoonse.BackofficeResponseCode;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
+import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -16,6 +18,8 @@ import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +30,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class BackofficeController {
 
     private final UserTrackRoleCoreService userTrackRoleCoreService;
+
+    @PostMapping("/role/approve")
+    @Operation(operationId = "BACKOFFICE-002", summary = "유저 권한 수락 - 백오피스")
+    public ResponseEntity<CommonResponseDto> userTrackRoleApprove(
+            @LoginUser User user,
+            @RequestBody List<RoleRequestListReq> reqList
+    ){
+        userTrackRoleCoreService.userTrackRoleApprove(user,reqList);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE, null));
+    }
 
     @GetMapping("/role/select")
     @Operation(operationId = "BACKOFFICE-007", summary = "마지막에 선택한 권한 조회 - 백오피스")

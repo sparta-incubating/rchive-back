@@ -45,4 +45,7 @@ public class Role extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private AuthEnum auth;
 
+    public void approveAuth(){
+        this.auth = AuthEnum.APPROVE;
+    }
 }
