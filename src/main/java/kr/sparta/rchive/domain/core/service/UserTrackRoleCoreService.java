@@ -70,6 +70,14 @@ public class UserTrackRoleCoreService {
         roleService.approveRoleRequest(reqList);
     }
 
+    @Transactional
+    public void userTrackRoleReject(User manager, List<RoleRequestListReq> reqList) {
+        Track managaerTrack = roleService.getRoleByManager(manager).getTrack();
+        managerTrackRoleInvalid(managaerTrack, reqList);
+
+        roleService.rejectRoleRequest(reqList);
+    }
+
     public void managerTrackRoleInvalid(Track managaerTrack, List<RoleRequestListReq> reqList) {
         /* PM */
         if(managaerTrack.getPeriod()==0){

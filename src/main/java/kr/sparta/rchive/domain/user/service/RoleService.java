@@ -64,6 +64,14 @@ public class RoleService {
         roleRepository.saveAll(roleList);
     }
 
+    public void rejectRoleRequest(List<RoleRequestListReq> reqList){
+        List<Role> roleList = findRoleListByEmailAndTrackNameAndPeriodAndTrackRole(reqList);
+        for(Role role: roleList){
+            role.rejectAuth();
+        }
+        roleRepository.saveAll(roleList);
+    }
+
     public AuthEnum getResultRoleFirstLogin(User user) {
 
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
