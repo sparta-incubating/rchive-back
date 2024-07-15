@@ -72,6 +72,11 @@ public class RoleService {
         roleRepository.saveAll(roleList);
     }
 
+    public void deleteRoleListByAuthNotApprove(List<RoleRequestListReq> reqList){
+        List<Role> roleList = findRoleListByEmailAndAuthNotApprove(reqList);
+        roleRepository.deleteAll(roleList);
+    }
+
     public AuthEnum getResultRoleFirstLogin(User user) {
 
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
@@ -113,4 +118,16 @@ public class RoleService {
                 () -> new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE_REQUEST_LIST)
         );
     }
+
+    public List<Role> findRoleListByEmailAndAuthNotApprove(List<RoleRequestListReq> reqList){
+        List<Role> roleList = new ArrayList<>();
+        for(RoleRequestListReq req : reqList){
+            List<Role> rejectList = roleRepository.findAllByEmailAndAuth(req.email(),AuthEnum.REJECT);
+            roleList.addAll(rejectList);
+            List<Role> waitList = roleRepository.findAllByEmailAndAuth(req.email(),AuthEnum.WAIT);
+            roleList.addAll(waitList);
+        }
+        return roleList;
+    }
+
 }

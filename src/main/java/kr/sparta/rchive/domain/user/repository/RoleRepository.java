@@ -28,4 +28,8 @@ public interface RoleRepository extends JpaRepository<Role, RoleId> {
             + "and r.trackRole = :trackRole")
     Optional<Role> findByEmailAndTrackNameAndPeriodAndTrackRole(String email, TrackNameEnum trackName, int period, TrackRoleEnum trackRole);
 
+    @Query("select r from Role r "
+            + "where r.user.email = :email "
+            + "and r.auth = :auth")
+    List<Role> findAllByEmailAndAuth(String email, AuthEnum auth);
 }
