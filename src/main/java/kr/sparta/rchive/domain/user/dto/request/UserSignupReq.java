@@ -18,6 +18,7 @@ public record UserSignupReq (
         LocalDate birth,
         String phone,
         GenderEnum gender,
+        String profileImg,
         String nickname,
         UserRoleEnum userRole,
         Boolean termUserAge,

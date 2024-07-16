@@ -65,6 +65,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private GenderEnum gender;
 
+    @Column(nullable = false)
+    private String profileImg;
+
     @Column(nullable = true, length = 20, unique = true)
     private String nickname;
 
