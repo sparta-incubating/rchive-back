@@ -69,10 +69,10 @@ public class BackofficeController {
 
     @GetMapping("/profile")
     @Operation(operationId = "BACKOFFICE-008", summary = "프로필 조회 - 백오피스")
-    public ResponseEntity<CommonResponseDto> getProfile(
+    public ResponseEntity<CommonResponseDto> getProfileBackoffice(
             @LoginUser User user
     ){
-        UserRes res = userTrackRoleCoreService.getProfile(user);
+        UserRes res = userTrackRoleCoreService.getProfileBackoffice(user);
 
         return ResponseEntity.status(BackofficeResponseCode.OK_GET_PROFILE.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_PROFILE, res));

@@ -11,6 +11,7 @@ import lombok.Builder;
 public record UserRes (
         String email,
         String username,
+        String profileImg,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         String nickname,
         LocalDate birth,

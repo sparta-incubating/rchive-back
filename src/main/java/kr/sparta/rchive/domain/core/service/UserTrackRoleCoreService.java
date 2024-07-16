@@ -43,7 +43,7 @@ public class UserTrackRoleCoreService {
                 .build();
     }
 
-    public UserRes getProfile(User user) {
+    public UserRes getProfileBackoffice(User user) {
 
         Role role = roleService.getRoleByManager(user);
         Track track = role.getTrack();
@@ -51,6 +51,7 @@ public class UserTrackRoleCoreService {
         return UserRes.builder()
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .profileImg(user.getProfileImg())
                 .nickname(user.getNickname())
                 .birth(user.getBirth())
                 .phone(user.getPhone())
