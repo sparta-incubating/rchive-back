@@ -41,22 +41,23 @@ public class BackofficeController {
     private final PostTagCoreService postTagCoreService;
 
     @GetMapping("/post/search")
-    @Operation(operationId = "BACKOFFICE-007", summary = "백오피스에서 교육자료 검색")
+    @Operation(operationId = "BACKOFFICE-006", summary = "백오피스에서 교육자료 검색")
     public ResponseEntity<CommonResponseDto> searchPostInBackOffice(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @RequestParam(value = "postType", required = false) PostTypeEnum postType,
-            @RequestParam(value = "uploadedAt", required = false) LocalDate uploadedAt,
-            @RequestParam(value = "period", required = false) Integer period,
-            @RequestParam(value = "tutor", required = false) String tutor,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
             @RequestParam(value = "isOpened", required = false) Boolean isOpened,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.by("uploadedAt").descending());
         Page<PostSearchBackOfficeRes> responseList =
-                postTagCoreService.getPostListInBackOffice(user, trackName, postType, uploadedAt,
-                        period, tutor, isOpened, pageable);
+                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
+                        searchPeriod, isOpened, pageable);
         return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
     }
