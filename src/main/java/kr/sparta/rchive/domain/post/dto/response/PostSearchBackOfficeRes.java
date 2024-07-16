@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.post.dto.response;
 
+import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import lombok.Builder;
 
@@ -14,6 +15,6 @@ public record PostSearchBackOfficeRes(
         Integer period,
         Boolean isOpened,
         LocalDate uploadedAt,
-        List<String> tagNameList
+        List<TagInfo> tagInfoList
 ) {
 }
