@@ -100,4 +100,43 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .orderBy(post.uploadedAt.desc())
                 .fetch();
     }
+
+    @Override
+    public List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        post.postType.eq(postType),
+                        post.track.id.eq(trackId),
+                        post.isOpened.eq(true)
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        post.postType.eq(postType),
+                        post.track.id.eq(trackId)
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
+    }
 }

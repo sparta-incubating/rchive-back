@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
-    List<Post> findAllByPostTypeAndTrackId(PostTypeEnum postType, Long trackId);
 
 //    @Query("select p from Post p " +
 //            "join fetch p.track t " +
