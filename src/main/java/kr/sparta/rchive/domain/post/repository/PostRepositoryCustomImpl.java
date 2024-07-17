@@ -1,10 +1,7 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.sparta.rchive.domain.post.entity.Post;
-import kr.sparta.rchive.domain.post.entity.QPost;
-import kr.sparta.rchive.domain.post.entity.QPostTag;
-import kr.sparta.rchive.domain.post.entity.QTag;
+import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import lombok.RequiredArgsConstructor;
 
