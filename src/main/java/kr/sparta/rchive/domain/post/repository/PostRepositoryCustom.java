@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    List<Post> findPostListInBackOfficePostTypeAllByPM(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod);
+    List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod);
 
-    List<Post> findPostListInBackOfficePostTypeAllByNotPM(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer period);
+    List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer period);
 
     List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened);
 
-    List<Post> findPostListInBackOfficePostTypeNotNullByNotPM(PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer period, Boolean isOpened);
+    List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer period, Boolean isOpened);
 }

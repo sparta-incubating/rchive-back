@@ -101,17 +101,17 @@ public class PostService {
     }
 
     public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
-        if(track.getPeriod() == 0){
-            return postRepository.findPostListInBackOfficePostTypeAllByPM(startDate, endDate, isOpened, searchPeriod);
+        if (track.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate, isOpened, searchPeriod);
         }
-        return postRepository.findPostListInBackOfficePostTypeAllByNotPM(startDate, endDate, isOpened, track.getPeriod());
+        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened, track.getPeriod());
     }
 
     public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
-        if(track.getPeriod() == 0) {
+        if (track.getPeriod() == 0) {
             return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate, endDate, searchPeriod, isOpened);
         }
-        return postRepository.findPostListInBackOfficePostTypeNotNullByNotPM(postType, startDate, endDate, track.getPeriod(), isOpened);
+        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getPeriod(), isOpened);
     }
 
 //    public Post findTest(Long postId) {

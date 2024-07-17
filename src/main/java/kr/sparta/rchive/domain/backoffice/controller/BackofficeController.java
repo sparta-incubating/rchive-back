@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,7 +55,7 @@ public class BackofficeController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        Pageable pageable = new CustomPageable(page, size, Sort.by("uploadedAt").descending());
+        Pageable pageable = new CustomPageable(page, size, Sort.by("id").descending());
         Page<PostSearchBackOfficeRes> responseList =
                 postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
                         searchPeriod, isOpened, pageable);

@@ -9,6 +9,7 @@ import java.util.List;
 
 @Builder
 public record PostSearchBackOfficeRes(
+        Long postId,
         String title,
         PostTypeEnum postType,
         String tutor,

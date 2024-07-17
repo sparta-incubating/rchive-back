@@ -63,37 +63,38 @@ public class PostTagCoreService {
 
         List<Post> postList;
 
-        if(postType == null) {
+        if (postType == null) {
             postList = postService.findPostListInBackOfficePostTypeAll(track, startDate, endDate, searchPeriod, isOpened);
         } else {
             postList = postService.findPostListInBackOffice(track, postType, startDate, endDate, searchPeriod, isOpened);
         }
 
         List<PostSearchBackOfficeRes> responseList = postList.stream()
-            .map(post -> {
-                List<Tag> tagList = post.getPostTagList().stream().map(
-                    postTag -> postTag.getTag()
-                ).toList();
+                .map(post -> {
+                    List<Tag> tagList = post.getPostTagList().stream().map(
+                            postTag -> postTag.getTag()
+                    ).toList();
 
-                List<TagInfo> tagInfoList = tagList.stream().map(
-                    tag -> {
-                        return TagInfo.builder()
-                            .tagId(tag.getId())
-                            .tagName(tag.getTagName())
+                    List<TagInfo> tagInfoList = tagList.stream().map(
+                            tag -> {
+                                return TagInfo.builder()
+                                        .tagId(tag.getId())
+                                        .tagName(tag.getTagName())
+                                        .build();
+                            }
+                    ).toList();
+
+                    return PostSearchBackOfficeRes.builder()
+                            .postId(post.getId())
+                            .title(post.getTitle())
+                            .postType(post.getPostType())
+                            .tutor(post.getTutor())
+                            .period(post.getTrack().getPeriod())
+                            .isOpened(post.getIsOpened())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagInfoList(tagInfoList)
                             .build();
-                    }
-                ).toList();
-
-                return PostSearchBackOfficeRes.builder()
-                    .title(post.getTitle())
-                    .postType(post.getPostType())
-                    .tutor(post.getTutor())
-                    .period(post.getTrack().getPeriod())
-                    .isOpened(post.getIsOpened())
-                    .uploadedAt(post.getUploadedAt())
-                    .tagInfoList(tagInfoList)
-                    .build();
-            }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), responseList.size());

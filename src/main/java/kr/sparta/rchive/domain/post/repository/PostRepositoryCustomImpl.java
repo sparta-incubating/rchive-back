@@ -17,7 +17,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByPM(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod) {
+    public List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -37,7 +37,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByNotPM(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer period) {
+    public List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer period) {
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
@@ -77,8 +77,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeNotNullByNotPM(PostTypeEnum postType, LocalDate startDate,
-        LocalDate endDate, Integer period, Boolean isOpened) {
+    public List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, LocalDate startDate,
+                                                                 LocalDate endDate, Integer period, Boolean isOpened) {
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
