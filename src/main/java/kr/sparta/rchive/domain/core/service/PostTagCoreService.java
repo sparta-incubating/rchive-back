@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.PostSearchInfo;
+import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
@@ -54,39 +55,46 @@ public class PostTagCoreService {
 
 
     public Page<PostSearchBackOfficeRes> getPostListInBackOffice(
-            User user, TrackNameEnum trackName, PostTypeEnum postType, LocalDate uploadedAt, Integer period,
-            String tutor, Boolean isOpened, Pageable pageable
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, LocalDate startDate, LocalDate endDate,
+            Integer searchPeriod, Boolean isOpened, Pageable pageable
     ) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         userRoleAndTrackCheck(user, track);
 
-        List<Long> postIdList;
+        List<Post> postList;
 
         if (postType == null) {
-            postIdList = postService.findPostIdListByTrack(track);
+            postList = postService.findPostListInBackOfficePostTypeAll(track, startDate, endDate, searchPeriod, isOpened);
         } else {
-            postIdList = postService.findPostIdListInBackOffice(postType, uploadedAt, period, tutor, isOpened);
+            postList = postService.findPostListInBackOffice(track, postType, startDate, endDate, searchPeriod, isOpened);
         }
 
-        Map<Long, List<Long>> postTagMap = postTagService.findPostTagListByTagId(postIdList);
+        List<PostSearchBackOfficeRes> responseList = postList.stream()
+                .map(post -> {
+                    List<Tag> tagList = post.getPostTagList().stream().map(
+                            postTag -> postTag.getTag()
+                    ).toList();
 
-        List<PostSearchBackOfficeRes> responseList = postTagMap.entrySet().stream()
-                .map(response -> {
-                    Long postId = response.getKey();
-                    List<Long> tagIdList = response.getValue();
-
-                    PostSearchInfo postSearchInfo = getPostDetails(postId, tagIdList);
+                    List<TagInfo> tagInfoList = tagList.stream().map(
+                            tag -> {
+                                return TagInfo.builder()
+                                        .tagId(tag.getId())
+                                        .tagName(tag.getTagName())
+                                        .build();
+                            }
+                    ).toList();
 
                     return PostSearchBackOfficeRes.builder()
-                            .title(postSearchInfo.post().getTitle())
-                            .postType(postSearchInfo.post().getPostType())
-                            .tutor(postSearchInfo.post().getTutor())
-                            .period(postSearchInfo.post().getTrack().getPeriod())
-                            .isOpened(postSearchInfo.post().getIsOpened())
-                            .uploadedAt(postSearchInfo.post().getUploadedAt())
-                            .tagNameList(postSearchInfo.tagNameList())
+                            .postId(post.getId())
+                            .title(post.getTitle())
+                            .postType(post.getPostType())
+                            .tutor(post.getTutor())
+                            .period(post.getTrack().getPeriod())
+                            .isOpened(post.getIsOpened())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagInfoList(tagInfoList)
                             .build();
-                }).toList();
+                }).collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), responseList.size());
@@ -215,23 +223,28 @@ public class PostTagCoreService {
     public List<PostGetCategoryPostRes> getPostListByCategory(
             User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType
     ) {
+
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         userRoleAndTrackCheck(user, track);
 
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(postType, track.getId());
+        List<Long> postIdList = postService.findPostIdListByPostTypeAndTrackId(postType, track.getId());
 
-        return postList.stream().map(post -> {
-            List<String> tagNameList = post.getPostTagList().stream()
-                    .map(postTag -> postTag.getTag().getTagName())
-                    .collect(Collectors.toList());
+        Map<Long, List<Long>> postTagMap = postTagService.findPostTagListByTagId(postIdList);
 
-            return PostGetCategoryPostRes.builder()
-                    .title(post.getTitle())
-                    .tutor(post.getTutor())
-                    .uploadedAt(post.getUploadedAt())
-                    .tagNameList(tagNameList)
-                    .build();
-        }).collect(Collectors.toList());
+        return postTagMap.entrySet().stream()
+                .map(response -> {
+                    Long postId = response.getKey();
+                    List<Long> tagIdList = response.getValue();
+
+                    PostSearchInfo postSearchInfo = getPostDetails(postId, tagIdList);
+
+                    return PostGetCategoryPostRes.builder()
+                            .title(postSearchInfo.post().getTitle())
+                            .tutor(postSearchInfo.post().getTutor())
+                            .uploadedAt(postSearchInfo.post().getUploadedAt())
+                            .tagNameList(postSearchInfo.tagNameList())
+                            .build();
+                }).toList();
     }
 
     private PostSearchInfo getPostDetails(Long postId, List<Long> tagIdList) {
@@ -300,14 +313,14 @@ public class PostTagCoreService {
     private List<Long> filterPostByTrackId(List<Long> postIdList, Track userTrack, Long userId) {
         TrackRoleEnum trackRole = roleService.findTrackRoleByTrackIdAndUserId(userTrack.getId(), userId);
 
-        if (UserTrackRoleIsPM(trackRole)) {
+        if (UserTrackRoleIsPm(trackRole)) {
             return postService.filterPostIdListByTrackName(postIdList, userTrack.getTrackName());
         }
 
         return postService.filterPostIdListByTrackId(postIdList, userTrack.getId());
     }
 
-    private boolean UserTrackRoleIsPM(TrackRoleEnum trackRole) {
+    private boolean UserTrackRoleIsPm(TrackRoleEnum trackRole) {
         return trackRole == TrackRoleEnum.PM;
     }
 
@@ -336,10 +349,7 @@ public class PostTagCoreService {
 
         for (Role r : roleList) {
             if (r.getTrackRole().equals(TrackRoleEnum.PM)) {
-                if (r.getTrack().getTrackName().equals(track.getTrackName())) {
-                    return;
-                }
-                continue;
+                return;
             }
 
             role = r;

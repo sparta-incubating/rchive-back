@@ -1,7 +1,10 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.QPost;
+import kr.sparta.rchive.domain.post.entity.QPostTag;
+import kr.sparta.rchive.domain.post.entity.QTag;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import lombok.RequiredArgsConstructor;
 
@@ -14,33 +17,87 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Long> findPostIdListByOption(PostTypeEnum postType, LocalDate uploadedAt, Integer period, String tutor, Boolean isOpened) {
-        QPost post = QPost.post;
+    public List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod) {
 
-        return queryFactory.select(post.id)
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory
+                .select(post).distinct()
                 .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
-                        postType != null ? post.postType.eq(postType) : null,
-                        uploadedAt != null ? post.uploadedAt.eq(uploadedAt) : null,
-                        period != null ? post.track.period.eq(period) : null,
-                        tutor != null ? post.tutor.eq(tutor) : null,
-                        isOpened != null ? post.isOpened.eq(isOpened) : null
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        searchPeriod != null ? post.track.period.eq(searchPeriod) : null
                 )
+                .orderBy(post.uploadedAt.desc())
                 .fetch();
     }
 
     @Override
-    public List<Long> findPostIdListInBackOfficeByPM(PostTypeEnum postType, LocalDate uploadedAt,
-                                                     String tutor, Boolean isOpened) {
+    public List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer period) {
         QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
 
-        return queryFactory.select(post.id)
+        return queryFactory
+                .select(post).distinct()
                 .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        post.track.period.eq(period)
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, LocalDate startDate,
+                                                                  LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
                         postType != null ? post.postType.eq(postType) : null,
-                        uploadedAt != null ? post.uploadedAt.eq(uploadedAt) : null,
-                        tutor != null ? post.tutor.eq(tutor) : null,
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null
-                ).fetch();
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, LocalDate startDate,
+                                                                 LocalDate endDate, Integer period, Boolean isOpened) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        postType != null ? post.postType.eq(postType) : null,
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        post.track.period.eq(period),
+                        isOpened != null ? post.isOpened.eq(isOpened) : null
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
     }
 }

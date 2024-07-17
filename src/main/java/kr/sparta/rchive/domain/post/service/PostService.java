@@ -76,6 +76,12 @@ public class PostService {
         );
     }
 
+    public List<Long> findPostIdListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
+        return postRepository.findAllByPostTypeAndTrackId(postType, trackId).stream()
+                .map(Post::getId)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void openPost(Long postId) {
         Post post = findPostById(postId);
@@ -94,29 +100,18 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<Long> findPostIdListInBackOffice(PostTypeEnum postType, LocalDate uploadedAt,
-                                                 Integer period, String tutor, Boolean isOpened) {
-        if(period == 0) {
-            return findPostIdListInBackOfficeUserRolePM(postType, uploadedAt, tutor, isOpened);
+    public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        if (track.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate, isOpened, searchPeriod);
         }
-
-        return postRepository.findPostIdListByOption(postType, uploadedAt, period, tutor, isOpened);
+        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened, track.getPeriod());
     }
 
-    private List<Long> findPostIdListInBackOfficeUserRolePM(PostTypeEnum postType, LocalDate uploadedAt,
-                                                            String tutor, Boolean isOpened) {
-        return postRepository.findPostIdListInBackOfficeByPM(postType, uploadedAt, tutor, isOpened);
-    }
-
-    public List<Long> findPostIdListByTrack(Track track) {
-        if(track.getPeriod() == 0) {
-            return postRepository.findAllByTrackName(track.getTrackName());
+    public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        if (track.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate, endDate, searchPeriod, isOpened);
         }
-        return postRepository.findAllByTrackId(track.getId());
-    }
-
-    public List<Post> findPostListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
-        return postRepository.findAllByPostTypeAndTrackId2(postType, trackId);
+        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getPeriod(), isOpened);
     }
 
 //    public Post findTest(Long postId) {

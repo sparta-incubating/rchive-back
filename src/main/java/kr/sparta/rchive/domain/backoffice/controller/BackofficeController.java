@@ -2,13 +2,12 @@ package kr.sparta.rchive.domain.backoffice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import kr.sparta.rchive.domain.backoffice.respoonse.BackofficeResponseCode;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
-import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -21,15 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,22 +35,23 @@ public class BackofficeController {
     private final PostTagCoreService postTagCoreService;
 
     @GetMapping("/post/search")
-    @Operation(operationId = "BACKOFFICE-007", summary = "백오피스에서 교육자료 검색")
+    @Operation(operationId = "BACKOFFICE-006", summary = "백오피스에서 교육자료 검색")
     public ResponseEntity<CommonResponseDto> searchPostInBackOffice(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @RequestParam(value = "postType", required = false) PostTypeEnum postType,
-            @RequestParam(value = "uploadedAt", required = false) LocalDate uploadedAt,
-            @RequestParam(value = "period", required = false) Integer period,
-            @RequestParam(value = "tutor", required = false) String tutor,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
             @RequestParam(value = "isOpened", required = false) Boolean isOpened,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        Pageable pageable = new CustomPageable(page, size, Sort.by("uploadedAt").descending());
+        Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostSearchBackOfficeRes> responseList =
-                postTagCoreService.getPostListInBackOffice(user, trackName, postType, uploadedAt,
-                        period, tutor, isOpened, pageable);
+                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
+                        searchPeriod, isOpened, pageable);
         return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
     }
