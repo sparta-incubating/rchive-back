@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.post.dto.response;
 
+import kr.sparta.rchive.domain.post.dto.TagInfo;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -10,6 +11,6 @@ public record PostGetCategoryPostRes(
         String tutor,
         String title,
         LocalDate uploadedAt,
-        List<String> tagNameList
+        List<TagInfo> tagList
 ) {
 }
