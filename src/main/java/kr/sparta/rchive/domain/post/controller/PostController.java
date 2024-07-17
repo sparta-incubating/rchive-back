@@ -75,11 +75,13 @@ public class PostController {
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("period") Integer period,
-            @RequestParam("category") PostTypeEnum postType
+            @RequestParam("category") PostTypeEnum postType,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
     ){
-        List<PostGetCategoryPostRes> responseList =
-                postTagCoreService.getPostListByCategory(user, trackName, period, postType);
-
+        Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
+        Page<PostGetCategoryPostRes> responseList =
+                postTagCoreService.getPostListByCategory(user, trackName, period, postType, pageable);
         return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_CATEGORY_POST, responseList));
     }
