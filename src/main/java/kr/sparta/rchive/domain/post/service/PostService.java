@@ -124,7 +124,7 @@ public class PostService {
         }
     }
 
-//    public Post findTest(Long postId) {
-//        return postRepository.findtestpostid(postId);
-//    }
+    public Post findPostWithDetailByPostId(Long postId) {
+        return postRepository.findPostWithDetailByPostId(postId);
+    }
 }

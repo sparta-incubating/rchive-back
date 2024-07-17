@@ -184,33 +184,33 @@ public class PostTagCoreService {
 
     public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-
-//        Post post = postService.findTest(postId);
-//
-//        List<String> contentList = post.getContentList().stream()
-//                .map(content -> content.getContent())
-//                .toList();
-//
-//        List<String> tagName = post.getPostTagList().stream()
-//                .map(postTag -> postTag.getTag().getTagName())
-//                .collect(Collectors.toList());
-
-        Post post = postService.findPostById(postId);
-
         userRoleAndTrackCheck(user, track);
 
-        String content = findContentByPostId(postId);
+        Post post = postService.findPostWithDetailByPostId(postId);
 
-        List<Long> tagIdList = postTagService.findTagIdListByPostId(post.getId());
-        List<String> tagNameList = tagService.findTagNameListBytagIdList(tagIdList);
+        List<TagInfo> tagList = post.getPostTagList().stream()
+                .map(postTag -> {
+                    return TagInfo.builder()
+                            .tagId(postTag.getTag().getId())
+                            .tagName(postTag.getTag().getTagName())
+                            .build();
+                }).toList();
+
+        String detail = "";
+
+        if(!post.getContentList().isEmpty()) {
+            detail = post.getContentList().stream()
+                    .map(Content::getDetail)
+                    .collect(Collectors.joining());
+        }
 
 //        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
 
         return PostGetSinglePostRes.builder()
                 .title(post.getTitle())
                 .videoLink(post.getVideoLink())
-                .content(content)
-                .tagList(tagNameList)
+                .detail(detail)
+                .tagList(tagList)
 //                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
                 .build();
     }
@@ -325,28 +325,18 @@ public class PostTagCoreService {
         return userRole == UserRoleEnum.USER;
     }
 
-    private String findContentByPostId(Long postId) {
-        StringBuilder sb = new StringBuilder();
-
-        List<String> contentList = contentService.findContentByPostId(postId).stream()
-                .filter(content -> content.getId() == 1)
-                .map(Content::getContent)
-                .toList();
-
-        for (String s : contentList) {
-            sb.append(s);
-        }
-
-        return sb.toString();
-    }
-
     private void userRoleAndTrackCheck(User user, Track track) {
         List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
         Role role = null;
 
         for (Role r : roleList) {
-            if (r.getTrackRole().equals(TrackRoleEnum.PM)) {
+            if (r.getTrackRole().equals(TrackRoleEnum.PM) && track.getTrackName().equals(r.getTrack().getTrackName())) {
                 return;
+            }
+
+            if(r.getTrack().equals(track)) {
+                role = r;
+                break;
             }
 
             role = r;
@@ -360,6 +350,5 @@ public class PostTagCoreService {
             throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
         }
     }
-
 
 }
