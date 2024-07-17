@@ -24,16 +24,17 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QTag tag = QTag.tag;
 
         return queryFactory
-            .select(post).distinct()
-            .from(post)
-            .leftJoin(post.postTagList, postTag).fetchJoin()
-            .leftJoin(postTag.tag, tag).fetchJoin()
-            .where(
-                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                isOpened != null ? post.isOpened.eq(isOpened) : null,
-                searchPeriod != null ? post.track.period.eq(searchPeriod) : null
-            )
-            .fetch();
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        searchPeriod != null ? post.track.period.eq(searchPeriod) : null
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
     }
 
     @Override
@@ -43,37 +44,39 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QTag tag = QTag.tag;
 
         return queryFactory
-            .select(post).distinct()
-            .from(post)
-            .leftJoin(post.postTagList, postTag).fetchJoin()
-            .leftJoin(postTag.tag, tag).fetchJoin()
-            .where(
-                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                isOpened != null ? post.isOpened.eq(isOpened) : null,
-                post.track.period.eq(period)
-            )
-            .fetch();
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        post.track.period.eq(period)
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
     }
 
     @Override
     public List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, LocalDate startDate,
-        LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+                                                                  LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
         return queryFactory
-            .select(post).distinct()
-            .from(post)
-            .leftJoin(post.postTagList, postTag).fetchJoin()
-            .leftJoin(postTag.tag, tag).fetchJoin()
-            .where(
-                postType != null ? post.postType.eq(postType) : null,
-                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
-                isOpened != null ? post.isOpened.eq(isOpened) : null
-            )
-            .fetch();
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        postType != null ? post.postType.eq(postType) : null,
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
+                        isOpened != null ? post.isOpened.eq(isOpened) : null
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
     }
 
     @Override
@@ -84,16 +87,17 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QTag tag = QTag.tag;
 
         return queryFactory
-            .select(post).distinct()
-            .from(post)
-            .leftJoin(post.postTagList, postTag).fetchJoin()
-            .leftJoin(postTag.tag, tag).fetchJoin()
-            .where(
-                postType != null ? post.postType.eq(postType) : null,
-                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                post.track.period.eq(period),
-                isOpened != null ? post.isOpened.eq(isOpened) : null
-            )
-            .fetch();
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .where(
+                        postType != null ? post.postType.eq(postType) : null,
+                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                        post.track.period.eq(period),
+                        isOpened != null ? post.isOpened.eq(isOpened) : null
+                )
+                .orderBy(post.uploadedAt.desc())
+                .fetch();
     }
 }
