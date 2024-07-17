@@ -9,6 +9,7 @@ import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +78,7 @@ public class PostService {
     }
 
     public List<Long> findPostIdListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
-        return postRepository.findAllByPostTypeAndTrackId(postType, trackId).stream()
+        return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, trackId).stream()
                 .map(Post::getId)
                 .collect(Collectors.toList());
     }
@@ -112,6 +113,15 @@ public class PostService {
             return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate, endDate, searchPeriod, isOpened);
         }
         return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getPeriod(), isOpened);
+    }
+
+    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType, Track track) {
+        if(userRole.equals(UserRoleEnum.USER)) {
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
+        }
+        else {
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
+        }
     }
 
 //    public Post findTest(Long postId) {

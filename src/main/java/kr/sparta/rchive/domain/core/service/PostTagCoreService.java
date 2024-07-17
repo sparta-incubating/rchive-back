@@ -71,18 +71,11 @@ public class PostTagCoreService {
 
         List<PostSearchBackOfficeRes> responseList = postList.stream()
                 .map(post -> {
-                    List<Tag> tagList = post.getPostTagList().stream().map(
-                            postTag -> postTag.getTag()
-                    ).toList();
-
-                    List<TagInfo> tagInfoList = tagList.stream().map(
-                            tag -> {
-                                return TagInfo.builder()
-                                        .tagId(tag.getId())
-                                        .tagName(tag.getTagName())
-                                        .build();
-                            }
-                    ).toList();
+                    List<TagInfo> tagInfoList = post.getPostTagList().stream()
+                            .map(postTag -> TagInfo.builder()
+                                    .tagId(postTag.getTag().getId())
+                                    .tagName(postTag.getTag().getTagName())
+                                    .build()).toList();
 
                     return PostSearchBackOfficeRes.builder()
                             .postId(post.getId())
@@ -130,14 +123,16 @@ public class PostTagCoreService {
                     List<Long> tagIdList = response.getValue();
 
                     PostSearchInfo postSearchInfo = getPostDetails(postId, tagIdList);
-
+                    List<String> tagNameList = postSearchInfo.tagNameList().stream()
+                            .map(Tag::getTagName)
+                            .toList();
 
                     return PostSearchByTagRes.builder()
                             .title(postSearchInfo.post().getTitle())
                             .tutor(postSearchInfo.post().getTutor())
                             .uploadedAt(postSearchInfo.post().getUploadedAt())
                             .postType(postSearchInfo.post().getPostType())
-                            .tagNameList(postSearchInfo.tagNameList())
+                            .tagNameList(tagNameList)
                             .build();
                 }).toList();
 
@@ -220,39 +215,41 @@ public class PostTagCoreService {
                 .build();
     }
 
-    public List<PostGetCategoryPostRes> getPostListByCategory(
-            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType
-    ) {
+    public Page<PostGetCategoryPostRes> getPostListByCategory(
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType,
+            Pageable pageable) {
 
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        userRoleAndTrackCheck(user, track);
 
-        List<Long> postIdList = postService.findPostIdListByPostTypeAndTrackId(postType, track.getId());
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(), postType, track);
 
-        Map<Long, List<Long>> postTagMap = postTagService.findPostTagListByTagId(postIdList);
-
-        return postTagMap.entrySet().stream()
-                .map(response -> {
-                    Long postId = response.getKey();
-                    List<Long> tagIdList = response.getValue();
-
-                    PostSearchInfo postSearchInfo = getPostDetails(postId, tagIdList);
+        List<PostGetCategoryPostRes> responseList = postList.stream()
+                .map(post -> {
+                    List<TagInfo> tagInfoList = post.getPostTagList().stream()
+                            .map(postTag -> TagInfo.builder()
+                                    .tagId(postTag.getTag().getId())
+                                    .tagName(postTag.getTag().getTagName())
+                                    .build()).toList();
 
                     return PostGetCategoryPostRes.builder()
-                            .title(postSearchInfo.post().getTitle())
-                            .tutor(postSearchInfo.post().getTutor())
-                            .uploadedAt(postSearchInfo.post().getUploadedAt())
-                            .tagNameList(postSearchInfo.tagNameList())
+                            .title(post.getTitle())
+                            .tutor(post.getTutor())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagList(tagInfoList)
                             .build();
-                }).toList();
+                }).collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), responseList.size());
+
+        return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
     private PostSearchInfo getPostDetails(Long postId, List<Long> tagIdList) {
         Post post = postService.findPostById(postId);
 
-        List<String> tagNameList = tagIdList.stream()
+        List<Tag> tagNameList = tagIdList.stream()
                 .map(tagService::findTagById)
-                .map(Tag::getTagName)
                 .collect(Collectors.toList());
 
         return new PostSearchInfo(post, tagNameList);
@@ -360,8 +357,7 @@ public class PostTagCoreService {
         }
 
         if (!Objects.equals(role.getTrack().getId(), track.getId())) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS); //TODO: 추후에 커스텀 에러 위치 정할 예정
-
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
         }
     }
 
