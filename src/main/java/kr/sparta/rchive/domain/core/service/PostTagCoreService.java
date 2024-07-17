@@ -313,14 +313,14 @@ public class PostTagCoreService {
     private List<Long> filterPostByTrackId(List<Long> postIdList, Track userTrack, Long userId) {
         TrackRoleEnum trackRole = roleService.findTrackRoleByTrackIdAndUserId(userTrack.getId(), userId);
 
-        if (UserTrackRoleIsPM(trackRole)) {
+        if (UserTrackRoleIsPm(trackRole)) {
             return postService.filterPostIdListByTrackName(postIdList, userTrack.getTrackName());
         }
 
         return postService.filterPostIdListByTrackId(postIdList, userTrack.getId());
     }
 
-    private boolean UserTrackRoleIsPM(TrackRoleEnum trackRole) {
+    private boolean UserTrackRoleIsPm(TrackRoleEnum trackRole) {
         return trackRole == TrackRoleEnum.PM;
     }
 
