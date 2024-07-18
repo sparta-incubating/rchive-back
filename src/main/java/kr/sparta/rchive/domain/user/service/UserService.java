@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -56,6 +57,8 @@ public class UserService {
             }
         }
 
+        // TODO: profileImg null이면 기본값 넣어주기
+
         User user = User.builder()
                 .email(req.email())
                 .password(bCryptPasswordEncoder.encode(req.password()))
@@ -65,6 +68,7 @@ public class UserService {
                 .birth(req.birth())
                 .phone(req.phone())
                 .gender(req.gender())
+                .profileImg(req.profileImg())
                 .nickname(req.nickname())
                 .userRole(req.userRole())
                 .termUserAge(req.termUserAge())
@@ -135,6 +139,19 @@ public class UserService {
     @Transactional
     public void withdraw(User user) {
         user.delete();
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateProfile(User user, ProfileUpdateReq req) {
+        if(user.getUserRole() == UserRoleEnum.USER){
+            if(userRepository.existsByNickname(req.nickname())){
+                throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
+            }
+            user.updateProfileByUser(req.profileImg(),req.nickname());
+        }else{
+            user.updateProfileByManager(req.profileImg());
+        }
         userRepository.save(user);
     }
 

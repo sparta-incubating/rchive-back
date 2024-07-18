@@ -4,10 +4,14 @@ import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.AuthEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
@@ -43,7 +47,7 @@ public class UserTrackRoleCoreService {
                 .build();
     }
 
-    public UserRes getProfile(User user) {
+    public UserRes getProfileBackoffice(User user) {
 
         Role role = roleService.getRoleByManager(user);
         Track track = role.getTrack();
@@ -51,6 +55,7 @@ public class UserTrackRoleCoreService {
         return UserRes.builder()
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .profileImg(user.getProfileImg())
                 .nickname(user.getNickname())
                 .birth(user.getBirth())
                 .phone(user.getPhone())
@@ -65,9 +70,8 @@ public class UserTrackRoleCoreService {
         Track managaerTrack = roleService.getRoleByManager(manager).getTrack();
         managerTrackRoleInvalid(managaerTrack, reqList);
 
-        // TODO: 전에 Reject 한 내역 강한 삭제
-
         roleService.approveRoleRequest(reqList);
+        roleService.deleteRoleListByAuthNotApprove(reqList);
     }
 
     @Transactional
@@ -97,5 +101,33 @@ public class UserTrackRoleCoreService {
         }
     }
 
+    public RoleGetTrackRoleRequestCountRes getTrackRoleRequestCount(User user, TrackNameEnum trackName, Integer period) {
+
+        Role role = roleService.getRoleByManager(user);
+
+        if(role.getTrackRole() == TrackRoleEnum.PM){
+
+            roleService.existByUserAndTrackNameByPmThrowsException(user.getId(), trackName);
+
+            return RoleGetTrackRoleRequestCountRes.builder()
+                    .statusAll(roleService.countByTrackNameAndAuthNotRejectByPm(trackName))
+                    .statusWait(roleService.countByTrackNameAndAuthByPm(trackName, AuthEnum.WAIT))
+                    .statusApprove(roleService.countByTrackNameAndAuthByPm(trackName, AuthEnum.APPROVE))
+                    .build();
+        }
+
+        if(period==null){
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_PARAMETER_PERIOD);
+        }
+
+        roleService.existByUserAndTrackNameAndPeriodByApmThrowsException(user.getId(), trackName, period);
+
+        return RoleGetTrackRoleRequestCountRes.builder()
+                .statusAll(roleService.countByTrackNameAndPeriodAndAuthNotRejectByApm(trackName, period))
+                .statusWait(roleService.countByTrackNameAndPeriodAndAuthByApm(trackName, period, AuthEnum.WAIT))
+                .statusApprove(roleService.countByTrackNameAndPeriodAndAuthByApm(trackName, period, AuthEnum.APPROVE))
+                .build();
+
+    }
 
 }
