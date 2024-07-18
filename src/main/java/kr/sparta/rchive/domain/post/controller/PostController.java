@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -127,15 +128,15 @@ public class PostController {
     @Operation(operationId = "POST-011", summary = "태그를 이용하여 검색하는 기능")
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @LoginUser User user,
-            @RequestParam("tagName") String tagName,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
+            @RequestParam("tagId") Long tagId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-
         Page<PostSearchByTagRes> responseList = postTagCoreService
-                .searchPostByTag(tagName, user, pageable);
-
+                .searchPostByTag(trackName, period, tagId, user, pageable);
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
     }
