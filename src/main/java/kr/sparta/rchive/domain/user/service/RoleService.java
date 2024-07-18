@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.user.service;
 
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
@@ -14,6 +15,7 @@ import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,6 +130,42 @@ public class RoleService {
             roleList.addAll(waitList);
         }
         return roleList;
+    }
+
+    public int countByTrackNameAndAuthByPm(TrackNameEnum trackName, AuthEnum auth){
+        return roleRepository.countAllByTrackNameAndAuthByPm(trackName, auth);
+    }
+
+    public int countByTrackNameAndAuthNotRejectByPm(TrackNameEnum trackName){
+        return roleRepository.countAllByTrackNameAndAuthNotRejectByPm(trackName);
+    }
+
+    public int countByTrackNameAndPeriodAndAuthByApm(TrackNameEnum trackName, int period, AuthEnum auth){
+        return roleRepository.countAllByTrackNameAndPeriodAndAuthByApm(trackName, period, auth);
+    }
+
+    public int countByTrackNameAndPeriodAndAuthNotRejectByApm(TrackNameEnum trackName, int period){
+        return roleRepository.countAllByTrackNameAndPeriodAndAuthNotRejectByApm(trackName, period);
+    }
+
+    public void existByUserAndTrackNameByPmThrowsException(Long userId, TrackNameEnum trackName) {
+        if(!existByUserAndTrackNameByPm(userId, trackName)){
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+        }
+    }
+
+    public boolean existByUserAndTrackNameByPm(Long userId, TrackNameEnum trackName) {
+        return roleRepository.existsByUserIdAndTrackNameAndAuthApproveByPm(userId, trackName);
+    }
+
+    public void existByUserAndTrackNameAndPeriodByApmThrowsException(Long userId, TrackNameEnum trackName, int period) {
+        if(!existByUserAndTrackNameAndPeriodByApm(userId, trackName, period)){
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_PERIOD_NOT_ACCESS);
+        }
+    }
+
+    public boolean existByUserAndTrackNameAndPeriodByApm(Long userId, TrackNameEnum trackName, int period) {
+        return roleRepository.existsByUserIdAndTrackNameAndPeriodAndAuthApproveByApm(userId, trackName, period);
     }
 
 }

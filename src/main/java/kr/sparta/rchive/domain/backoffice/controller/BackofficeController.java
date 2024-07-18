@@ -7,8 +7,10 @@ import kr.sparta.rchive.domain.backoffice.respoonse.BackofficeResponseCode;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.response.ProfileResponseCode;
 import kr.sparta.rchive.domain.user.response.RoleResponseCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -54,6 +57,19 @@ public class BackofficeController {
 
         return ResponseEntity.status(BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE, null));
+    }
+
+    @GetMapping("/role/count")
+    @Operation(operationId = "BACKOFFICE-004", summary = "유저의 트랙 권한 신청 건수 - 백오피스")
+    public ResponseEntity<CommonResponseDto> getTrackRoleRequestCount (
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam(required = false, value = "period") Integer period
+    ){
+        RoleGetTrackRoleRequestCountRes res = userTrackRoleCoreService.getTrackRoleRequestCount(user,trackName,period);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT, res));
     }
 
     @GetMapping("/role/select")
