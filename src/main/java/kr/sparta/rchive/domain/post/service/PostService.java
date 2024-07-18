@@ -8,14 +8,13 @@ import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.Track;
-import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,29 +55,11 @@ public class PostService {
         postRepository.save(findPost);
     }
 
-    public List<Long> filterPostIdListByTrackId(List<Long> postIdList, Long trackId) {
-        return postIdList.stream().filter(
-                postId -> Objects.equals(findPostById(postId).getTrack().getId(), trackId)
-        ).collect(Collectors.toList());
-    }
-
-    public List<Long> filterPostIdListByTrackName(List<Long> postIdList, TrackNameEnum trackName) {
-        return postIdList.stream().filter(
-                postId -> findPostById(postId).getTrack().getTrackName().equals(trackName)
-        ).collect(Collectors.toList());
-    }
-
     // 교육자료 테이블에서 ID를 이용하여 검색하는 로직
     public Post findPostById(Long postId) {
         return postRepository.findById(postId).orElseThrow(
                 () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
         );
-    }
-
-    public List<Long> findPostIdListByPostTypeAndTrackId(PostTypeEnum postType, Long trackId) {
-        return postRepository.findAllByPostTypeAndTrackId(postType, trackId).stream()
-                .map(Post::getId)
-                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -97,5 +78,36 @@ public class PostService {
         post.closePost();
 
         postRepository.save(post);
+    }
+
+    public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        if (track.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate, isOpened, searchPeriod);
+        }
+        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened, track.getPeriod());
+    }
+
+    public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        if (track.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate, endDate, searchPeriod, isOpened);
+        }
+        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getPeriod(), isOpened);
+    }
+
+    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType, Track track) {
+        if(userRole.equals(UserRoleEnum.USER)) {
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
+        }
+        else {
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
+        }
+    }
+
+    public Post findPostWithDetailByPostId(Long postId) {
+        return postRepository.findPostWithDetailByPostId(postId);
+    }
+
+    public List<Post> findPostListByTagIdWithTagList(Long tagId, Long trackId) {
+        return postRepository.findPostListByTagIdAndTrackIdWithTagList(tagId, trackId);
     }
 }

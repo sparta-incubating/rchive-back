@@ -8,13 +8,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record PostSearchByTagRes(
+public record PostSearchBackOfficeRes(
+        Long postId,
         String title,
-        String tutor,
-        LocalDate uploadedAt,
         PostTypeEnum postType,
-        List<TagInfo> tagList
-        // 제목 카테고리 튜터 기수 공개여부 날짜 태그
+        String tutor,
+        Integer period,
+        Boolean isOpened,
+        LocalDate uploadedAt,
+        List<TagInfo> tagInfoList
 ) {
-
 }

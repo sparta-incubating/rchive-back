@@ -1,11 +1,16 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import kr.sparta.rchive.domain.post.entity.Post;
-import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
-public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByPostTypeAndTrackId(PostTypeEnum postType, Long trackId);
+    @Query("select p from Post p " +
+            "join fetch p.track t " +
+            "left join fetch p.postTagList pt " +
+            "left join fetch pt.tag tag " +
+            "left join p.contentList " +
+            "where p.id = :postId")
+    Post findPostWithDetailByPostId(Long postId);
 }
