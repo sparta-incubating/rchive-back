@@ -63,13 +63,6 @@ public class TagService {
                 .build();
     }
 
-    // 태그 이름으로 태그 검색해오는 로직
-    public Tag findTagBytagName(String tagName) {
-        return tagRepository.findByTagName(tagName).orElseThrow(
-                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG_NOT_EXIST)
-        );
-    }
-
     // 태그가 존재하는지 체크하는 로직
     public Boolean tagExist(Tag tag) {
         if(tag == null) {

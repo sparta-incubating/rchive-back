@@ -23,22 +23,6 @@ public class PostTagService {
         return postTagRepository.findPostTagListByTagIdAlive(tagId);
     }
 
-    // 교육자료에 붙어있는 모든 태그들을 가져오는 로직
-    public List<PostTag> findPostTagByPostIdList(List<Long> postIdList) {
-        return postTagRepository.findByPostIdIn(postIdList);
-    }
-
-    public Map<Long, List<Long>> findPostTagListByTagId(List<Long> postIdList) {
-        List<PostTag> postTagList = findPostTagByPostIdList(postIdList);
-
-        // 교육자료 ID를 Key로 태그 List를 Value로 갖는 Map 형식으로 변환
-        return postTagList.stream()
-                .collect(Collectors.groupingBy(
-                        postTag -> postTag.getPost().getId(),
-                        Collectors.mapping(postTag -> postTag.getTag().getId(), Collectors.toList())
-                ));
-    }
-
     public void savePostTagByPostAndTagIdList(Post post, List<Tag> tagList) {
         List<PostTag> postTagList = tagList.stream()
                 .map(
@@ -60,9 +44,5 @@ public class PostTagService {
 
     private List<PostTag> findPostTagByPostId(Long postId) {
         return postTagRepository.findByPostId(postId);
-    }
-
-    public List<Long> findTagIdListByPostId(Long postId) {
-        return postTagRepository.findTagIdListByPostId(postId);
     }
 }
