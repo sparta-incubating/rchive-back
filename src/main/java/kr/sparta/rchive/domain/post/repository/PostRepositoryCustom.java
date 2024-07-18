@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.post.repository;
 
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,4 +20,6 @@ public interface PostRepositoryCustom {
     List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId);
 
     List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId);
+
+    List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId);
 }

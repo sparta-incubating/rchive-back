@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.post.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
@@ -134,6 +135,27 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         post.track.id.eq(trackId)
                 )
                 .orderBy(post.uploadedAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory.selectDistinct(post)
+                .from(post)
+                .join(post.postTagList, postTag).fetchJoin()
+                .join(postTag.tag, tag).fetchJoin()
+                .where(
+                        post.id.in(
+                                queryFactory.select(post.id)
+                                        .from(post)
+                                        .join(post.postTagList, postTag)
+                                        .where(postTag.tag.id.eq(tagId))
+                        ),
+                        post.track.id.eq(trackId))
                 .fetch();
     }
 }
