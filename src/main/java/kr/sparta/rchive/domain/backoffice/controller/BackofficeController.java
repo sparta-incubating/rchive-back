@@ -13,10 +13,6 @@ import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
-import kr.sparta.rchive.domain.user.response.ProfileResponseCode;
-import kr.sparta.rchive.domain.user.response.RoleResponseCode;
-import kr.sparta.rchive.domain.user.service.RoleService;
-import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.global.custom.CustomPageable;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
