@@ -113,26 +113,20 @@ public class UserTrackRoleCoreService {
                     .statusWait(roleService.countByTrackNameAndAuthByPm(trackName, AuthEnum.WAIT))
                     .statusApprove(roleService.countByTrackNameAndAuthByPm(trackName, AuthEnum.APPROVE))
                     .build();
-        } else if(role.getTrackRole() == TrackRoleEnum.APM){
-
-            if(period==null){
-                throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_PARAMETER_PERIOD);
-            }
-
-            roleService.existByUserAndTrackNameAndPeriodByApmThrowsException(user.getId(), trackName, period);
-
-            return RoleGetTrackRoleRequestCountRes.builder()
-                    .statusAll(roleService.countByTrackNameAndPeriodAndAuthNotRejectByApm(trackName, period))
-                    .statusWait(roleService.countByTrackNameAndPeriodAndAuthByApm(trackName, period, AuthEnum.WAIT))
-                    .statusApprove(roleService.countByTrackNameAndPeriodAndAuthByApm(trackName, period, AuthEnum.APPROVE))
-                    .build();
         }
 
+        if(period==null){
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_PARAMETER_PERIOD);
+        }
+
+        roleService.existByUserAndTrackNameAndPeriodByApmThrowsException(user.getId(), trackName, period);
+
         return RoleGetTrackRoleRequestCountRes.builder()
-                .statusAll(0)
-                .statusWait(0)
-                .statusApprove(0)
+                .statusAll(roleService.countByTrackNameAndPeriodAndAuthNotRejectByApm(trackName, period))
+                .statusWait(roleService.countByTrackNameAndPeriodAndAuthByApm(trackName, period, AuthEnum.WAIT))
+                .statusApprove(roleService.countByTrackNameAndPeriodAndAuthByApm(trackName, period, AuthEnum.APPROVE))
                 .build();
+
     }
 
 }
