@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -95,46 +94,31 @@ public class PostTagCoreService {
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
-    // TODO : Redis 만들기, paging 적용하기
-    public Page<PostSearchByTagRes> searchPostByTag(String tagName, User user, Pageable pageable) {
-        Long trackId = userService.findUserTrackIdByUserEmail(user.getEmail());   // TODO: 로그인한 유저의 트랙 ID 확인 추후에 레디스와 연결하여
-        // 마지막에 들어간 트랙 받아오는 로직으로 변경
-        Track userTrack = trackService.findTrackById(trackId);
+    // TODO : Redis 만들기
+    public Page<PostSearchByTagRes> searchPostByTag(TrackNameEnum trackName, Integer period,
+                                                    Long tagId, User user, Pageable pageable) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track);
 
-        UserCheckPermission(user.getUserRole(), trackId);   // 로그인한 유저의 권한과 트랙 ID를 통해 열람 권한 확인
+        List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId());
 
-        String lowerCaseTagName = tagName.toLowerCase();
-
-        Tag tag = tagService.findTagBytagName(lowerCaseTagName); // 검색하려는 태그 찾아오는 로직
-
-        // 검색하려는 태그가 달려있는 교육자료 ID를 리스트로 찾아오는 로직
-        List<Long> postIdList = findPostIdInRedisByRedisIdUseTagAndTrack(tag, userTrack);
-
-        // 교육자료 ID 리스트 중 로그인한 User의 Track에 해당하는 자료만 가져오는 로직
-        postIdList = filterPostByTrackId(postIdList, userTrack, user.getId());
-
-        // 필터링이 끝난 EducationDataId를 키로 갖고 educationData에 달려있는 Tag들의 List를 value로 갖는 Map으로 변경하는 로직
-        Map<Long, List<Long>> postTagMap = postTagService.findPostTagListByTagId(postIdList);
-
-        // 위에서 Map으로 변경시켜놓은 EducationDataId / TagIdList를 실제 데이터들로 바꿔 responseList에 담는 로직
-        List<PostSearchByTagRes> responseList = postTagMap.entrySet().stream()
-                .map(response -> {
-                    Long postId = response.getKey();
-                    List<Long> tagIdList = response.getValue();
-
-                    PostSearchInfo postSearchInfo = getPostDetails(postId, tagIdList);
-                    List<String> tagNameList = postSearchInfo.tagNameList().stream()
-                            .map(Tag::getTagName)
-                            .toList();
+        List<PostSearchByTagRes> responseList = postList.stream()
+                .map(post -> {
+                    List<TagInfo> tagInfoList = post.getPostTagList().stream()
+                            .map(postTag -> TagInfo.builder()
+                                    .tagId(postTag.getTag().getId())
+                                    .tagName(postTag.getTag().getTagName())
+                                    .build()).collect(Collectors.toList());
 
                     return PostSearchByTagRes.builder()
-                            .title(postSearchInfo.post().getTitle())
-                            .tutor(postSearchInfo.post().getTutor())
-                            .uploadedAt(postSearchInfo.post().getUploadedAt())
-                            .postType(postSearchInfo.post().getPostType())
-                            .tagNameList(tagNameList)
+                            .title(post.getTitle())
+                            .tutor(post.getTutor())
+                            .uploadedAt(post.getUploadedAt())
+                            .postType(post.getPostType())
+                            .tagList(tagInfoList)
                             .build();
-                }).toList();
+                }).collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), responseList.size());
@@ -185,6 +169,7 @@ public class PostTagCoreService {
     public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track);
 
         Post post = postService.findPostWithDetailByPostId(postId);
 
@@ -198,7 +183,7 @@ public class PostTagCoreService {
 
         String detail = "";
 
-        if(!post.getContentList().isEmpty()) {
+        if (!post.getContentList().isEmpty()) {
             detail = post.getContentList().stream()
                     .map(Content::getDetail)
                     .collect(Collectors.joining());
@@ -220,6 +205,9 @@ public class PostTagCoreService {
             Pageable pageable) {
 
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track);
 
         List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(), postType, track);
 
@@ -243,16 +231,6 @@ public class PostTagCoreService {
         int end = Math.min((start + pageable.getPageSize()), responseList.size());
 
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
-    }
-
-    private PostSearchInfo getPostDetails(Long postId, List<Long> tagIdList) {
-        Post post = postService.findPostById(postId);
-
-        List<Tag> tagNameList = tagIdList.stream()
-                .map(tagService::findTagById)
-                .collect(Collectors.toList());
-
-        return new PostSearchInfo(post, tagNameList);
     }
 
     private void createContentByPost(Post createPost, String content) {
@@ -298,30 +276,23 @@ public class PostTagCoreService {
     }
 
     // 유저가 속해있는 트랙의 열람권한을 체크하는 로직
-    private void UserCheckPermission(UserRoleEnum userRole, Long trackId) {
-        if (UserRoleIsUser(userRole)) {
-            if (!trackService.checkPermission(trackId)) {
+    private void userCheckPermission(UserRoleEnum userRole, Track track) {
+        if (userRoleIsUser(userRole) || track.getPeriod() != 0) {
+            if (track.getIsPermission()) {
                 throw new IllegalArgumentException(); // TODO: 추후 커스텀 에러로 변경할 예정
             }
         }
     }
 
-    // 로그인 한 유저가 속해있는 트랙의 데이터만 남기는 로직
-    private List<Long> filterPostByTrackId(List<Long> postIdList, Track userTrack, Long userId) {
-        TrackRoleEnum trackRole = roleService.findTrackRoleByTrackIdAndUserId(userTrack.getId(), userId);
-
-        if (UserTrackRoleIsPm(trackRole)) {
-            return postService.filterPostIdListByTrackName(postIdList, userTrack.getTrackName());
-        }
-
-        return postService.filterPostIdListByTrackId(postIdList, userTrack.getId());
+    private boolean userTrackRoleIsApm(TrackRoleEnum trackRole) {
+        return trackRole == TrackRoleEnum.APM;
     }
 
-    private boolean UserTrackRoleIsPm(TrackRoleEnum trackRole) {
+    private boolean userTrackRoleIsPm(TrackRoleEnum trackRole) {
         return trackRole == TrackRoleEnum.PM;
     }
 
-    private boolean UserRoleIsUser(UserRoleEnum userRole) {
+    private boolean userRoleIsUser(UserRoleEnum userRole) {
         return userRole == UserRoleEnum.USER;
     }
 
@@ -330,13 +301,12 @@ public class PostTagCoreService {
         Role role = null;
 
         for (Role r : roleList) {
-            if (r.getTrackRole().equals(TrackRoleEnum.PM) && track.getTrackName().equals(r.getTrack().getTrackName())) {
+            if (userTrackRoleIsPm(r.getTrackRole()) && track.getTrackName().equals(r.getTrack().getTrackName())) {
                 return;
             }
 
-            if(r.getTrack().equals(track)) {
-                role = r;
-                break;
+            if (r.getTrack().equals(track)) {
+                return;
             }
 
             role = r;
