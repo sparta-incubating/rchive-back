@@ -28,7 +28,7 @@ public class Content extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false, columnDefinition = "LONGTEXT")
-    private String content;
+    private String detail;
 
     @Column
     private Integer seq;

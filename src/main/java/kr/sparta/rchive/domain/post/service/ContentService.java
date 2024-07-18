@@ -15,9 +15,9 @@ import java.util.List;
 public class ContentService {
     private final ContentRepository contentRepository;
 
-    public void createContent(String content, Post post) {
+    public void createContent(String detail, Post post) {
         Content createContent = Content.builder()
-                .content(content)
+                .detail(detail)
                 .seq(1)
                 .post(post)
                 .build();
