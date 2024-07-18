@@ -18,10 +18,10 @@ env:
   REDIS_HOST: ${{secrets.REDIS_HOST}}
   REDIS_PORT: ${{secrets.REDIS_PORT}}
   JWT_KEY: ${{secrets.JWT_KEY}}
-  bucketBUCKET_NAME: ${{BUCKET_NAME}}
-  REGION: ${{REGION}}
-  S3_ACCESS_KEY: ${{S3_ACCESS_KEY}}
-  S3_SECRET_ACCESS_KEY: ${{S3_SECRET_ACCESS_KEY}}
+  bucketBUCKET_NAME: ${{secrets.BUCKET_NAME}}
+  REGION: ${{secrets.REGION}}
+  S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
+  S3_SECRET_ACCESS_KEY: ${{secrets.S3_SECRET_ACCESS_KEY}}
 jobs:
   test:
     runs-on: ubuntu-latest
