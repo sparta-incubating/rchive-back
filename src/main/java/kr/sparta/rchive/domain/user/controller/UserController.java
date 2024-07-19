@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
@@ -34,7 +35,7 @@ public class UserController {
 
     @PostMapping("/signup")
     @Operation(operationId = "USER-001", summary = "회원가입")
-    public ResponseEntity<CommonResponseDto> signup(@RequestBody UserSignupReq req){
+    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserSignupReq req){
         userService.signup(req);
         return ResponseEntity.status(UserResponseCode.OK_SIGNUP.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_SIGNUP, null));
