@@ -1,6 +1,5 @@
 package kr.sparta.rchive.global.s3;
 
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -34,7 +33,7 @@ public class S3ImageService {
     private String bucketName;
 
     @Transactional
-    public String getUrlAfterThumbnailUpload(MultipartFile image) {
+    public String getUrlAfterUpload(MultipartFile image) {
         String originalName = image.getOriginalFilename();
         validateImageFile(originalName);
 

@@ -23,7 +23,7 @@ public class S3ImageController {
     public ResponseEntity<CommonResponseDto> uploadThumbnail(
         @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
-        String thumbnailImageUrl = s3ImageService.getUrlAfterThumbnailUpload(thumbnail);
+        String thumbnailImageUrl = s3ImageService.getUrlAfterUpload(thumbnail);
         return ResponseEntity.status(GlobalResponseCode.FILE_UPLOAD.getHttpStatus())
                 .body(CommonResponseDto.of(GlobalResponseCode.FILE_UPLOAD, thumbnailImageUrl));
     }
