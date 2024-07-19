@@ -80,26 +80,33 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
-        if (track.getPeriod() == 0) {
-            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate, isOpened, searchPeriod);
+    public List<Post> findPostListInBackOfficePostTypeAll(Track managerTrack, LocalDate startDate,
+            LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        if (managerTrack.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate,
+                    isOpened, searchPeriod);
         }
-        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened, track.getPeriod());
+        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened,
+                managerTrack.getPeriod());
     }
 
-    public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
-        if (track.getPeriod() == 0) {
-            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate, endDate, searchPeriod, isOpened);
+    public List<Post> findPostListInBackOffice(Track managerTrack, PostTypeEnum postType,
+            LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+        if (managerTrack.getPeriod() == 0) {
+            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate,
+                    endDate, searchPeriod, isOpened);
         }
-        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getPeriod(), isOpened);
+        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate,
+                endDate, managerTrack.getPeriod(), isOpened);
     }
 
-    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType, Track track) {
-        if(userRole.equals(UserRoleEnum.USER)) {
+    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,
+            Track track) {
+        if (userRole.equals(UserRoleEnum.USER)) {
             return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
-        }
-        else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
+        } else {
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType,
+                    track.getId());
         }
     }
 
