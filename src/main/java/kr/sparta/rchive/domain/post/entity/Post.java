@@ -47,6 +47,9 @@ public class Post extends BaseTimeEntity {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
 
+    @Column
+    private String thumbnailUrl;
+
     @Column(name = "video_link")
     private String videoLink;
 
