@@ -38,9 +38,11 @@ public class PostController {
     @PostMapping
     @Operation(operationId = "POST-001", summary = "게시물 생성")
     public ResponseEntity<CommonResponseDto> createPost(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
             @RequestBody PostCreateReq request
     ) {
-        PostCreateRes response = postTagCoreService.createPost(request);
+        PostCreateRes response = postTagCoreService.createPost(user, trackName, request);
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_POST, response));
@@ -49,10 +51,13 @@ public class PostController {
     @PatchMapping("/{postId}")
     @Operation(operationId = "POST-002", summary = "게시물 관리 - 수정")
     public ResponseEntity<CommonResponseDto> updatePost(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @PathVariable Long postId,
             @RequestBody PostModifyReq request
     ) {
-        PostModifyRes response = postTagCoreService.updatePost(postId, request);
+        PostModifyRes response = postTagCoreService.updatePost(user, trackName, period, postId, request);
 
         return ResponseEntity.status(PostResponseCode.OK_MODIFY_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_MODIFY_POST, response));
@@ -61,9 +66,12 @@ public class PostController {
     @DeleteMapping("/{postId}")
     @Operation(operationId = "POST-003", summary = "게시물 관리 - 삭제")
     public ResponseEntity<CommonResponseDto> deletePost(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @PathVariable Long postId
     ) {
-        postService.deletePost(postId);
+        postTagCoreService.deletePost(user, trackName, period, postId);
 
         return ResponseEntity.status(PostResponseCode.OK_DELETE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_POST, null));
@@ -103,6 +111,7 @@ public class PostController {
     @PostMapping("/tags")
     @Operation(operationId = "POST-009", summary = "사용할 태그 생성")
     public ResponseEntity<CommonResponseDto> createTag(
+            @LoginUser User user,
             @RequestBody TagCreateReq request
     ) {
         TagCreateRes response = tagService.createTag(request.tagName());
@@ -114,6 +123,7 @@ public class PostController {
     @GetMapping("/tags")
     @Operation(operationId = "POST-010", summary = "사용할 태그 검색")
     public ResponseEntity<CommonResponseDto> searchTag(
+            @LoginUser User user,
             @RequestParam("tagName") String tagName
     ) {
 
@@ -143,9 +153,12 @@ public class PostController {
     @PatchMapping("/{postId}/open")
     @Operation(operationId = "POST-014", summary = "게시물 공개 여부 변경 - 공개")
     public ResponseEntity<CommonResponseDto> openPost(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @PathVariable Long postId
     ) {
-        postService.openPost(postId);
+        postTagCoreService.openPost(user, trackName, period, postId);
 
         return ResponseEntity.status(PostResponseCode.OK_OPEN_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_OPEN_POST, null));
@@ -154,13 +167,14 @@ public class PostController {
     @PatchMapping("/{postId}/close")
     @Operation(operationId = "POST-015", summary = "게시물 공개 여부 변경 - 비공개")
     public ResponseEntity<CommonResponseDto> closePost(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @PathVariable Long postId
     ) {
-        postService.closePost(postId);
+        postTagCoreService.closePost(user, trackName, period, postId);
 
         return ResponseEntity.status(PostResponseCode.OK_CLOSE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CLOSE_POST, null));
     }
-
-
 }
