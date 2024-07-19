@@ -19,7 +19,6 @@ public record PostCreateReq(
         String contentLink,
         String content,
         List<String> tagNameList,
-        TrackNameEnum trackName,
         Integer period,
         Boolean isOpened
 ) {
