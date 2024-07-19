@@ -16,6 +16,7 @@ public enum GlobalExceptionCode {
     BAD_REQUEST_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST,"GLOBAL-008","토큰 시간 만료"),
     BAD_REQUEST_IMAGE_EXTENSION_NOT_EXIST(HttpStatus.BAD_REQUEST,"GLOBAL-010","이미지의 확장자가 존재하지 않음"),
     BAD_REQUEST_IMAGE_EXTENSION_MISMATCH(HttpStatus.BAD_REQUEST, "GLOBAL-011","확장자가 옳바르지 않음"),
+    BAD_REQUEST_IMAGE_NOT_UPLOAD(HttpStatus.BAD_REQUEST, "GLOBAL-011","업로드한 이미지가 존재하지 않음"),
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 
@@ -29,7 +30,8 @@ public enum GlobalExceptionCode {
 
     /*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"GLOBAL-005", "내부 서버 에러"),
-    INTERNAL_SERVER_ERROR_IMAGE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"GLOBAL-009", "이미지 업로드 실패");
+    INTERNAL_SERVER_ERROR_IMAGE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"GLOBAL-009", "이미지 업로드 실패"),
+    INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"GLOBAL-012", "이미지 삭제 실패");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

@@ -29,6 +29,7 @@ public class PostService {
                 .title(request.title())
                 .tutor(request.tutor())
                 .uploadedAt(request.uploadedAt())
+                .thumbnailUrl(request.thumbnailUrl())
                 .videoLink(request.videoLink())
                 .contentLink(request.contentLink())
                 .isOpened(request.isOpened())

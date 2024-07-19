@@ -70,6 +70,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/role/**").permitAll()
                         .requestMatchers("/api/v1/posts/**").permitAll()
                         .requestMatchers("/api/v1/backoffice/**").hasRole(UserRoleEnum.MANAGER.toString())
+                        .requestMatchers("/api/v1/s3/**").hasRole(UserRoleEnum.MANAGER.toString())
 //                        .requestMatchers("/api/v1/**").permitAll()
 //                        .requestMatchers("/api/v1/admin").hasRole(UserRoleEnum.ADMIN.toString())
                         .anyRequest().authenticated()

@@ -10,6 +10,7 @@ public enum GlobalResponseCode implements ResponseCode {
 
     /* 200 OK */
     OK(HttpStatus.OK,"GLOBAL-001", "REQUEST SUCCESS, OK"),
+    UPLOAD(HttpStatus.OK,"GLOBAL-004", "UPLOAD SUCCESS, OK"),
 
     /* 201 CREATED */
     CREATE(HttpStatus.CREATED, "GLOBAL-002", "REQUEST SUCCESS, CREATE"),
