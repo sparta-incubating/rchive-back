@@ -14,6 +14,7 @@ public record PostCreateReq(
         String title,
         String tutor,
         LocalDate uploadedAt,
+        String thumbnailUrl,
         String videoLink,
         String contentLink,
         String content,
