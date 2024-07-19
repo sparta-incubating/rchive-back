@@ -18,15 +18,13 @@ public enum RoleExceptionCode {
     FORBIDDEN_USER_ROLE_USER(HttpStatus.FORBIDDEN, "ROLE-002", "일반 유저 접근 불가"),
     FORBIDDEN_ROLE_NOT_ACCESS(HttpStatus.FORBIDDEN, "ROLE-004", "해당 권한 접근 불가"),
     FORBIDDEN_TRACK_NOT_ACCESS(HttpStatus.BAD_REQUEST, "ROLE-005", "해당 트랙 접근 불가"),
-    FORBIDDEN_PERIOD_NOT_ACCESS(HttpStatus.BAD_REQUEST, "ROLE-006", "해당 기수 접근 불가"),
 
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
     NOT_FOUND_ROLE_REQUEST(HttpStatus.NOT_FOUND, "ROLE-001", "권한 신청 없음")
 
     /*  409 CONFLICT : Resource 중복  */
 
-    /*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
-    ;
+    /*  500 INTERNAL_SERVER_ERROR : 서버 에러  */;
 
     private final HttpStatus httpStatus;
     private final String errorCode;

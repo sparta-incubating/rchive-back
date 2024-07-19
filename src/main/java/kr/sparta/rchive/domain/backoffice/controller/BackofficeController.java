@@ -10,9 +10,12 @@ import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.global.custom.CustomPageable;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
@@ -35,18 +38,42 @@ public class BackofficeController {
     private final UserTrackRoleCoreService userTrackRoleCoreService;
     private final PostTagCoreService postTagCoreService;
 
+    @GetMapping("/role")
+    @Operation(operationId = "BACKOFFICE-001", summary = "유저의 트랙 권한 신청 목록 조회 - 백오피스")
+    public ResponseEntity<CommonResponseDto> getUserTrackRoleRequestList(
+            @LoginUser User user,
+            @RequestParam(value = "status", required = false) AuthEnum status,
+            @RequestParam(value = "trackName") TrackNameEnum trackName,
+            @RequestParam(value = "period") Integer period,
+            @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "trackRole", required = false) TrackRoleEnum trackRole,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
+        Page<RoleGetTrackRoleRequestListRes> responseList =
+                userTrackRoleCoreService.getUserTrackRoleRequestList(user, trackName, period,
+                        status, searchPeriod, email, trackRole, pageable);
 
+        return ResponseEntity.status(
+                        BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_LIST.getHttpStatus())
+                .body(CommonResponseDto.of(
+                        BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_LIST, responseList));
+    }
 
     @PostMapping("/role/approve")
     @Operation(operationId = "BACKOFFICE-002", summary = "유저의 트랙 권한 수락 - 백오피스")
     public ResponseEntity<CommonResponseDto> userTrackRoleApprove(
             @LoginUser User user,
             @RequestBody List<RoleRequestListReq> reqList
-    ){
-        userTrackRoleCoreService.userTrackRoleApprove(user,reqList);
+    ) {
+        userTrackRoleCoreService.userTrackRoleApprove(user, reqList);
 
-        return ResponseEntity.status(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE.getHttpStatus())
-                .body(CommonResponseDto.of(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE, null));
+        return ResponseEntity.status(
+                        BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_APPROVE_USER_TRACK_ROLE,
+                        null));
     }
 
     @DeleteMapping("/role/reject")
@@ -54,24 +81,29 @@ public class BackofficeController {
     public ResponseEntity<CommonResponseDto> userTrackRoleReject(
             @LoginUser User user,
             @RequestBody List<RoleRequestListReq> reqList
-    ){
-        userTrackRoleCoreService.userTrackRoleReject(user,reqList);
+    ) {
+        userTrackRoleCoreService.userTrackRoleReject(user, reqList);
 
-        return ResponseEntity.status(BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE.getHttpStatus())
+        return ResponseEntity.status(
+                        BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_REJECT_USER_TRACK_ROLE, null));
     }
 
     @GetMapping("/role/count")
     @Operation(operationId = "BACKOFFICE-004", summary = "유저의 트랙 권한 신청 건수 - 백오피스")
-    public ResponseEntity<CommonResponseDto> getTrackRoleRequestCount (
+    public ResponseEntity<CommonResponseDto> getTrackRoleRequestCount(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam(required = false, value = "period") Integer period
-    ){
-        RoleGetTrackRoleRequestCountRes res = userTrackRoleCoreService.getTrackRoleRequestCount(user,trackName,period);
+            @RequestParam("period") Integer period,
+            @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod
+    ) {
+        RoleGetTrackRoleRequestCountRes res = userTrackRoleCoreService.getTrackRoleRequestCount(
+                user, trackName, period, searchPeriod);
 
-        return ResponseEntity.status(BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT.getHttpStatus())
-                .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT, res));
+        return ResponseEntity.status(
+                        BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT.getHttpStatus())
+                .body(CommonResponseDto.of(
+                        BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT, res));
     }
 
     @GetMapping("/post/search")
@@ -90,10 +122,13 @@ public class BackofficeController {
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostSearchBackOfficeRes> responseList =
-                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
+                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType,
+                        startDate, endDate,
                         searchPeriod, isOpened, pageable);
+
         return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
-                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST,
+                        responseList));
     }
 
     @GetMapping("/role/select")
@@ -111,7 +146,7 @@ public class BackofficeController {
     @Operation(operationId = "BACKOFFICE-008", summary = "프로필 조회 - 백오피스")
     public ResponseEntity<CommonResponseDto> getProfileBackoffice(
             @LoginUser User user
-    ){
+    ) {
         UserRes res = userTrackRoleCoreService.getProfileBackoffice(user);
 
         return ResponseEntity.status(BackofficeResponseCode.OK_GET_PROFILE.getHttpStatus())
