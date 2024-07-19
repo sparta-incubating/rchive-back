@@ -1,7 +1,9 @@
 package kr.sparta.rchive.global.s3;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import kr.sparta.rchive.global.execption.GlobalCustomException;
@@ -14,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -23,20 +29,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class S3ImageService {
     private static final String thumbnailDirectoryName = "thumbnails/dev/";
-    private static final String defaultThumbNailUrl = "https://rchive-bucket.s3.ap-northeast-2.amazonaws.com/thumbnails/dev/416b9c59-6728-412c-b93d-d86d57a13def-default%20Thumbnail.png";
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
     @Transactional
     public String getUrlAfterThumbnailUpload(MultipartFile image) {
-        String originalName;
-        try{
-            originalName = image.getOriginalFilename();
-        } catch (NullPointerException e){
-            return defaultThumbNailUrl;
-        }
-
+        String originalName = image.getOriginalFilename();
         validateImageFile(originalName);
 
         String randomImageName = getRandomImageName(originalName);
@@ -85,5 +84,23 @@ public class S3ImageService {
         String extention = originalName.substring(originalName.lastIndexOf("."));
         metadata.setContentType("image/" + extention);
         return metadata;
+    }
+
+    public void deleteS3Image(String imageUrl) {
+        String key = getKeyFromImageAddress(imageUrl);
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
+        } catch (Exception e) {
+            throw new GlobalCustomException(GlobalExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL);
+        }
+    }
+
+    private String getKeyFromImageAddress(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            return URLDecoder.decode(url.getPath(), "UTF-8").substring(1);
+        } catch (MalformedURLException | UnsupportedEncodingException e) {
+            throw new GlobalCustomException(GlobalExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL);
+        }
     }
 }
