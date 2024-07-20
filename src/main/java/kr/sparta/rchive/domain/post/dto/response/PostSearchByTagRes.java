@@ -9,6 +9,7 @@ import java.util.List;
 
 @Builder
 public record PostSearchByTagRes(
+        String thumbnailUrl,
         String title,
         String tutor,
         LocalDate uploadedAt,

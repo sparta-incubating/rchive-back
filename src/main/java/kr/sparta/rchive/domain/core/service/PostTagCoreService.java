@@ -80,6 +80,7 @@ public class PostTagCoreService {
 
                     return PostSearchBackOfficeRes.builder()
                             .postId(post.getId())
+                            .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .postType(post.getPostType())
                             .tutor(post.getTutor())
@@ -114,6 +115,7 @@ public class PostTagCoreService {
                                     .build()).collect(Collectors.toList());
 
                     return PostSearchByTagRes.builder()
+                            .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor())
                             .uploadedAt(post.getUploadedAt())
@@ -244,6 +246,7 @@ public class PostTagCoreService {
                                     .build()).toList();
 
                     return PostGetCategoryPostRes.builder()
+                            .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor())
                             .uploadedAt(post.getUploadedAt())

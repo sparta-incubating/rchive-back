@@ -9,7 +9,6 @@ import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
-import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -31,7 +30,6 @@ import java.util.List;
 @Tag(name = "4. Post API", description = "Post 관련 API입니다.")
 public class PostController {
 
-    private final PostService postService;
     private final PostTagCoreService postTagCoreService;
     private final TagService tagService;
 
