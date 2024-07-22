@@ -1,7 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.comment.service.CommentService;
-import kr.sparta.rchive.domain.post.dto.PostSearchInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
@@ -22,6 +21,7 @@ import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
+import kr.sparta.rchive.domain.user.repository.RoleRepository;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
@@ -58,7 +58,9 @@ public class PostTagCoreService {
             Integer searchPeriod, Boolean isOpened, Pageable pageable
     ) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        userRoleAndTrackCheck(user, track);
+        if (!IsUserManager(user, track)) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        }
 
         List<Post> postList;
 
@@ -78,6 +80,7 @@ public class PostTagCoreService {
 
                     return PostSearchBackOfficeRes.builder()
                             .postId(post.getId())
+                            .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .postType(post.getPostType())
                             .tutor(post.getTutor())
@@ -98,8 +101,8 @@ public class PostTagCoreService {
     public Page<PostSearchByTagRes> searchPostByTag(TrackNameEnum trackName, Integer period,
                                                     Long tagId, User user, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        userRoleAndTrackCheck(user, track);
-        userCheckPermission(user.getUserRole(), track);
+        Role role = userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId());
 
@@ -112,6 +115,7 @@ public class PostTagCoreService {
                                     .build()).collect(Collectors.toList());
 
                     return PostSearchByTagRes.builder()
+                            .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor())
                             .uploadedAt(post.getUploadedAt())
@@ -127,9 +131,12 @@ public class PostTagCoreService {
     }
 
     @Transactional
-    public PostCreateRes createPost(PostCreateReq request) {
+    public PostCreateRes createPost(User user, TrackNameEnum trackName, PostCreateReq request) {
 
-        Track track = findTrackByTrackNameAndPeriod(request.trackName(), request.period());
+        Track track = findTrackByTrackNameAndPeriod(trackName, request.period());
+        if (!IsUserManager(user, track)) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        }
 
         Post createPost = postService.createPost(request, track);
 
@@ -143,15 +150,21 @@ public class PostTagCoreService {
     }
 
     @Transactional
-    public PostModifyRes updatePost(Long id, PostModifyReq request) {
+    public PostModifyRes updatePost(User user, TrackNameEnum trackName, Integer period, Long postId, PostModifyReq request) {
 
-        Track track = null;
+        Post findPost = postService.findPostById(postId);
+        Track track = findTrackByTrackNameAndPeriod(trackName, period);
+
+        if (!IsUserManager(user, track)) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        }
+        checkPostAndTrack(findPost, track);
 
         if (request.period() != null) {
             track = findTrackByTrackNameAndPeriod(request.trackName(), request.period());
         }
 
-        Post updatePost = postService.updatePost(id, request, track);
+        Post updatePost = postService.updatePost(findPost, request, track);
 
         if (request.content() != null) {
             updateContent(updatePost, request.content());
@@ -166,10 +179,23 @@ public class PostTagCoreService {
                 .build();
     }
 
+    public void deletePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
+
+        Track track = findTrackByTrackNameAndPeriod(trackName, period);
+        Post findPost = postService.findPostById(postId);
+
+        if (!IsUserManager(user, track)) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        }
+        checkPostAndTrack(findPost, track);
+
+        postService.deletePost(findPost);
+    }
+
     public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        userRoleAndTrackCheck(user, track);
-        userCheckPermission(user.getUserRole(), track);
+        Role role = userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         Post post = postService.findPostWithDetailByPostId(postId);
 
@@ -206,8 +232,8 @@ public class PostTagCoreService {
 
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
 
-        userRoleAndTrackCheck(user, track);
-        userCheckPermission(user.getUserRole(), track);
+        Role role = userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(), postType, track);
 
@@ -220,6 +246,7 @@ public class PostTagCoreService {
                                     .build()).toList();
 
                     return PostGetCategoryPostRes.builder()
+                            .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor())
                             .uploadedAt(post.getUploadedAt())
@@ -231,6 +258,29 @@ public class PostTagCoreService {
         int end = Math.min((start + pageable.getPageSize()), responseList.size());
 
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
+    }
+
+    public void openPost(User user, TrackNameEnum trackName, Integer period, Long postId) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        Post findPost = postService.findPostById(postId);
+        if (!IsUserManager(user, track)) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        }
+        checkPostAndTrack(findPost, track);
+
+        postService.openPost(findPost);
+    }
+
+    public void closePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
+        Post findPost = postService.findPostById(postId);
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        if (!IsUserManager(user, track)) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        }
+        checkPostAndTrack(findPost, track);
+
+
+        postService.closePost(findPost);
     }
 
     private void createContentByPost(Post createPost, String content) {
@@ -276,9 +326,9 @@ public class PostTagCoreService {
     }
 
     // 유저가 속해있는 트랙의 열람권한을 체크하는 로직
-    private void userCheckPermission(UserRoleEnum userRole, Track track) {
-        if (userRoleIsUser(userRole) || track.getPeriod() != 0) {
-            if (track.getIsPermission()) {
+    private void userCheckPermission(UserRoleEnum userRole, Track track, TrackRoleEnum trackRole) {
+        if (userRoleIsUser(userRole) || userTrackRoleIsApm(trackRole)) {
+            if (!track.getIsPermission()) {
                 throw new IllegalArgumentException(); // TODO: 추후 커스텀 에러로 변경할 예정
             }
         }
@@ -296,29 +346,43 @@ public class PostTagCoreService {
         return userRole == UserRoleEnum.USER;
     }
 
-    private void userRoleAndTrackCheck(User user, Track track) {
+    private Role userRoleAndTrackCheck(User user, Track track) {
         List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
-        Role role = null;
 
-        for (Role r : roleList) {
-            if (userTrackRoleIsPm(r.getTrackRole()) && track.getTrackName().equals(r.getTrack().getTrackName())) {
-                return;
-            }
-
-            if (r.getTrack().equals(track)) {
-                return;
-            }
-
-            role = r;
-        }
-
-        if (role == null) {
+        if (roleList.isEmpty()) {
             throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
         }
 
-        if (!Objects.equals(role.getTrack().getId(), track.getId())) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        for (Role r : roleList) {
+            if (userTrackRoleIsPm(r.getTrackRole()) && track.getTrackName().equals(r.getTrack().getTrackName())) {
+                return r;
+            }
+
+            if (r.getTrack().equals(track)) {
+                return r;
+            }
         }
+
+        throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
     }
 
+    private Boolean IsUserManager(User user, Track track) {
+
+        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+
+        Boolean check = roleList.stream().anyMatch(role -> (role.getTrack().getTrackName().equals(track.getTrackName()) && role.getTrackRole() == TrackRoleEnum.PM) ||
+                (role.getTrack().equals(track) && role.getTrackRole() == TrackRoleEnum.APM));
+
+        return check;
+    }
+
+    private void checkPostAndTrack(Post findPost, Track track) {
+        if (findPost.getTrack().getTrackName() != track.getTrackName()) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+        }
+
+        if (track.getPeriod() != 0 && !Objects.equals(findPost.getTrack().getPeriod(), track.getPeriod())) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_PERIOD_NOT_ACCESS);
+        }
+    }
 }

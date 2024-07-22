@@ -97,6 +97,7 @@ public class Post extends BaseTimeEntity {
         this.title = request.title() == null ? this.title : request.title();
         this.tutor = request.tutor() == null ? this.tutor : request.tutor();
         this.uploadedAt = request.uploadedAt() == null ? this.uploadedAt : request.uploadedAt();
+        this.thumbnailUrl = request.thumbnailUrl() == null ? this.thumbnailUrl : request.thumbnailUrl();
         this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
         this.contentLink = request.contentLink() == null ? this.contentLink : request.contentLink();
         this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();

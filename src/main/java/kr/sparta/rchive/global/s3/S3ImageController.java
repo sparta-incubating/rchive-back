@@ -21,10 +21,21 @@ public class S3ImageController {
     @PostMapping(value = "/thumbnail/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(operationId = "S3-001", summary = "썸네일 파일 업로드")
     public ResponseEntity<CommonResponseDto> uploadThumbnail(
-        @RequestPart(value = "thumbnail", required = false) final MultipartFile thumbnail
+        @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
-        String thumbnailImageUrl = s3ImageService.getUrlAfterThumbnailUpload(thumbnail);
-        return ResponseEntity.status(GlobalResponseCode.UPLOAD.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalResponseCode.UPLOAD, thumbnailImageUrl));
+        String thumbnailImageUrl = s3ImageService.getUrlAfterUpload(thumbnail);
+        return ResponseEntity.status(GlobalResponseCode.FILE_UPLOAD.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalResponseCode.FILE_UPLOAD, thumbnailImageUrl));
+    }
+
+    @GetMapping("/thumnail/delete")
+    @Operation(operationId = "S3-002", summary = "썸네일 파일 삭제")
+    public ResponseEntity<CommonResponseDto> deleteThumbnail(
+            @RequestParam(value = "thumbnailUrl") String thumbnailUrl
+    ) {
+        s3ImageService.deleteS3Image(thumbnailUrl);
+
+        return ResponseEntity.status(GlobalResponseCode.FILE_DELETE.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalResponseCode.FILE_DELETE, null));
     }
 }
