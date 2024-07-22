@@ -25,7 +25,7 @@ public class BookmarkService {
     }
 
     private Bookmark findBookmarkByUserIdAndPostId(Long userId, Long postId) {
-        return bookmarkRepository.findBookmarkByUserIdAnAndPostId(userId, postId).orElseThrow(
+        return bookmarkRepository.findBookmarkByUserIdAndPostId(userId, postId).orElseThrow(
             () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_BOOKMARK_NOT_EXIST)
         );
     }
