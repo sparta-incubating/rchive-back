@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record RoleRes(
+        Long trackId,
         TrackRoleEnum trackRoleEnum,
         TrackNameEnum trackName,
         int period) {

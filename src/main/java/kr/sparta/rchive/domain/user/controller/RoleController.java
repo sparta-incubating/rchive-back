@@ -45,12 +45,21 @@ public class RoleController {
                 .body(CommonResponseDto.of(RoleResponseCode.OK_GET_MY_ROLE_LIST, resList));
     }
 
-
     @PostMapping
     @Operation(operationId = "ROLE-002", summary = "내 권한(트랙 및 기수) 요청")
     public ResponseEntity<CommonResponseDto> requestRole(@LoginUser User user,
             @RequestBody RoleRequestReq req) {
         userTrackRoleCoreService.requestRole(user, req);
+
+        return ResponseEntity.status(RoleResponseCode.OK_REQUEST_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_REQUEST_ROLE, null));
+    }
+
+    @PostMapping
+    @Operation(operationId = "ROLE-003", summary = "내 권한(트랙 및 기수) 선택")
+    public ResponseEntity<CommonResponseDto> selectMyRole(@LoginUser User user,
+            @RequestBody RoleRequestReq req) {
+        userTrackRoleCoreService.selectMyRole(user, req);
 
         return ResponseEntity.status(RoleResponseCode.OK_REQUEST_ROLE.getHttpStatus())
                 .body(CommonResponseDto.of(RoleResponseCode.OK_REQUEST_ROLE, null));

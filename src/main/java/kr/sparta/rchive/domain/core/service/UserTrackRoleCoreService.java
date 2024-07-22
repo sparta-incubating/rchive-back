@@ -52,6 +52,7 @@ public class UserTrackRoleCoreService {
             return trackList.stream()
                     .map(track -> {
                         return RoleRes.builder()
+                                .trackId(track.getId())
                                 .trackRoleEnum(TrackRoleEnum.PM)
                                 .trackName(track.getTrackName())
                                 .period(track.getPeriod())
@@ -62,6 +63,7 @@ public class UserTrackRoleCoreService {
         return roleList.stream()
                 .map(role -> {
                     return RoleRes.builder()
+                            .trackId(role.getTrack().getId())
                             .trackRoleEnum(role.getTrackRole())
                             .trackName(role.getTrack().getTrackName())
                             .period(role.getTrack().getPeriod())
