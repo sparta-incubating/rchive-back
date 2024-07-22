@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.core.service;
 
 import java.util.ArrayList;
 import kr.sparta.rchive.domain.comment.service.CommentService;
+import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
@@ -159,15 +160,9 @@ public class PostTagCoreService {
     @Transactional
     public PostModifyRes updatePost(User user, TrackNameEnum trackName, Integer period, Long postId, PostModifyReq request) {
 
-        Post findPost = postService.findPostById(postId);
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        
-        if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
-        } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
-        }
-        checkPostAndTrack(findPost, managerTrack);
+        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
+        Post findPost = postTrackInfo.post();
+        Track managerTrack = postTrackInfo.track();
 
         if (request.period() != null) {
             managerTrack = findTrackByTrackNameAndPeriod(request.trackName(), request.period());
@@ -190,17 +185,9 @@ public class PostTagCoreService {
 
     public void deletePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
 
-        Post findPost = postService.findPostById(postId);
+        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
 
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
-        } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
-        }
-        checkPostAndTrack(findPost, managerTrack);
-
-        postService.deletePost(findPost);
+        postService.deletePost(postTrackInfo.post());
     }
 
     public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName, Integer period) {
@@ -273,20 +260,18 @@ public class PostTagCoreService {
     }
 
     public void openPost(User user, TrackNameEnum trackName, Integer period, Long postId) {
-        Post findPost = postService.findPostById(postId);
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
-        } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
-        }
-        checkPostAndTrack(findPost, managerTrack);
-
-        postService.openPost(findPost);
+        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
+        postService.openPost(postTrackInfo.post());
     }
 
     public void closePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
+        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
+        postService.closePost(postTrackInfo.post());
+    }
+
+    private PostTrackInfo checkPostAndTrack(User user, TrackNameEnum trackName, Integer period, Long postId) {
         Post findPost = postService.findPostById(postId);
+
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
             roleService.existByUserAndTrackByPm(user.getId(), trackName);
@@ -295,8 +280,10 @@ public class PostTagCoreService {
         }
         checkPostAndTrack(findPost, managerTrack);
 
-
-        postService.closePost(findPost);
+        return PostTrackInfo.builder()
+            .post(findPost)
+            .track(managerTrack)
+            .build();
     }
 
     private void createContentByPost(Post createPost, String content) {
