@@ -8,6 +8,7 @@ import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
@@ -34,6 +35,39 @@ public class UserTrackRoleCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final TrackService trackService;
+
+    public List<RoleRes> getMyRoleList(User user) {
+        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+
+        TrackNameEnum trackName = null;
+        for (Role r : roleList) {
+            if (r.getTrackRole() == TrackRoleEnum.PM) {
+                trackName = r.getTrack().getTrackName();
+            }
+        }
+
+        if (trackName != null) {
+            List<Track> trackList = trackService.findTrackListByTrackName(trackName);
+
+            return trackList.stream()
+                    .map(track -> {
+                        return RoleRes.builder()
+                                .trackRoleEnum(TrackRoleEnum.PM)
+                                .trackName(track.getTrackName())
+                                .period(track.getPeriod())
+                                .build();
+                    }).collect(Collectors.toList());
+        }
+
+        return roleList.stream()
+                .map(role -> {
+                    return RoleRes.builder()
+                            .trackRoleEnum(role.getTrackRole())
+                            .trackName(role.getTrack().getTrackName())
+                            .period(role.getTrack().getPeriod())
+                            .build();
+                }).collect(Collectors.toList());
+    }
 
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
             User user, TrackNameEnum trackName, Integer period, AuthEnum status,
@@ -175,5 +209,6 @@ public class UserTrackRoleCoreService {
                 .build();
 
     }
+
 
 }
