@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
@@ -31,6 +32,7 @@ import java.util.List;
 public class PostController {
 
     private final PostTagCoreService postTagCoreService;
+    private final PostBookmarkCoreService postBookmarkCoreService;
     private final TagService tagService;
 
     @PostMapping
@@ -146,6 +148,30 @@ public class PostController {
                 .searchPostByTag(trackName, period, tagId, user, pageable);
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
+    }
+
+    @PostMapping("/{postId}/bookmark")
+    @Operation(operationId = "POST-013", summary = "북마크 생성")
+    public ResponseEntity<CommonResponseDto> createBookmark(
+        @LoginUser User user,
+        @PathVariable Long postId
+    ) {
+        postBookmarkCoreService.createBookmark(user, postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_CREATE_BOOKMARK.getHttpStatus())
+            .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_BOOKMARK, null));
+    }
+
+    @DeleteMapping("/{postId}/bookmark")
+    @Operation(operationId = "POST-014", summary = "북마크 삭제")
+    public ResponseEntity<CommonResponseDto> deleteBookmark(
+        @LoginUser User user,
+        @PathVariable Long postId
+    ) {
+        postBookmarkCoreService.deleteBookmark(user, postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_CREATE_BOOKMARK.getHttpStatus())
+            .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_BOOKMARK, null));
     }
 
     @PatchMapping("/{postId}/open")
