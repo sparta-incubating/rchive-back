@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleSelectRoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
@@ -16,11 +17,13 @@ import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
+import kr.sparta.rchive.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,6 +38,7 @@ public class UserTrackRoleCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final TrackService trackService;
+    private final RedisService redisService;
 
     public List<RoleRes> getMyRoleList(User user) {
         List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
@@ -71,15 +75,33 @@ public class UserTrackRoleCoreService {
                 }).collect(Collectors.toList());
     }
 
+    public void selectRole(User user, RoleSelectRoleReq req) {
+        if (req.period() == 0) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+        }
+
+        Track track = trackService.findTrackByTrackNameAndPeriod(req.trackName(), req.period());
+        boolean isPm = roleService.existByUserAndTrackByPm(user.getId(), track.getTrackName());
+
+        if (!isPm) {
+            Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), track.getId());
+            if (role == null || role.getAuth() != AuthEnum.APPROVE) {
+                throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
+            }
+        }
+
+        redisService.setSelectRole(user, track.getId());
+    }
+
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
             User user, TrackNameEnum trackName, Integer period, AuthEnum status,
             Integer searchPeriod, String email, TrackRoleEnum trackRole, Pageable pageable) {
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
         List<Role> roleList = new ArrayList<>();
@@ -186,10 +208,10 @@ public class UserTrackRoleCoreService {
             User user, TrackNameEnum trackName, Integer period, Integer searchPeriod) {
 
         if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
             Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-            roleService.existByUserAndTrackByApm(user.getId(), track.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), track.getId());
         }
 
         if (period == 0) {

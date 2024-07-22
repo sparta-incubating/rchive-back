@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum RoleExceptionCode {
     /*  400 BAD_REQUEST : 잘못된 요청  */
-    BAD_REQUEST_NO_ROLE(HttpStatus.BAD_REQUEST, "ROLE-003", "유저가 속한 트랙 없음"),
+    BAD_REQUEST_NO_ROLE(HttpStatus.BAD_REQUEST, "ROLE-003", "유저가 속하지 않는 트랙"),
     BAD_REQUEST_NO_ROLE_REQUEST_LIST(HttpStatus.BAD_REQUEST, "ROLE-007", "유저가 신청한 트랙 내역 없음"),
     BAD_REQUEST_NO_PARAMETER_PERIOD(HttpStatus.BAD_REQUEST, "ROLE-008", "파라미터 누락: period"),
 
