@@ -17,6 +17,7 @@ public enum PostExceptionCode {
     NOT_FOUND_POST_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-002", "해당 자료는 존재하지 않음"),
     NOT_FOUND_TAG_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-003", "해당 태그는 존재하지 않음"),
     NOT_FOUND_CONTENT_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-004", "게시물 내용이 존재하지 않음"),
+    NOT_FOUND_BOOKMARK_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-005", "북마크가 존재하지 않음"),
 
     /*  409 CONFLICT : Resource 중복  */
 
