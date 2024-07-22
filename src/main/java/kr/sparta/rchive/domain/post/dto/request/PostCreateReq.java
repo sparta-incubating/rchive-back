@@ -14,11 +14,11 @@ public record PostCreateReq(
         String title,
         String tutor,
         LocalDate uploadedAt,
+        String thumbnailUrl,
         String videoLink,
         String contentLink,
         String content,
         List<String> tagNameList,
-        TrackNameEnum trackName,
         Integer period,
         Boolean isOpened
 ) {
