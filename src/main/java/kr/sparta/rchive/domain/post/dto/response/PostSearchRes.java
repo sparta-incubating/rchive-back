@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record PostSearchRes(
+        String thumbnailUrl,
         String title,
         String tutor,
         LocalDate uploadedAt,

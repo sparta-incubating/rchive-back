@@ -35,28 +35,6 @@ public class BackofficeController {
     private final UserTrackRoleCoreService userTrackRoleCoreService;
     private final PostTagCoreService postTagCoreService;
 
-    @GetMapping("/post/search")
-    @Operation(operationId = "BACKOFFICE-006", summary = "백오피스에서 교육자료 검색")
-    public ResponseEntity<CommonResponseDto> searchPostInBackOffice(
-            @LoginUser User user,
-            @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
-            @RequestParam(value = "postType", required = false) PostTypeEnum postType,
-            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate,
-            @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
-            @RequestParam(value = "isOpened", required = false) Boolean isOpened,
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size
-    ) {
-        Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostSearchBackOfficeRes> responseList =
-                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
-                        searchPeriod, isOpened, pageable);
-        return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
-                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
-    }
-
     @PostMapping("/role/approve")
     @Operation(operationId = "BACKOFFICE-002", summary = "유저의 트랙 권한 수락 - 백오피스")
     public ResponseEntity<CommonResponseDto> userTrackRoleApprove(
@@ -92,6 +70,28 @@ public class BackofficeController {
 
         return ResponseEntity.status(BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT, res));
+    }
+
+    @GetMapping("/post/search")
+    @Operation(operationId = "BACKOFFICE-006", summary = "백오피스에서 교육자료 검색")
+    public ResponseEntity<CommonResponseDto> searchPostInBackOffice(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
+            @RequestParam(value = "postType", required = false) PostTypeEnum postType,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
+            @RequestParam(value = "isOpened", required = false) Boolean isOpened,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
+        Page<PostSearchBackOfficeRes> responseList =
+                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
+                        searchPeriod, isOpened, pageable);
+        return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
     }
 
     @GetMapping("/role/select")
