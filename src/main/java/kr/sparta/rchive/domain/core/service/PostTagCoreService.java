@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
+import java.util.ArrayList;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -21,7 +22,6 @@ import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
-import kr.sparta.rchive.domain.user.repository.RoleRepository;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
@@ -54,7 +54,8 @@ public class PostTagCoreService {
 
 
     public Page<PostSearchBackOfficeRes> getPostListInBackOffice(
-            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, LocalDate startDate, LocalDate endDate,
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType,
+            LocalDate startDate, LocalDate endDate,
             Integer searchPeriod, Boolean isOpened, Pageable pageable
     ) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
@@ -62,12 +63,14 @@ public class PostTagCoreService {
             throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
         }
 
-        List<Post> postList;
+        List<Post> postList = new ArrayList<>();
 
         if (postType == null) {
-            postList = postService.findPostListInBackOfficePostTypeAll(track, startDate, endDate, searchPeriod, isOpened);
+            postList = postService.findPostListInBackOfficePostTypeAll(track, startDate, endDate,
+                    searchPeriod, isOpened);
         } else {
-            postList = postService.findPostListInBackOffice(track, postType, startDate, endDate, searchPeriod, isOpened);
+            postList = postService.findPostListInBackOffice(track, postType, startDate, endDate,
+                    searchPeriod, isOpened);
         }
 
         List<PostSearchBackOfficeRes> responseList = postList.stream()
@@ -99,7 +102,7 @@ public class PostTagCoreService {
 
     // TODO : Redis 만들기
     public Page<PostSearchByTagRes> searchPostByTag(TrackNameEnum trackName, Integer period,
-                                                    Long tagId, User user, Pageable pageable) {
+            Long tagId, User user, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
@@ -235,7 +238,8 @@ public class PostTagCoreService {
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(), postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(),
+                postType, track);
 
         List<PostGetCategoryPostRes> responseList = postList.stream()
                 .map(post -> {
@@ -309,7 +313,8 @@ public class PostTagCoreService {
         return trackService.findTrackByTrackNameAndPeriod(trackName, period);
     }
 
-    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag, Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
+    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag,
+            Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
 
         List<Long> postIdList;
 //        postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);

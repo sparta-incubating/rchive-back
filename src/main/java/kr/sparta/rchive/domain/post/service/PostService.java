@@ -89,12 +89,13 @@ public class PostService {
         return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getId(), isOpened);
     }
 
-    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType, Track track) {
-        if(userRole.equals(UserRoleEnum.USER)) {
+    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,
+            Track track) {
+        if (userRole.equals(UserRoleEnum.USER)) {
             return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
-        }
-        else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
+        } else {
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType,
+                    track.getId());
         }
     }
 

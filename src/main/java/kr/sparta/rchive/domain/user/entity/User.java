@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class User extends BaseTimeEntity {
     private OAuthTypeEnum oAuthType;
 
     @Column(nullable = false, length = 50, unique = true)
+    @Email(message = "올바르지 않은 이메일 형식")
     private String email;
 
     @Column(nullable = false, length = 100)
@@ -59,6 +62,7 @@ public class User extends BaseTimeEntity {
     private LocalDate birth;
 
     @Column(nullable = false, length = 20)
+    @Pattern(regexp = "^[0-9]{11}$", message = "휴대폰번호는 숫자만 11자리")
     private String phone;
 
     @Column(nullable = true, length = 20)
@@ -69,6 +73,7 @@ public class User extends BaseTimeEntity {
     private String profileImg;
 
     @Column(nullable = true, length = 20, unique = true)
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10자리")
     private String nickname;
 
     @Column(nullable = false, length = 20)
