@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleRes;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
@@ -23,7 +24,7 @@ public class TrackService {
     public RoleGetTrackNameListRes getTrackNameList() {
         List<String> trackNameList = new ArrayList<>();
 
-        for(TrackNameEnum trackName : TrackNameEnum.values()){
+        for (TrackNameEnum trackName : TrackNameEnum.values()) {
             trackNameList.add(trackName.name());
         }
 
@@ -63,5 +64,9 @@ public class TrackService {
 
     public Integer findPeriodByTrackId(Long trackId) {
         return findTrackById(trackId).getPeriod();
+    }
+
+    public List<Track> findTrackListByTrackName(TrackNameEnum trackName) {
+        return trackRepository.findAllByTrackName(trackName);
     }
 }
