@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleSelectRoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
@@ -20,6 +21,7 @@ import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +47,6 @@ public class RoleController {
                 .body(CommonResponseDto.of(RoleResponseCode.OK_GET_MY_ROLE_LIST, resList));
     }
 
-
     @PostMapping
     @Operation(operationId = "ROLE-002", summary = "내 권한(트랙 및 기수) 요청")
     public ResponseEntity<CommonResponseDto> requestRole(@LoginUser User user,
@@ -54,6 +55,16 @@ public class RoleController {
 
         return ResponseEntity.status(RoleResponseCode.OK_REQUEST_ROLE.getHttpStatus())
                 .body(CommonResponseDto.of(RoleResponseCode.OK_REQUEST_ROLE, null));
+    }
+
+    @PatchMapping("/select")
+    @Operation(operationId = "ROLE-003", summary = "내 권한(트랙 및 기수) 선택")
+    public ResponseEntity<CommonResponseDto> selectRole(@LoginUser User user,
+            @RequestBody RoleSelectRoleReq req) {
+        userTrackRoleCoreService.selectRole(user, req);
+
+        return ResponseEntity.status(RoleResponseCode.OK_SELECT_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_SELECT_ROLE, null));
     }
 
     @GetMapping("/track")

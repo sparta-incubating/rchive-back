@@ -148,13 +148,17 @@ public class RoleService {
         return roleRepository.countByRoleRequestByApm(trackName, period, auth);
     }
 
-    public void existByUserAndTrackByPm(Long userId, TrackNameEnum trackName) {
+    public void existByUserAndTrackByPmThrowException(Long userId, TrackNameEnum trackName) {
         if (!roleRepository.existsByUserIdAndTracNameAndAuthApproveByPm(userId, trackName)) {
             throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
         }
     }
 
-    public void existByUserAndTrackByApm(Long userId, Long trackId) {
+    public boolean existByUserAndTrackByPm(Long userId, TrackNameEnum trackName) {
+        return roleRepository.existsByUserIdAndTracNameAndAuthApproveByPm(userId, trackName);
+    }
+
+    public void existByUserAndTrackByApmThrowException(Long userId, Long trackId) {
         if (!roleRepository.existsByUserIdAndTracIdAndAuthApproveByApm(userId, trackId)) {
             throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
         }

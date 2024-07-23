@@ -61,9 +61,9 @@ public class PostTagCoreService {
     ) {
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
         List<Post> postList;
@@ -144,9 +144,9 @@ public class PostTagCoreService {
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName,
                 request.period());
         if (request.period() == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
         Post createPost = postService.createPost(request, managerTrack);
@@ -280,9 +280,9 @@ public class PostTagCoreService {
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
         return PostTrackInfo.builder()
@@ -375,4 +375,5 @@ public class PostTagCoreService {
 
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
     }
+
 }
