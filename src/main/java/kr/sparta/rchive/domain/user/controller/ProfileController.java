@@ -27,10 +27,10 @@ public class ProfileController {
     private final UserTrackRoleCoreService userTrackRoleCoreService;
 
     @PatchMapping()
-    @Operation(operationId = "PROFILE-007", summary = "프로필 변경")
+    @Operation(operationId = "PROFILE-006", summary = "프로필 변경")
     public ResponseEntity<CommonResponseDto> updateProfile(
             @LoginUser User user,
-            @RequestBody ProfileUpdateReq req){
+            @RequestBody ProfileUpdateReq req) {
         userService.updateProfile(user, req);
 
         return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PROFILE.getHttpStatus())
@@ -38,10 +38,10 @@ public class ProfileController {
     }
 
     @PatchMapping("/password")
-    @Operation(operationId = "PROFILE-008", summary = "비밀번호 변경")
+    @Operation(operationId = "PROFILE-007", summary = "비밀번호 변경")
     public ResponseEntity<CommonResponseDto> updatePassword(
             @LoginUser User user,
-            @RequestBody ProfileUpdatePasswordReq req){
+            @RequestBody ProfileUpdatePasswordReq req) {
         userService.updatePassword(user, req);
 
         return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PASSWORD.getHttpStatus())

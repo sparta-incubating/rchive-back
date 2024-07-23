@@ -284,7 +284,6 @@ public class PostTagCoreService {
         } else {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
-        checkPostAndTrack(findPost, managerTrack);
 
         return PostTrackInfo.builder()
                 .post(findPost)
@@ -377,14 +376,4 @@ public class PostTagCoreService {
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
     }
 
-    private void checkPostAndTrack(Post findPost, Track track) {
-        if (findPost.getTrack().getTrackName() != track.getTrackName()) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
-        }
-
-        if (track.getPeriod() != 0 && !Objects.equals(findPost.getTrack().getPeriod(),
-                track.getPeriod())) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
-        }
-    }
 }

@@ -21,11 +21,12 @@ public class S3ImageController {
     @PostMapping(value = "/thumbnail/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(operationId = "S3-001", summary = "썸네일 파일 업로드")
     public ResponseEntity<CommonResponseDto> uploadThumbnail(
-        @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
         String thumbnailImageUrl = s3ImageService.getUrlAfterUpload(thumbnail);
-        return ResponseEntity.status(GlobalResponseCode.FILE_UPLOAD.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalResponseCode.FILE_UPLOAD, thumbnailImageUrl));
+        return ResponseEntity.status(GlobalResponseCode.OK_S3_FILE_UPLOAD.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalResponseCode.OK_S3_FILE_UPLOAD,
+                        thumbnailImageUrl));
     }
 
     @GetMapping("/thumnail/delete")
@@ -35,7 +36,7 @@ public class S3ImageController {
     ) {
         s3ImageService.deleteS3Image(thumbnailUrl);
 
-        return ResponseEntity.status(GlobalResponseCode.FILE_DELETE.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalResponseCode.FILE_DELETE, null));
+        return ResponseEntity.status(GlobalResponseCode.OK_S3_FILE_DELETE.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalResponseCode.OK_S3_FILE_DELETE, null));
     }
 }

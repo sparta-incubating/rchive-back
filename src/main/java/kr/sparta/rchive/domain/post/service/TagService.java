@@ -28,7 +28,7 @@ public class TagService {
 
         List<Tag> tagList = tagRepository.findByTagNameContains(tagName);
 
-        for(Tag t : tagList) {
+        for (Tag t : tagList) {
             TagSearchRes tagSearchRes = TagSearchRes.builder()
                     .tagId(t.getId())
                     .tagName(t.getTagName())
@@ -47,7 +47,7 @@ public class TagService {
 
         Tag findTag = tagRepository.findByTagNameNotOptional(lowerName);
 
-        if(tagExist(findTag)) {
+        if (tagExist(findTag)) {
             throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
         }
 
@@ -65,7 +65,7 @@ public class TagService {
 
     // 태그가 존재하는지 체크하는 로직
     public Boolean tagExist(Tag tag) {
-        if(tag == null) {
+        if (tag == null) {
             return false;
         }
 
@@ -75,7 +75,7 @@ public class TagService {
     // 태그 ID로 태그를 검색해오는 로직
     public Tag findTagById(Long tagId) {
         return tagRepository.findById(tagId).orElseThrow(
-                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG_NOT_EXIST)
+                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG)
         );
     }
 

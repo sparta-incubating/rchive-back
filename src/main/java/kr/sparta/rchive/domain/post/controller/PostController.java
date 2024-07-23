@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
@@ -31,6 +32,7 @@ import java.util.List;
 public class PostController {
 
     private final PostTagCoreService postTagCoreService;
+    private final PostBookmarkCoreService postBookmarkCoreService;
     private final TagService tagService;
 
     @PostMapping
@@ -55,10 +57,11 @@ public class PostController {
             @PathVariable Long postId,
             @RequestBody PostModifyReq request
     ) {
-        PostModifyRes response = postTagCoreService.updatePost(user, trackName, period, postId, request);
+        PostModifyRes response = postTagCoreService.updatePost(user, trackName, period, postId,
+                request);
 
-        return ResponseEntity.status(PostResponseCode.OK_MODIFY_POST.getHttpStatus())
-                .body(CommonResponseDto.of(PostResponseCode.OK_MODIFY_POST, response));
+        return ResponseEntity.status(PostResponseCode.OK_UPDATE_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_UPDATE_POST, response));
     }
 
     @DeleteMapping("/{postId}")
@@ -84,10 +87,11 @@ public class PostController {
             @RequestParam("category") PostTypeEnum postType,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
-    ){
+    ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostGetCategoryPostRes> responseList =
-                postTagCoreService.getPostListByCategory(user, trackName, period, postType, pageable);
+                postTagCoreService.getPostListByCategory(user, trackName, period, postType,
+                        pageable);
         return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_CATEGORY_POST, responseList));
     }
@@ -107,7 +111,7 @@ public class PostController {
     }
 
     @PostMapping("/tags")
-    @Operation(operationId = "POST-009", summary = "사용할 태그 생성")
+    @Operation(operationId = "POST-010", summary = "사용할 태그 생성")
     public ResponseEntity<CommonResponseDto> createTag(
             @LoginUser User user,
             @RequestBody TagCreateReq request
@@ -119,7 +123,7 @@ public class PostController {
     }
 
     @GetMapping("/tags")
-    @Operation(operationId = "POST-010", summary = "사용할 태그 검색")
+    @Operation(operationId = "POST-011", summary = "사용할 태그 검색")
     public ResponseEntity<CommonResponseDto> searchTag(
             @LoginUser User user,
             @RequestParam("tagName") String tagName
@@ -132,7 +136,7 @@ public class PostController {
     }
 
     @GetMapping("/tags/search")
-    @Operation(operationId = "POST-011", summary = "태그를 이용하여 검색하는 기능")
+    @Operation(operationId = "POST-012", summary = "태그를 이용하여 검색하는 기능")
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -148,8 +152,32 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
     }
 
+    @PostMapping("/{postId}/bookmark")
+    @Operation(operationId = "POST-013", summary = "북마크 생성")
+    public ResponseEntity<CommonResponseDto> createBookmark(
+            @LoginUser User user,
+            @PathVariable Long postId
+    ) {
+        postBookmarkCoreService.createBookmark(user, postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_CREATE_BOOKMARK.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_BOOKMARK, null));
+    }
+
+    @DeleteMapping("/{postId}/bookmark")
+    @Operation(operationId = "POST-014", summary = "북마크 삭제")
+    public ResponseEntity<CommonResponseDto> deleteBookmark(
+            @LoginUser User user,
+            @PathVariable Long postId
+    ) {
+        postBookmarkCoreService.deleteBookmark(user, postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_DELETE_BOOKMARK.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_BOOKMARK, null));
+    }
+
     @PatchMapping("/{postId}/open")
-    @Operation(operationId = "POST-014", summary = "게시물 공개 여부 변경 - 공개")
+    @Operation(operationId = "POST-015", summary = "게시물 공개 여부 변경 - 공개")
     public ResponseEntity<CommonResponseDto> openPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -163,7 +191,7 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/close")
-    @Operation(operationId = "POST-015", summary = "게시물 공개 여부 변경 - 비공개")
+    @Operation(operationId = "POST-016", summary = "게시물 공개 여부 변경 - 비공개")
     public ResponseEntity<CommonResponseDto> closePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
