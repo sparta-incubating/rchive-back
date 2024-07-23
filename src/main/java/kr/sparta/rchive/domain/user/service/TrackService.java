@@ -9,6 +9,8 @@ import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleRes;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.exception.TrackCustomException;
+import kr.sparta.rchive.domain.user.exception.TrackExceptionCode;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,13 +54,13 @@ public class TrackService {
     // 트랙 ID로 트랙을 검색해오는 로직
     public Track findTrackById(Long trackId) {
         return trackRepository.findById(trackId).orElseThrow(
-                () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
+                () -> new TrackCustomException(TrackExceptionCode.NOT_FOUND_TRACK)
         );
     }
 
     public Track findTrackByTrackNameAndPeriod(TrackNameEnum trackName, Integer period) {
         return trackRepository.findTrackByTrackNameAndPeriod(trackName, period).orElseThrow(
-                () -> new IllegalArgumentException() // TODO: 추후에 커스텀 에러 코드로 변경
+                () -> new TrackCustomException(TrackExceptionCode.NOT_FOUND_TRACK)
         );
     }
 
