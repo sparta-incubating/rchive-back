@@ -17,16 +17,16 @@ public class BookmarkService {
 
     public void createBookmark(User user, Post findPost) {
         Bookmark bookmark = Bookmark.builder()
-            .post(findPost)
-            .user(user)
-            .build();
+                .post(findPost)
+                .user(user)
+                .build();
 
         bookmarkRepository.save(bookmark);
     }
 
     private Bookmark findBookmarkByUserIdAndPostId(Long userId, Long postId) {
         return bookmarkRepository.findBookmarkByUserIdAndPostId(userId, postId).orElseThrow(
-            () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_BOOKMARK_NOT_EXIST)
+                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_BOOKMARK)
         );
     }
 

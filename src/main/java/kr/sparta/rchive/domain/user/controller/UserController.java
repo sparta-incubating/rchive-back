@@ -35,7 +35,7 @@ public class UserController {
 
     @PostMapping("/signup")
     @Operation(operationId = "USER-001", summary = "회원가입")
-    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserSignupReq req){
+    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserSignupReq req) {
         userService.signup(req);
         return ResponseEntity.status(UserResponseCode.OK_SIGNUP.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_SIGNUP, null));
@@ -48,16 +48,17 @@ public class UserController {
             throws UnsupportedEncodingException {
         userService.logout(res, user);
         return ResponseEntity.status(UserResponseCode.OK_LOGOUT.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_LOGOUT,null));
+                .body(CommonResponseDto.of(UserResponseCode.OK_LOGOUT, null));
     }
 
     @PostMapping("/reissue")
     @Operation(operationId = "USER-005", summary = "토큰 재발급")
-    public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req, HttpServletResponse res)
+    public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req,
+            HttpServletResponse res)
             throws UnsupportedEncodingException, ParseException {
-        userService.reissue(req,res);
+        userService.reissue(req, res);
         return ResponseEntity.status(UserResponseCode.OK_REISSUE.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_REISSUE,null));
+                .body(CommonResponseDto.of(UserResponseCode.OK_REISSUE, null));
     }
 
     @DeleteMapping
@@ -68,32 +69,32 @@ public class UserController {
         userService.logout(res, user);
         userService.withdraw(user);
         return ResponseEntity.status(UserResponseCode.OK_DELETE_USER.getHttpStatus())
-                .body(CommonResponseDto.of(UserResponseCode.OK_DELETE_USER,null));
+                .body(CommonResponseDto.of(UserResponseCode.OK_DELETE_USER, null));
     }
 
     @GetMapping("overlap/email")
-    @Operation(operationId = "USER-009", summary = "이메일 중복 여부 조회")
-    public ResponseEntity<CommonResponseDto> overlapEmail(@RequestParam("email") String email){
+    @Operation(operationId = "USER-007", summary = "이메일 중복 여부 조회")
+    public ResponseEntity<CommonResponseDto> overlapEmail(@RequestParam("email") String email) {
         boolean isOverlap = userService.overlapEmail(email);
 
-        if(isOverlap){
+        if (isOverlap) {
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
                     .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, true));
-        }else{
+        } else {
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
                     .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, false));
         }
     }
-  
+
     @GetMapping("/overlap/nickname")
-    @Operation(operationId = "USER-010", summary = "닉네임 중복 여부 조회")
-    public ResponseEntity<CommonResponseDto> withdraw(@RequestParam("nickname") String nickname){
+    @Operation(operationId = "USER-008", summary = "닉네임 중복 여부 조회")
+    public ResponseEntity<CommonResponseDto> withdraw(@RequestParam("nickname") String nickname) {
         boolean isOverlap = userService.overlapNickname(nickname);
 
-        if(isOverlap){
+        if (isOverlap) {
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
                     .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, true));
-        }else{
+        } else {
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
                     .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, false));
         }

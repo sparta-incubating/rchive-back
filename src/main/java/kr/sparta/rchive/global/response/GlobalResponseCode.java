@@ -9,30 +9,29 @@ import org.springframework.http.HttpStatus;
 public enum GlobalResponseCode implements ResponseCode {
 
     /* 200 OK */
-    OK(HttpStatus.OK,"GLOBAL-001", "REQUEST SUCCESS, OK"),
-    FILE_UPLOAD(HttpStatus.OK,"GLOBAL-004", "UPLOAD FILE SUCCESS, OK"),
-    FILE_DELETE(HttpStatus.OK,"GLOBAL-005", "DELETE FILE SUCCESS, OK"),
+    OK(HttpStatus.OK, "GLOBAL-001", "REQUEST SUCCESS, OK"),
+    OK_S3_FILE_UPLOAD(HttpStatus.OK, "S3-001", "UPLOAD FILE SUCCESS, OK"),
+    OK_S3_FILE_DELETE(HttpStatus.OK, "S3-002", "DELETE FILE SUCCESS, OK"),
 
     /* 201 CREATED */
     CREATE(HttpStatus.CREATED, "GLOBAL-002", "REQUEST SUCCESS, CREATE"),
 
     /* 204 NO CONTENT */
-    NO_CONTENT(HttpStatus.NO_CONTENT, "GLOBAL-003", "REQUEST SUCCESS, NO CONTENT")
-    ;
+    NO_CONTENT(HttpStatus.NO_CONTENT, "GLOBAL-003", "REQUEST SUCCESS, NO CONTENT");
 
     private final HttpStatus httpStatus;
     private final String ResponseCode;
     private final String message;
 
-    public HttpStatus getHttpStatus(GlobalResponseCode responseCode){
+    public HttpStatus getHttpStatus(GlobalResponseCode responseCode) {
         return responseCode.getHttpStatus();
     }
 
-    public String getResponseCode(GlobalResponseCode responseCode){
+    public String getResponseCode(GlobalResponseCode responseCode) {
         return responseCode.getResponseCode();
     }
 
-    public String getMessage(GlobalResponseCode responseCode){
+    public String getMessage(GlobalResponseCode responseCode) {
         return responseCode.getMessage();
     }
 }

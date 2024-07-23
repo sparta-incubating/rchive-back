@@ -31,28 +31,29 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
 
     @Transactional
-    public void signup(UserSignupReq req){
+    public void signup(UserSignupReq req) {
 
-        if(!req.termUserAge() || !req.termUseService() || !req.termPersonalInfo()){
+        if (!req.termUserAge() || !req.termUseService() || !req.termPersonalInfo()) {
             throw new UserCustomException(UserExceptionCode.BAD_REQUEST_DISAGREE_TERMS);
         }
 
-        if(userRepository.existsByEmail(req.email())){
+        if (userRepository.existsByEmail(req.email())) {
             throw new UserCustomException(UserExceptionCode.CONFLICT_EMAIL);
         }
 
-        if(req.userRole() == UserRoleEnum.USER){
-            if(userRepository.existsByNickname(req.nickname())){
+        if (req.userRole() == UserRoleEnum.USER) {
+            if (userRepository.existsByNickname(req.nickname())) {
                 throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
             }
-        }else{
-            if(req.nickname()!=null){
+        } else {
+            if (req.nickname() != null) {
                 throw new UserCustomException(UserExceptionCode.BAD_REQUEST_MANAGER_NICKNAME);
             }
         }
@@ -101,21 +102,21 @@ public class UserService {
         }
 
         if (refreshToken == null) {
-            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_REFRESH_TOKEN_NULL);
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_REFRESH_TOKEN_NULL);
         }
 
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_TOKEN_EXPIRED);
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_TOKEN_EXPIRED);
         }
 
         String email = jwtUtil.getEmail(refreshToken);
         User user = findByEmailAlive(email);
 
         String redisRefresh = redisService.getRefreshToken(user);
-        if(!redisRefresh.equals(refreshToken)){
-            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_REFRESH_NOT_MATCH);
+        if (!redisRefresh.equals(refreshToken)) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_REFRESH_TOKEN_NOT_MATCH);
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -126,9 +127,9 @@ public class UserService {
         issuedAt = sdf.parse(sdf.format(issuedAt));
         date = sdf.parse(sdf.format(date));
 
-        if(!issuedAt.equals(date)){
+        if (!issuedAt.equals(date)) {
             String newRefresh = jwtUtil.createRefreshToken(user);
-            redisService.setRefreshToken(user,newRefresh);
+            redisService.setRefreshToken(user, newRefresh);
             res.addCookie(jwtUtil.addRefreshTokenToCookie(newRefresh));
         }
 
@@ -144,12 +145,12 @@ public class UserService {
 
     @Transactional
     public void updateProfile(User user, ProfileUpdateReq req) {
-        if(user.getUserRole() == UserRoleEnum.USER){
-            if(userRepository.existsByNickname(req.nickname())){
+        if (user.getUserRole() == UserRoleEnum.USER) {
+            if (userRepository.existsByNickname(req.nickname())) {
                 throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
             }
-            user.updateProfileByUser(req.profileImg(),req.nickname());
-        }else{
+            user.updateProfileByUser(req.profileImg(), req.nickname());
+        } else {
             user.updateProfileByManager(req.profileImg());
         }
         userRepository.save(user);
@@ -157,24 +158,24 @@ public class UserService {
 
     @Transactional
     public void updatePassword(User user, ProfileUpdatePasswordReq req) {
-        if(!bCryptPasswordEncoder.matches(req.originPassword(), user.getPassword())){
+        if (!bCryptPasswordEncoder.matches(req.originPassword(), user.getPassword())) {
             throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NO_MATCH_PASSWORD);
         }
         user.updatePassword(bCryptPasswordEncoder.encode(req.newPassword()));
         userRepository.save(user);
     }
-  
-    public boolean overlapEmail(String email){
+
+    public boolean overlapEmail(String email) {
         return userRepository.existsByEmail(email);
     }
-  
-    public boolean overlapNickname(String nickname){
+
+    public boolean overlapNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
-      
-    public User findByEmailAlive(String email){
+
+    public User findByEmailAlive(String email) {
         return userRepository.findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(()-> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
+                .orElseThrow(() -> new UserCustomException(UserExceptionCode.BAD_REQUEST_EMAIL));
     }
 
     // 유저의 Email로 트랙 ID 찾아오는 로직

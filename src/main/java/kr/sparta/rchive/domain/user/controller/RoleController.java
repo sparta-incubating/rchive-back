@@ -57,7 +57,7 @@ public class RoleController {
     }
 
     @GetMapping("/track")
-    @Operation(operationId = "ROLE-005", summary = "트랙명 조회")
+    @Operation(operationId = "ROLE-004", summary = "트랙명 조회")
     public ResponseEntity<CommonResponseDto> getTrackNameList() {
         RoleGetTrackNameListRes res = trackService.getTrackNameList();
 
@@ -66,7 +66,7 @@ public class RoleController {
     }
 
     @GetMapping("/track/period")
-    @Operation(operationId = "ROLE-006", summary = "트랙의 기수 조회")
+    @Operation(operationId = "ROLE-005", summary = "트랙의 기수 조회")
     public ResponseEntity<CommonResponseDto> getTrackPeriodList(
             @RequestParam TrackNameEnum trackName) {
         RoleGetTrackPeriodListRes res = trackService.getTrackPeriodList(trackName);
@@ -76,7 +76,7 @@ public class RoleController {
     }
 
     @GetMapping("/result")
-    @Operation(operationId = "ROLE-007", summary = "권한 신청 결과 조회 - 최초 로그인")
+    @Operation(operationId = "ROLE-006", summary = "권한 신청 결과 조회 - 최초 로그인")
     public ResponseEntity<CommonResponseDto> getResultRoleFirstLogin(@LoginUser User user) {
         AuthEnum auth = roleService.getResultRoleFirstLogin(user);
 
@@ -86,7 +86,7 @@ public class RoleController {
     }
 
     @GetMapping("/request")
-    @Operation(operationId = "ROLE-008", summary = "권한 신청 여부 조회 - 최초 로그인")
+    @Operation(operationId = "ROLE-007", summary = "권한 신청 여부 조회 - 최초 로그인")
     public ResponseEntity<CommonResponseDto> getRequestRoleFirstLogin(@LoginUser User user) {
         boolean isRequest = roleService.getRequestRoleFirstLogin(user);
 
