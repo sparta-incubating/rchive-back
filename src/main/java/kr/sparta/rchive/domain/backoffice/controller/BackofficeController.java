@@ -122,13 +122,15 @@ public class BackofficeController {
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostSearchBackOfficeRes> responseList =
-                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType, startDate, endDate,
+                postTagCoreService.getPostListInBackOffice(user, trackName, period, postType,
+                        startDate, endDate,
                         searchPeriod, isOpened, pageable);
         return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
-                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST,
+                        responseList));
     }
 
-    @GetMapping("/role/select")
+    @GetMapping("/role/select/last")
     @Operation(operationId = "BACKOFFICE-007", summary = "마지막에 선택한 권한 조회 - 백오피스")
     public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
             @LoginUser User user

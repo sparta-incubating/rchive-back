@@ -17,7 +17,6 @@ import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
-import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
@@ -41,7 +40,7 @@ public class UserTrackRoleCoreService {
     private final RedisService redisService;
 
     public List<RoleRes> getMyRoleList(User user) {
-        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+        List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
 
         TrackNameEnum trackName = null;
         for (Role r : roleList) {
@@ -136,12 +135,37 @@ public class UserTrackRoleCoreService {
         roleService.requestRole(user, track, req.trackRole());
     }
 
+    public RoleGetLastSelectRoleRes getLastSelectRoleUserPage(User user) {
+
+        Long trackId = redisService.getSelectRole(user);
+        if (trackId == null) {
+            List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
+            if (roleList.size() == 1) {
+                redisService.setSelectRole(user, roleList.get(0).getTrack().getId());
+                trackId = roleList.get(0).getTrack().getId();
+            } else {
+                throw new RoleCustomException(RoleExceptionCode.NOT_FOUND_LAST_SELECT_ROLE);
+            }
+        }
+
+        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
+        Track track = role.getTrack();
+
+        return RoleGetLastSelectRoleRes.builder()
+                .trackId(track.getId())
+                .trackRole(role.getTrackRole())
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+    }
+
     public RoleGetLastSelectRoleRes getLastSelectRoleBackoffice(User user) {
 
         Role role = roleService.getRoleByManager(user);
         Track track = role.getTrack();
 
         return RoleGetLastSelectRoleRes.builder()
+                .trackId(track.getId())
                 .trackRole(role.getTrackRole())
                 .trackName(track.getTrackName())
                 .period(track.getPeriod())

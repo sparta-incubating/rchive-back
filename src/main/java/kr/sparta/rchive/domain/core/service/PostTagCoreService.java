@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.core.service;
 
-import java.util.ArrayList;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
@@ -36,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -356,7 +354,7 @@ public class PostTagCoreService {
     }
 
     private Role userRoleAndTrackCheck(User user, Track track) {
-        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+        List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
 
         if (roleList.isEmpty()) {
             throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);

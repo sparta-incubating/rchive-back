@@ -60,6 +60,11 @@ public class RedisService {
 
     public Long getSelectRole(User user) {
         String key = keySelectRole(user);
+        String stringValue = redisUtil.get(key);
+        if (stringValue == null) {
+            return null;
+        }
+
         return Long.parseLong(redisUtil.get(key));
     }
 
