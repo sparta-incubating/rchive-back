@@ -20,10 +20,10 @@ public enum RoleExceptionCode {
     FORBIDDEN_TRACK_NOT_ACCESS(HttpStatus.BAD_REQUEST, "ROLE-3003", "해당 트랙 접근 불가"),
 
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
-    NOT_FOUND_ROLE_REQUEST(HttpStatus.NOT_FOUND, "ROLE-4001", "권한 신청 없음")
+    NOT_FOUND_ROLE_REQUEST(HttpStatus.NOT_FOUND, "ROLE-4001", "권한 신청 없음"),
+    NOT_FOUND_LAST_SELECT_ROLE(HttpStatus.NOT_FOUND, "ROLE-4002", "마지막 선택한 권한 없음")
 
-    /*  409 CONFLICT : Resource 중복  */
-    ;
+    /*  409 CONFLICT : Resource 중복  */;
 
     private final HttpStatus httpStatus;
     private final String errorCode;

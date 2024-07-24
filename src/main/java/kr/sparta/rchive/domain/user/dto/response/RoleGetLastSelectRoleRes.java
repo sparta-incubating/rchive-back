@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record RoleGetLastSelectRoleRes(
+        Long trackId,
         TrackRoleEnum trackRole,
         TrackNameEnum trackName,
         int period

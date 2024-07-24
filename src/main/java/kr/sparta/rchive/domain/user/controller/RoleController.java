@@ -107,5 +107,14 @@ public class RoleController {
                         isRequest));
     }
 
+    @GetMapping("/select/last")
+    @Operation(operationId = "ROLE-008", summary = "마지막에 선택한 권한 조회")
+    public ResponseEntity<CommonResponseDto> getLastSelectRoleUserPage(@LoginUser User user) {
+        RoleGetLastSelectRoleRes res = userTrackRoleCoreService.getLastSelectRoleUserPage(user);
+
+        return ResponseEntity.status(
+                        RoleResponseCode.OK_GET_LAST_SELECT_ROLE.getHttpStatus())
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_LAST_SELECT_ROLE, res));
+    }
 
 }
