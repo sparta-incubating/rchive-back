@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.entity.Tag;
-import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +47,8 @@ public class TagService {
 
         Tag findTag = tagRepository.findByTagNameNotOptional(lowerName);
 
-        if (tagExist(findTag)) {
-            throw new PostCustomExeption(PostExceptionCode.CONFLICT_TAG);
+        if(tagExist(findTag)) {
+            throw new PostCustomException(PostExceptionCode.CONFLICT_TAG);
         }
 
         Tag createTag = Tag.builder()
@@ -75,7 +75,7 @@ public class TagService {
     // 태그 ID로 태그를 검색해오는 로직
     public Tag findTagById(Long tagId) {
         return tagRepository.findById(tagId).orElseThrow(
-                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_TAG)
+                () -> new PostCustomException(PostExceptionCode.NOT_FOUND_TAG)
         );
     }
 

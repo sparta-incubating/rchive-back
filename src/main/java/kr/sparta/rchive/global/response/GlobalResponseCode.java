@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum GlobalResponseCode implements ResponseCode {
 
     /* 200 OK */
-    OK(HttpStatus.OK, "GLOBAL-001", "REQUEST SUCCESS, OK"),
-    OK_S3_FILE_UPLOAD(HttpStatus.OK, "S3-001", "UPLOAD FILE SUCCESS, OK"),
-    OK_S3_FILE_DELETE(HttpStatus.OK, "S3-002", "DELETE FILE SUCCESS, OK"),
+    OK(HttpStatus.OK,"GLOBAL-001", "REQUEST SUCCESS, OK"),
 
     /* 201 CREATED */
     CREATE(HttpStatus.CREATED, "GLOBAL-002", "REQUEST SUCCESS, CREATE"),

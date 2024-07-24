@@ -3,7 +3,7 @@ package kr.sparta.rchive.domain.bookmark.service;
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
 import kr.sparta.rchive.domain.bookmark.repository.BookmarkRepository;
 import kr.sparta.rchive.domain.post.entity.Post;
-import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class BookmarkService {
 
     private Bookmark findBookmarkByUserIdAndPostId(Long userId, Long postId) {
         return bookmarkRepository.findBookmarkByUserIdAndPostId(userId, postId).orElseThrow(
-                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_BOOKMARK)
+            () -> new PostCustomException(PostExceptionCode.NOT_FOUND_BOOKMARK)
         );
     }
 
