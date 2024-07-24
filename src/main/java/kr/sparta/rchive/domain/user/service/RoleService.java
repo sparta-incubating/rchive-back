@@ -147,7 +147,7 @@ public class RoleService {
 
     public void existByUserAndTrackByPmThrowException(Long userId, TrackNameEnum trackName) {
         if (!roleRepository.existsByUserIdAndTracNameAndAuthApproveByPm(userId, trackName)) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
         }
     }
 
@@ -157,7 +157,7 @@ public class RoleService {
 
     public void existByUserAndTrackByApmThrowException(Long userId, Long trackId) {
         if (!roleRepository.existsByUserIdAndTracIdAndAuthApproveByApm(userId, trackId)) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
         }
     }
 
