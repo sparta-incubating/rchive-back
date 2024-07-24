@@ -28,7 +28,7 @@ public class TagService {
 
         List<Tag> tagList = tagRepository.findByTagNameContains(tagName);
 
-        for(Tag t : tagList) {
+        for (Tag t : tagList) {
             TagSearchRes tagSearchRes = TagSearchRes.builder()
                     .tagId(t.getId())
                     .tagName(t.getTagName())
@@ -65,7 +65,7 @@ public class TagService {
 
     // 태그가 존재하는지 체크하는 로직
     public Boolean tagExist(Tag tag) {
-        if(tag == null) {
+        if (tag == null) {
             return false;
         }
 

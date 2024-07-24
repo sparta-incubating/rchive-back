@@ -14,14 +14,13 @@ public enum PostExceptionCode {
     /*  403 FORBIDDEN : 권한 없음  */
 
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
-    NOT_FOUND_POST_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-002", "해당 자료는 존재하지 않음"),
-    NOT_FOUND_TAG_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-003", "해당 태그는 존재하지 않음"),
-    NOT_FOUND_CONTENT_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-004", "게시물 내용이 존재하지 않음"),
-    NOT_FOUND_BOOKMARK_NOT_EXIST(HttpStatus.NOT_FOUND, "POST-005", "북마크가 존재하지 않음"),
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "POST-4001", "자료를 찾을 수 없음"),
+    NOT_FOUND_TAG(HttpStatus.NOT_FOUND, "POST-4002", "태그를 찾을 수 없음"),
+    NOT_FOUND_CONTENT(HttpStatus.NOT_FOUND, "POST-4003", "게시물 내용을 찾을 수 없음"),
+    NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "POST-4004", "북마크를 찾을 수 없음"),
 
     /*  409 CONFLICT : Resource 중복  */
-
-    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-001", "중복된 태그");
+    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-9001", "중복된 태그");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

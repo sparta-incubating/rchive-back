@@ -75,18 +75,24 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+    public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate,
+            LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
         if (track.getPeriod() == 0) {
-            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate, isOpened, searchPeriod, track.getTrackName());
+            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate,
+                    isOpened, searchPeriod, track.getTrackName());
         }
-        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened, track.getId());
+        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened,
+                track.getId());
     }
 
-    public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+    public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType,
+            LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
         if (track.getPeriod() == 0) {
-            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate, endDate, searchPeriod, isOpened, track.getTrackName());
+            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate,
+                    endDate, searchPeriod, isOpened, track.getTrackName());
         }
-        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate, endDate, track.getId(), isOpened);
+        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate,
+                endDate, track.getId(), isOpened);
     }
 
     public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,

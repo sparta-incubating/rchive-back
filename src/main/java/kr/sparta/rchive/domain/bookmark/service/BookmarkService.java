@@ -17,9 +17,9 @@ public class BookmarkService {
 
     public void createBookmark(User user, Post findPost) {
         Bookmark bookmark = Bookmark.builder()
-            .post(findPost)
-            .user(user)
-            .build();
+                .post(findPost)
+                .user(user)
+                .build();
 
         bookmarkRepository.save(bookmark);
     }

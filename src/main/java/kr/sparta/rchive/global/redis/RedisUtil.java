@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 public class RedisUtil {
 
     private final StringRedisTemplate stringRedisTemplate;
-    private final RedisTemplate<String, Object> listLongRedisTemplate;
+    private final RedisTemplate<String, Long> longRedisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
 
     public void set(String key, String value, long ms) {
         log.info("[set] key : {}, value : {}, time : {} ms", key, value, ms);
@@ -32,13 +33,13 @@ public class RedisUtil {
     }
 
     public void setListTypeLong(String key, List<Long> value) {
-        ListOperations<String, Object> listOps = listLongRedisTemplate.opsForList();
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
         listOps.rightPushAll(key, value);
     }
 
     public List<Long> getListTypeLong(String key) {
-            ListOperations<String, Object> listOps = listLongRedisTemplate.opsForList();
-            List<Object> objects = listOps.range(key, 0, -1);
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
+        List<Object> objects = listOps.range(key, 0, -1);
         assert objects != null;
         return objects.stream()
                 .map(o -> (Long) o)

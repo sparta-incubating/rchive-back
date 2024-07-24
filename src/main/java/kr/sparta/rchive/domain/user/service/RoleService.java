@@ -1,10 +1,8 @@
 package kr.sparta.rchive.domain.user.service;
 
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
-import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -15,7 +13,6 @@ import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +36,7 @@ public class RoleService {
     }
 
     public Role getRoleByManager(User user) {
-        List<Role> roleList = findAllByUserIdApprove(user.getId());
+        List<Role> roleList = findRoleListByUserIdAuthApprove(user.getId());
         Role role = null;
         for (Role r : roleList) {
             if (r.getTrackRole() == TrackRoleEnum.PM) {
@@ -103,7 +100,7 @@ public class RoleService {
         );
     }
 
-    public List<Role> findAllByUserIdApprove(Long userId) {
+    public List<Role> findRoleListByUserIdAuthApprove(Long userId) {
         return roleRepository.findAllByUserIdAndAuth(userId, AuthEnum.APPROVE);
     }
 
@@ -148,15 +145,19 @@ public class RoleService {
         return roleRepository.countByRoleRequestByApm(trackName, period, auth);
     }
 
-    public void existByUserAndTrackByPm(Long userId, TrackNameEnum trackName) {
+    public void existByUserAndTrackByPmThrowException(Long userId, TrackNameEnum trackName) {
         if (!roleRepository.existsByUserIdAndTracNameAndAuthApproveByPm(userId, trackName)) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
         }
     }
 
-    public void existByUserAndTrackByApm(Long userId, Long trackId) {
+    public boolean existByUserAndTrackByPm(Long userId, TrackNameEnum trackName) {
+        return roleRepository.existsByUserIdAndTracNameAndAuthApproveByPm(userId, trackName);
+    }
+
+    public void existByUserAndTrackByApmThrowException(Long userId, Long trackId) {
         if (!roleRepository.existsByUserIdAndTracIdAndAuthApproveByApm(userId, trackId)) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
         }
     }
 
@@ -180,5 +181,6 @@ public class RoleService {
         return roleRepository.findRoleListInBackOfficeByApm(
                 managerTrack.getTrackName(), managerTrack.getPeriod(), auth, email, trackRole);
     }
+
 
 }

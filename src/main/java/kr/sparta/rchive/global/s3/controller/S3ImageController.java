@@ -3,7 +3,7 @@ package kr.sparta.rchive.global.s3.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.global.response.CommonResponseDto;
-import kr.sparta.rchive.global.response.GlobalResponse;
+import kr.sparta.rchive.global.response.GlobalResponseCode;
 import kr.sparta.rchive.global.s3.response.S3ResponseCode;
 import kr.sparta.rchive.global.s3.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class S3ImageController {
     @PostMapping(value = "/thumbnail/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(operationId = "S3-001", summary = "썸네일 파일 업로드")
     public ResponseEntity<CommonResponseDto> uploadThumbnail(
-        @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
         String thumbnailImageUrl = s3ImageService.getUrlAfterUpload(thumbnail);
         return ResponseEntity.status(S3ResponseCode.OK_FILE_UPLOAD.getHttpStatus())

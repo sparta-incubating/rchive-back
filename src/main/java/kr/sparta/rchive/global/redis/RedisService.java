@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class RedisService {
 
     private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
+    private static final long SELECT_ROLE_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
 
     private final RedisUtil redisUtil;
 
@@ -32,24 +33,44 @@ public class RedisService {
         redisUtil.setListTypeLong(redisKey, postIdList);
     }
 
-    /** Refresh Token **/
-    private String keyRefreshToken(User user){
-        return String.format("refresh-user-%d",user.getId());
+    // Refresh Token
+    private String keyRefreshToken(User user) {
+        return String.format("refresh-user-%d", user.getId());
     }
 
-    public String getRefreshToken(User user){
+    public String getRefreshToken(User user) {
         String key = keyRefreshToken(user);
         return redisUtil.get(key);
     }
 
-    public void setRefreshToken(User user, String refresh){
+    public void setRefreshToken(User user, String refresh) {
         String key = keyRefreshToken(user);
-        redisUtil.set(key,refresh,REFRESH_TOKEN_TIME);
+        redisUtil.set(key, refresh, REFRESH_TOKEN_TIME);
     }
 
-    public void deleteRefreshToken(User user){
+    public void deleteRefreshToken(User user) {
         String key = keyRefreshToken(user);
         redisUtil.delete(key);
+    }
+
+    // Select Role
+    private String keySelectRole(User user) {
+        return String.format("select-role-user-%d", user.getId());
+    }
+
+    public Long getSelectRole(User user) {
+        String key = keySelectRole(user);
+        String stringValue = redisUtil.get(key);
+        if (stringValue == null) {
+            return null;
+        }
+
+        return Long.parseLong(redisUtil.get(key));
+    }
+
+    public void setSelectRole(User user, Long trackId) {
+        String key = keySelectRole(user);
+        redisUtil.set(key, trackId.toString(), SELECT_ROLE_TIME);
     }
 
 }

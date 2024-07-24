@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleSelectRoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
@@ -21,6 +22,7 @@ import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
+import kr.sparta.rchive.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +37,10 @@ public class UserTrackRoleCoreService {
     private final UserService userService;
     private final RoleService roleService;
     private final TrackService trackService;
+    private final RedisService redisService;
 
     public List<RoleRes> getMyRoleList(User user) {
-        List<Role> roleList = roleService.findAllByUserIdApprove(user.getId());
+        List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
 
         TrackNameEnum trackName = null;
         for (Role r : roleList) {
@@ -52,6 +55,7 @@ public class UserTrackRoleCoreService {
             return trackList.stream()
                     .map(track -> {
                         return RoleRes.builder()
+                                .trackId(track.getId())
                                 .trackRoleEnum(TrackRoleEnum.PM)
                                 .trackName(track.getTrackName())
                                 .period(track.getPeriod())
@@ -62,11 +66,30 @@ public class UserTrackRoleCoreService {
         return roleList.stream()
                 .map(role -> {
                     return RoleRes.builder()
+                            .trackId(role.getTrack().getId())
                             .trackRoleEnum(role.getTrackRole())
                             .trackName(role.getTrack().getTrackName())
                             .period(role.getTrack().getPeriod())
                             .build();
                 }).collect(Collectors.toList());
+    }
+
+    public void selectRole(User user, RoleSelectRoleReq req) {
+        if (req.period() == 0) {
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_PARAMETER_PERIOD);
+        }
+
+        Track track = trackService.findTrackByTrackNameAndPeriod(req.trackName(), req.period());
+        boolean isPm = roleService.existByUserAndTrackByPm(user.getId(), track.getTrackName());
+
+        if (!isPm) {
+            Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), track.getId());
+            if (role == null || role.getAuth() != AuthEnum.APPROVE) {
+                throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_ROLE);
+            }
+        }
+
+        redisService.setSelectRole(user, track.getId());
     }
 
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
@@ -75,9 +98,9 @@ public class UserTrackRoleCoreService {
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApm(user.getId(), managerTrack.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
         List<Role> roleList = new ArrayList<>();
@@ -112,12 +135,37 @@ public class UserTrackRoleCoreService {
         roleService.requestRole(user, track, req.trackRole());
     }
 
+    public RoleGetLastSelectRoleRes getLastSelectRoleUserPage(User user) {
+
+        Long trackId = redisService.getSelectRole(user);
+        if (trackId == null) {
+            List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
+            if (roleList.size() == 1) {
+                redisService.setSelectRole(user, roleList.get(0).getTrack().getId());
+                trackId = roleList.get(0).getTrack().getId();
+            } else {
+                throw new RoleCustomException(RoleExceptionCode.NOT_FOUND_LAST_SELECT_ROLE);
+            }
+        }
+
+        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
+        Track track = role.getTrack();
+
+        return RoleGetLastSelectRoleRes.builder()
+                .trackId(track.getId())
+                .trackRole(role.getTrackRole())
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+    }
+
     public RoleGetLastSelectRoleRes getLastSelectRoleBackoffice(User user) {
 
         Role role = roleService.getRoleByManager(user);
         Track track = role.getTrack();
 
         return RoleGetLastSelectRoleRes.builder()
+                .trackId(track.getId())
                 .trackRole(role.getTrackRole())
                 .trackName(track.getTrackName())
                 .period(track.getPeriod())
@@ -164,7 +212,7 @@ public class UserTrackRoleCoreService {
         if (managaerTrack.getPeriod() == 0) {
             for (RoleRequestListReq req : reqList) {
                 if (req.trackName() != managaerTrack.getTrackName()) {
-                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
                 }
             }
         }
@@ -174,7 +222,7 @@ public class UserTrackRoleCoreService {
             for (RoleRequestListReq req : reqList) {
                 if (req.trackName() != managaerTrack.getTrackName()
                         || req.period() != managaerTrack.getPeriod()) {
-                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
                 }
             }
         }
@@ -184,10 +232,10 @@ public class UserTrackRoleCoreService {
             User user, TrackNameEnum trackName, Integer period, Integer searchPeriod) {
 
         if (period == 0) {
-            roleService.existByUserAndTrackByPm(user.getId(), trackName);
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
             Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-            roleService.existByUserAndTrackByApm(user.getId(), track.getId());
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), track.getId());
         }
 
         if (period == 0) {
