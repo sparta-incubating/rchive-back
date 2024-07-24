@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus;
 public enum S3ResponseCode implements ResponseCode {
 
     // OK 200
-    OK_FILE_UPLOAD(HttpStatus.OK,"GLOBAL-004", "UPLOAD FILE SUCCESS, OK"),
-    OK_FILE_DELETE(HttpStatus.OK,"GLOBAL-005", "DELETE FILE SUCCESS, OK");
+    OK_FILE_UPLOAD(HttpStatus.OK,"S3-001", "UPLOAD FILE SUCCESS, OK"),
+    OK_FILE_DELETE(HttpStatus.OK,"S3-002", "DELETE FILE SUCCESS, OK");
 
     private final HttpStatus httpStatus;
     private final String responseCode;
