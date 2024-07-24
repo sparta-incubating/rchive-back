@@ -371,7 +371,7 @@ public class PostTagCoreService {
             }
         }
 
-        throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE_NOT_ACCESS);
+        throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
     }
 
 }

@@ -76,7 +76,7 @@ public class UserTrackRoleCoreService {
 
     public void selectRole(User user, RoleSelectRoleReq req) {
         if (req.period() == 0) {
-            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+            throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_PARAMETER_PERIOD);
         }
 
         Track track = trackService.findTrackByTrackNameAndPeriod(req.trackName(), req.period());
@@ -212,7 +212,7 @@ public class UserTrackRoleCoreService {
         if (managaerTrack.getPeriod() == 0) {
             for (RoleRequestListReq req : reqList) {
                 if (req.trackName() != managaerTrack.getTrackName()) {
-                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
                 }
             }
         }
@@ -222,7 +222,7 @@ public class UserTrackRoleCoreService {
             for (RoleRequestListReq req : reqList) {
                 if (req.trackName() != managaerTrack.getTrackName()
                         || req.period() != managaerTrack.getPeriod()) {
-                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_TRACK_NOT_ACCESS);
+                    throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
                 }
             }
         }
