@@ -57,7 +57,7 @@ public class PostService {
     // 교육자료 테이블에서 ID를 이용하여 검색하는 로직
     public Post findPostById(Long postId) {
         return postRepository.findById(postId).orElseThrow(
-                () -> new PostCustomException(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
+                () -> new PostCustomException(PostExceptionCode.NOT_FOUND_POST)
         );
     }
 

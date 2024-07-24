@@ -75,7 +75,7 @@ public class TagService {
     // 태그 ID로 태그를 검색해오는 로직
     public Tag findTagById(Long tagId) {
         return tagRepository.findById(tagId).orElseThrow(
-                () -> new PostCustomException(PostExceptionCode.NOT_FOUND_TAG_NOT_EXIST)
+                () -> new PostCustomException(PostExceptionCode.NOT_FOUND_TAG)
         );
     }
 
