@@ -4,7 +4,7 @@ import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.exception.PostCustomExeption;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.Track;
@@ -57,7 +57,7 @@ public class PostService {
     // 교육자료 테이블에서 ID를 이용하여 검색하는 로직
     public Post findPostById(Long postId) {
         return postRepository.findById(postId).orElseThrow(
-                () -> new PostCustomExeption(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
+                () -> new PostCustomException(PostExceptionCode.NOT_FOUND_POST_NOT_EXIST)
         );
     }
 

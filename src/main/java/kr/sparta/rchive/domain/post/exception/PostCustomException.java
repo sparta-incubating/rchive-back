@@ -4,9 +4,9 @@ import kr.sparta.rchive.global.execption.CustomException;
 import lombok.Getter;
 
 @Getter
-public class PostCustomExeption extends CustomException {
+public class PostCustomException extends CustomException {
 
-    public PostCustomExeption(PostExceptionCode exceptionCode) {
+    public PostCustomException(PostExceptionCode exceptionCode) {
         super(exceptionCode.getHttpStatus(), exceptionCode.getErrorCode(),
                 exceptionCode.getMessage());
     }
