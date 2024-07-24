@@ -1,4 +1,4 @@
-package kr.sparta.rchive.global.s3;
+package kr.sparta.rchive.global.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

@@ -1,12 +1,15 @@
-package kr.sparta.rchive.global.s3;
+package kr.sparta.rchive.global.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.global.execption.GlobalCustomException;
 import kr.sparta.rchive.global.execption.GlobalExceptionCode;
+import kr.sparta.rchive.global.s3.exception.S3CustomException;
+import kr.sparta.rchive.global.s3.exception.S3ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +53,7 @@ public class S3ImageService {
                     .withCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(request);
         } catch (IOException e) {
-            throw new GlobalCustomException(GlobalExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_UPLOAD_FAIL);
+            throw new S3CustomException(S3ExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_UPLOAD_FAIL);
         }
 
         String url = amazonS3.getUrl(bucketName, randomImageName).toString();
@@ -61,14 +64,14 @@ public class S3ImageService {
     private void validateImageFile(String originalName) {
         int lastDotIndex = originalName.lastIndexOf(".");
         if (lastDotIndex == -1) {
-            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_IMAGE_EXTENSION_NOT_EXIST);
+            throw new S3CustomException(S3ExceptionCode.BAD_REQUEST_IMAGE_EXTENSION_NOT_EXIST);
         }
 
         String extention = originalName.substring(lastDotIndex + 1).toLowerCase();
         List<String> allowedExtentionList = Arrays.asList("jpg", "jpeg", "png", "bmp");
 
         if (!allowedExtentionList.contains(extention)) {
-            throw new GlobalCustomException(GlobalExceptionCode.BAD_REQUEST_IMAGE_EXTENSION_MISMATCH);
+            throw new S3CustomException(S3ExceptionCode.BAD_REQUEST_IMAGE_EXTENSION_MISMATCH);
         }
 
     }
@@ -90,7 +93,7 @@ public class S3ImageService {
         try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
         } catch (Exception e) {
-            throw new GlobalCustomException(GlobalExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL);
+            throw new S3CustomException(S3ExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL);
         }
     }
 
@@ -99,7 +102,7 @@ public class S3ImageService {
             URL url = new URL(imageUrl);
             return URLDecoder.decode(url.getPath(), "UTF-8").substring(1);
         } catch (MalformedURLException | UnsupportedEncodingException e) {
-            throw new GlobalCustomException(GlobalExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL);
+            throw new S3CustomException(S3ExceptionCode.INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL);
         }
     }
 }

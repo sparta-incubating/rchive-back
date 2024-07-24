@@ -1,9 +1,11 @@
-package kr.sparta.rchive.global.s3;
+package kr.sparta.rchive.global.s3.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.global.response.CommonResponseDto;
-import kr.sparta.rchive.global.response.GlobalResponseCode;
+import kr.sparta.rchive.global.response.GlobalResponse;
+import kr.sparta.rchive.global.s3.response.S3ResponseCode;
+import kr.sparta.rchive.global.s3.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +26,8 @@ public class S3ImageController {
         @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
         String thumbnailImageUrl = s3ImageService.getUrlAfterUpload(thumbnail);
-        return ResponseEntity.status(GlobalResponseCode.FILE_UPLOAD.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalResponseCode.FILE_UPLOAD, thumbnailImageUrl));
+        return ResponseEntity.status(S3ResponseCode.OK_FILE_UPLOAD.getHttpStatus())
+                .body(CommonResponseDto.of(S3ResponseCode.OK_FILE_UPLOAD, thumbnailImageUrl));
     }
 
     @GetMapping("/thumnail/delete")
@@ -35,7 +37,7 @@ public class S3ImageController {
     ) {
         s3ImageService.deleteS3Image(thumbnailUrl);
 
-        return ResponseEntity.status(GlobalResponseCode.FILE_DELETE.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalResponseCode.FILE_DELETE, null));
+        return ResponseEntity.status(S3ResponseCode.OK_FILE_DELETE.getHttpStatus())
+                .body(CommonResponseDto.of(S3ResponseCode.OK_FILE_DELETE, null));
     }
 }

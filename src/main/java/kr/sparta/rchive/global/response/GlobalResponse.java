@@ -6,12 +6,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum GlobalResponseCode implements ResponseCode {
+public enum GlobalResponse implements ResponseCode {
 
     /* 200 OK */
     OK(HttpStatus.OK,"GLOBAL-001", "REQUEST SUCCESS, OK"),
-    FILE_UPLOAD(HttpStatus.OK,"GLOBAL-004", "UPLOAD FILE SUCCESS, OK"),
-    FILE_DELETE(HttpStatus.OK,"GLOBAL-005", "DELETE FILE SUCCESS, OK"),
 
     /* 201 CREATED */
     CREATE(HttpStatus.CREATED, "GLOBAL-002", "REQUEST SUCCESS, CREATE"),
@@ -24,15 +22,15 @@ public enum GlobalResponseCode implements ResponseCode {
     private final String ResponseCode;
     private final String message;
 
-    public HttpStatus getHttpStatus(GlobalResponseCode responseCode){
+    public HttpStatus getHttpStatus(GlobalResponse responseCode){
         return responseCode.getHttpStatus();
     }
 
-    public String getResponseCode(GlobalResponseCode responseCode){
+    public String getResponseCode(GlobalResponse responseCode){
         return responseCode.getResponseCode();
     }
 
-    public String getMessage(GlobalResponseCode responseCode){
+    public String getMessage(GlobalResponse responseCode){
         return responseCode.getMessage();
     }
 }
