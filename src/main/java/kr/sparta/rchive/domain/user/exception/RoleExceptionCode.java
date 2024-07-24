@@ -1,12 +1,17 @@
 package kr.sparta.rchive.domain.user.exception;
 
+import java.lang.reflect.Field;
+import java.util.Objects;
+import kr.sparta.rchive.global.execption.ExceptionCode;
+import kr.sparta.rchive.global.execption.ExceptionReason;
+import kr.sparta.rchive.global.execption.ExplainException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 @Getter
-public enum RoleExceptionCode {
+public enum RoleExceptionCode implements ExceptionCode {
     /*  400 BAD_REQUEST : 잘못된 요청  */
     BAD_REQUEST_NO_ROLE(HttpStatus.BAD_REQUEST, "ROLE-0001", "유저가 속한 트랙 없음"),
     BAD_REQUEST_NO_ROLE_REQUEST_LIST(HttpStatus.BAD_REQUEST, "ROLE-0002", "유저가 신청한 트랙 내역 없음"),
@@ -26,4 +31,20 @@ public enum RoleExceptionCode {
     private final HttpStatus httpStatus;
     private final String errorCode;
     private final String message;
+
+    @Override
+    public ExceptionReason getExceptionReason() {
+        return ExceptionReason.builder()
+                .errorCode(errorCode)
+                .httpStatus(httpStatus)
+                .message(message).build();
+    }
+
+    @Override
+    public String getExplainException() throws NoSuchFieldException {
+        Field field = this.getClass().getField(this.name());
+        ExplainException annotation = field.getAnnotation(ExplainException.class);
+        return Objects.nonNull(annotation) ? annotation.value() : this.getMessage();
+    }
+
 }

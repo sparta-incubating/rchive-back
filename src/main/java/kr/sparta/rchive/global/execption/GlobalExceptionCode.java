@@ -1,5 +1,7 @@
 package kr.sparta.rchive.global.execption;
 
+import java.lang.reflect.Field;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -46,9 +48,9 @@ public enum GlobalExceptionCode implements ExceptionCode {
     }
 
     @Override
-    public String getExplainError() throws NoSuchFieldException {
+    public String getExplainException() throws NoSuchFieldException {
         Field field = this.getClass().getField(this.name());
-        ExplainError annotation = field.getAnnotation(ExplainError.class);
-        return Objects.nonNull(annotation) ? annotation.value() : this.getReason();
+        ExplainException annotation = field.getAnnotation(ExplainException.class);
+        return Objects.nonNull(annotation) ? annotation.value() : this.getMessage();
     }
 }

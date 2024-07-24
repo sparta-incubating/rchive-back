@@ -1,10 +1,15 @@
 package kr.sparta.rchive.global.config;
 
-import io.swagger.annotations.Example;
+import static java.util.stream.Collectors.groupingBy;
+
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -110,29 +115,50 @@ public class SwaggerConfig {
                                         return SwaggerExampleHolder.builder()
                                                 .holder(
                                                         getSwaggerExample(
-                                                                exceptionCode.getExplainException(),
+                                                                exceptionCode
+                                                                        .getExplainException(),
                                                                 exceptionReason))
-                                                .status(exceptionReason.getHttpStatus())
+                                                .status(exceptionReason.getHttpStatus().value())
                                                 .name(exceptionReason.getErrorCode())
                                                 .build();
+
                                     } catch (NoSuchFieldException e) {
                                         throw new RuntimeException(e);
                                     }
                                 })
-                        .collect(groupingBy(ExampleHolder::getCode));
+                        .collect(groupingBy(SwaggerExampleHolder::getStatus));
         // response 객체들을 responses 에 넣습니다.
         addExamplesToResponses(responses, statusWithExampleHolders);
     }
 
     private Example getSwaggerExample(String value, ExceptionReason exceptionReason) {
         //ExceptionResponse 는 클라이언트한 실제 응답하는 공통 에러 응답 객체입니다.
-        ExceptionResponse exceptionResponse = new ExceptionResponse(exceptionReason,
-                "요청시 패스정보입니다.");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exceptionReason, "요청시 패스정보");
         Example example = new Example();
         example.description(value);
         example.setValue(exceptionResponse);
         return example;
+    }
 
+    private void addExamplesToResponses(
+            ApiResponses responses,
+            Map<Integer, List<SwaggerExampleHolder>> statusWithExampleHolders) {
+        statusWithExampleHolders.forEach(
+                (status, v) -> {
+                    Content content = new Content();
+                    MediaType mediaType = new MediaType();
+                    // 상태 코드마다 ApiResponse을 생성합니다.
+                    ApiResponse apiResponse = new ApiResponse();
+                    //  List<ExampleHolder> 를 순회하며, mediaType 객체에 예시값을 추가합니다.
+                    v.forEach(
+                            exampleHolder -> mediaType.addExamples(
+                                    exampleHolder.getName(), exampleHolder.getHolder()));
+                    // ApiResponse 의 content 에 mediaType을 추가합니다.
+                    content.addMediaType("application/json", mediaType);
+                    apiResponse.setContent(content);
+                    // 상태코드를 key 값으로 responses 에 추가합니다.
+                    responses.addApiResponse(status.toString(), apiResponse);
+                });
     }
 }
 
