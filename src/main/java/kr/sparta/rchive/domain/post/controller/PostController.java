@@ -203,4 +203,19 @@ public class PostController {
         return ResponseEntity.status(PostResponseCode.OK_CLOSE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CLOSE_POST, null));
     }
+
+    @GetMapping("/tutors")
+    @Operation(operationId = "POST-019", summary = "튜터를 검색")
+    public ResponseEntity<CommonResponseDto> searchTutor(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
+            @RequestParam("inputPeriod") Integer inputPeriod,
+            @RequestParam("tutorName") String tutorName
+    ) {
+        List<TutorRes> responseList = postTagCoreService.searchTutor(user, trackName, period, inputPeriod, tutorName);
+
+        return ResponseEntity.status(PostResponseCode.OK_SEARCH_TUTOR.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TUTOR, responseList));
+    }
 }
