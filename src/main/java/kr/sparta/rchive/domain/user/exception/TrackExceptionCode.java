@@ -12,6 +12,8 @@ public enum TrackExceptionCode {
     /*  401 UNAUTHORIZED : 인증 안됨  */
 
     /*  403 FORBIDDEN : 권한 없음  */
+    FORBIDDEN_TRACK_NOT_PERMISSION(HttpStatus.FORBIDDEN, "TRACK-3001", "트랙 열람권한 없음"),
+    FORBIDDEN_TRACK(HttpStatus.FORBIDDEN, "TRACK-3002", "트랙 접근권한 없음"),
 
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
     NOT_FOUND_TRACK(HttpStatus.NOT_FOUND, "TRACK-4001", "트랙을 찾을 수 없음")

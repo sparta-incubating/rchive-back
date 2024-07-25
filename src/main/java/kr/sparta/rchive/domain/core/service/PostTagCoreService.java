@@ -22,6 +22,8 @@ import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
+import kr.sparta.rchive.domain.user.exception.TrackCustomException;
+import kr.sparta.rchive.domain.user.exception.TrackExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.domain.user.service.UserService;
@@ -35,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -283,6 +286,15 @@ public class PostTagCoreService {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
+        // 게시물이 해당 트랙에 해당하는지 체크하는 로직
+        if (findPost.getTrack().getTrackName() != managerTrack.getTrackName()) {
+            throw new TrackCustomException(TrackExceptionCode.FORBIDDEN_TRACK);
+        }
+
+        if (managerTrack.getPeriod() != 0 && !Objects.equals(findPost.getTrack().getPeriod(), managerTrack.getPeriod())) {
+            throw new TrackCustomException(TrackExceptionCode.FORBIDDEN_TRACK);
+        }
+
         return PostTrackInfo.builder()
                 .post(findPost)
                 .track(managerTrack)
@@ -336,7 +348,7 @@ public class PostTagCoreService {
     private void userCheckPermission(UserRoleEnum userRole, Track track, TrackRoleEnum trackRole) {
         if (userRoleIsUser(userRole) || userTrackRoleIsApm(trackRole)) {
             if (!track.getIsPermission()) {
-                throw new IllegalArgumentException(); // TODO: 추후 커스텀 에러로 변경할 예정
+                throw new TrackCustomException(TrackExceptionCode.FORBIDDEN_TRACK_NOT_PERMISSION);
             }
         }
     }
