@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
-import kr.sparta.rchive.domain.user.dto.request.RoleSelectRoleReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
@@ -74,7 +74,7 @@ public class UserTrackRoleCoreService {
                 }).collect(Collectors.toList());
     }
 
-    public void selectRole(User user, RoleSelectRoleReq req) {
+    public void selectRole(User user, RoleReq req) {
         if (req.period() == 0) {
             throw new RoleCustomException(RoleExceptionCode.BAD_REQUEST_NO_PARAMETER_PERIOD);
         }
@@ -166,6 +166,24 @@ public class UserTrackRoleCoreService {
 
         return RoleGetLastSelectRoleRes.builder()
                 .trackId(track.getId())
+                .trackRole(role.getTrackRole())
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+    }
+
+    public UserRes getProfileUserPage(User user, TrackNameEnum trackName, Integer period) {
+
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), track.getId());
+
+        return UserRes.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .profileImg(user.getProfileImg())
+                .nickname(user.getNickname())
+                .birth(user.getBirth())
+                .phone(user.getPhone())
                 .trackRole(role.getTrackRole())
                 .trackName(track.getTrackName())
                 .period(track.getPeriod())
