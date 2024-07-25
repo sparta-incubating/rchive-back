@@ -41,9 +41,6 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, length = 20)
-    private String tutor;
-
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
 
@@ -84,6 +81,10 @@ public class Post extends BaseTimeEntity {
     private List<PostTag> postTagList = new ArrayList<>();
 
     @ManyToOne()
+    @JoinColumn(name = "tutor_id")
+    private Tutor tutor;
+
+    @ManyToOne()
     @JoinColumn(name = "track_id")
     private Track track;
 
@@ -95,7 +96,6 @@ public class Post extends BaseTimeEntity {
     public void update(PostModifyReq request, Track track) {
         this.postType = request.postType() == null ? this.postType : request.postType();
         this.title = request.title() == null ? this.title : request.title();
-        this.tutor = request.tutor() == null ? this.tutor : request.tutor();
         this.uploadedAt = request.uploadedAt() == null ? this.uploadedAt : request.uploadedAt();
         this.thumbnailUrl = request.thumbnailUrl() == null ? this.thumbnailUrl : request.thumbnailUrl();
         this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
