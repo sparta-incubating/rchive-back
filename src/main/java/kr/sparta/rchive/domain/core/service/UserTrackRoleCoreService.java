@@ -15,6 +15,7 @@ import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
+import kr.sparta.rchive.domain.user.enums.OrderRoleListEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
@@ -93,7 +94,8 @@ public class UserTrackRoleCoreService {
     }
 
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
-            User user, TrackNameEnum trackName, Integer period, AuthEnum status,
+            User user, OrderRoleListEnum sort, TrackNameEnum trackName, Integer period,
+            AuthEnum status,
             Integer searchPeriod, String email, TrackRoleEnum trackRole, Pageable pageable) {
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
@@ -106,10 +108,10 @@ public class UserTrackRoleCoreService {
         List<Role> roleList = new ArrayList<>();
         if (status == null) {
             roleList = roleService.findRoleListInBackOfficeAuthNoReject(
-                    managerTrack, searchPeriod, email, trackRole);
+                    managerTrack, searchPeriod, email, trackRole, sort);
         } else {
             roleList = roleService.findRoleListInBackOffice(
-                    managerTrack, searchPeriod, status, email, trackRole);
+                    managerTrack, searchPeriod, status, email, trackRole, sort);
         }
 
         List<RoleGetTrackRoleRequestListRes> responseList = roleList.stream()

@@ -14,6 +14,7 @@ import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
+import kr.sparta.rchive.domain.user.enums.OrderRoleListEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.global.custom.CustomPageable;
@@ -42,6 +43,7 @@ public class BackofficeController {
     @Operation(operationId = "BACKOFFICE-001", summary = "유저의 트랙 권한 신청 목록 조회 - 백오피스")
     public ResponseEntity<CommonResponseDto> getUserTrackRoleRequestList(
             @LoginUser User user,
+            @RequestParam(value = "sort") OrderRoleListEnum sort,
             @RequestParam(value = "status", required = false) AuthEnum status,
             @RequestParam(value = "trackName") TrackNameEnum trackName,
             @RequestParam(value = "period") Integer period,
@@ -53,7 +55,7 @@ public class BackofficeController {
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<RoleGetTrackRoleRequestListRes> responseList =
-                userTrackRoleCoreService.getUserTrackRoleRequestList(user, trackName, period,
+                userTrackRoleCoreService.getUserTrackRoleRequestList(user, sort, trackName, period,
                         status, searchPeriod, email, trackRole, pageable);
 
         return ResponseEntity.status(
