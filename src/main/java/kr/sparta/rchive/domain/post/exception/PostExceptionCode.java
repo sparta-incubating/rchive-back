@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum PostExceptionCode implements ExceptionCode {
     /*  400 BAD_REQUEST : 잘못된 요청  */
-
+    BAD_REQUEST_NOT_TRACK_TUTOR(HttpStatus.BAD_REQUEST, "POST-0001", "해당 트랙의 튜터가 아님"),
     /*  401 UNAUTHORIZED : 인증 안됨  */
 
     /*  403 FORBIDDEN : 권한 없음  */
