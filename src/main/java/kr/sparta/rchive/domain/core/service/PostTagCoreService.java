@@ -4,7 +4,7 @@ import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -136,17 +136,17 @@ public class PostTagCoreService {
     }
 
     @Transactional
-    public PostCreateRes createPost(User user, TrackNameEnum trackName, PostCreateReq request) {
+    public PostCreateRes createPost(User user, TrackNameEnum trackName, Integer period, PostCreateReq request) {
 
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName,
-                request.period());
-        Tutor tutor = tutorService.findTutorById(request.tutorId());
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, request.postPeriod());
 
-        if (request.period() == 0) {
+        if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
+
+        Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
 
         Post createPost = postService.createPost(request, managerTrack, tutor);
 
@@ -161,17 +161,21 @@ public class PostTagCoreService {
 
     @Transactional
     public PostModifyRes updatePost(User user, TrackNameEnum trackName, Integer period, Long postId,
-            PostModifyReq request) {
+            PostUpdateReq request) {
 
         PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
         Post findPost = postTrackInfo.post();
         Track managerTrack = postTrackInfo.track();
 
-        if (request.period() != null) {
-            managerTrack = findTrackByTrackNameAndPeriod(request.trackName(), request.period());
+        if (request.UpdatePeriod() != null) {
+            managerTrack = findTrackByTrackNameAndPeriod(request.trackName(), request.UpdatePeriod());
+        } else if (managerTrack.getPeriod() == 0) {
+            managerTrack = findPost.getTrack();
         }
 
-        Post updatePost = postService.updatePost(findPost, request, managerTrack);
+        Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
+
+        Post updatePost = postService.updatePost(findPost, request, managerTrack, tutor);
 
         if (request.content() != null) {
             updateContent(updatePost, request.content());

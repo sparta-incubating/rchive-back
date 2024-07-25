@@ -1,7 +1,7 @@
 package kr.sparta.rchive.domain.post.service;
 
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -40,9 +40,9 @@ public class PostService {
         return postRepository.save(createPost);
     }
 
-    public Post updatePost(Post post, PostModifyReq request, Track track) {
+    public Post updatePost(Post post, PostUpdateReq request, Track track, Tutor tutor) {
 
-        post.update(request, track);
+        post.update(request, track, tutor);
 
         return postRepository.save(post);
     }
