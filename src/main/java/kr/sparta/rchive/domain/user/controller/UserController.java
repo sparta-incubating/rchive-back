@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
+import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -92,4 +94,5 @@ public class UserController {
                     .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, false));
         }
     }
+
 }

@@ -1,12 +1,14 @@
 package kr.sparta.rchive.global.execption;
 
+import java.lang.reflect.Field;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 @Getter
-public enum GlobalExceptionCode {
+public enum GlobalExceptionCode implements ExceptionCode {
 
     /*  400 BAD_REQUEST : 잘못된 요청  */
     BAD_REQUEST_INVALID_VALUE(HttpStatus.BAD_REQUEST, "GLOBAL-001", "유효하지 않은 값"),
@@ -29,4 +31,19 @@ public enum GlobalExceptionCode {
     private final HttpStatus httpStatus;
     private final String errorCode;
     private final String message;
+
+    @Override
+    public ExceptionReason getExceptionReason() {
+        return ExceptionReason.builder()
+                .errorCode(errorCode)
+                .httpStatus(httpStatus)
+                .message(message).build();
+    }
+
+    @Override
+    public String getExplainException() throws NoSuchFieldException {
+        Field field = this.getClass().getField(this.name());
+        ExplainException annotation = field.getAnnotation(ExplainException.class);
+        return Objects.nonNull(annotation) ? annotation.value() : this.getMessage();
+    }
 }
