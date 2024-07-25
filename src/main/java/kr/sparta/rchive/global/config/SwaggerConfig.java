@@ -133,7 +133,7 @@ public class SwaggerConfig {
 
     private Example getSwaggerExample(String value, ExceptionReason exceptionReason) {
         //ExceptionResponse 는 클라이언트한 실제 응답하는 공통 에러 응답 객체입니다.
-        ExceptionResponse exceptionResponse = new ExceptionResponse(exceptionReason, "요청시 패스정보");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exceptionReason);
         Example example = new Example();
         example.description(value);
         example.setValue(exceptionResponse);

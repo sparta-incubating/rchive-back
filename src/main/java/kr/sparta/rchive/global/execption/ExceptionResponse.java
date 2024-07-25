@@ -11,23 +11,19 @@ public class ExceptionResponse {
     private final HttpStatus httpStatus;
     private final String errorCode;
     private final String message;
-    private final LocalDateTime timeStamp;
+//    private final String path;
 
-    private final String path;
-
-    public ExceptionResponse(ExceptionReason exceptionReason, String path) {
+    public ExceptionResponse(ExceptionReason exceptionReason) {
         this.httpStatus = exceptionReason.getHttpStatus();
         this.errorCode = exceptionReason.getErrorCode();
         this.message = exceptionReason.getMessage();
-        this.timeStamp = LocalDateTime.now();
-        this.path = path;
+//        this.path = path;
     }
 
-    public ExceptionResponse(HttpStatus httpStatus, String errorCode, String message, String path) {
+    public ExceptionResponse(HttpStatus httpStatus, String errorCode, String message) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
         this.message = message;
-        this.timeStamp = LocalDateTime.now();
-        this.path = path;
+//        this.path = path;
     }
 }
