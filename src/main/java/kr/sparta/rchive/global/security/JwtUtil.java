@@ -138,13 +138,15 @@ public class JwtUtil {
 
     public ResponseCookie addRefreshTokenToCookie(String refreshToken)
             throws UnsupportedEncodingException {
-        //refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
+//        refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
 
 //        Cookie cookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
 //        //cookie.setMaxAge(24*60*60);
 //        //cookie.setSecure(true);
 //        cookie.setPath("/");
 //        cookie.setHttpOnly(true);
+
+//        String cookieHeader = createSameSiteCookieHeader(cookie, "None");
 
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_HEADER, refreshToken)
                 .path("/")
@@ -154,22 +156,11 @@ public class JwtUtil {
                 //.maxAge(maxAge)
                 .build();
 
-        //String cookieHeader = createSameSiteCookieHeader(cookie, "None");
-
         return cookie;
     }
 
     public ResponseCookie removeRefreshTokenToCookie()
             throws UnsupportedEncodingException {
-        //refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
-
-//        Cookie cookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
-//        //cookie.setMaxAge(24*60*60);
-//        //cookie.setSecure(true);
-//        cookie.setPath("/");
-//        cookie.setHttpOnly(true);
-//        cookie.set
-
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_HEADER, "")
                 .path("/")
                 .sameSite("None")
@@ -177,8 +168,6 @@ public class JwtUtil {
                 .secure(true)
                 .maxAge(0)
                 .build();
-
-        //String cookieHeader = createSameSiteCookieHeader(cookie, "None");
 
         return cookie;
     }
