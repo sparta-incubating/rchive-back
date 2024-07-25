@@ -13,6 +13,7 @@ import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
+import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
@@ -190,4 +191,5 @@ public class UserService {
         return userRepository.findTrackIdByUserEmail(userEmail);
 
     }
+
 }
