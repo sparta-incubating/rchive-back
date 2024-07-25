@@ -12,7 +12,7 @@ import lombok.Builder;
 public record PostCreateReq(
         PostTypeEnum postType,
         String title,
-        String tutor,
+        Long tutorId,
         LocalDate uploadedAt,
         String thumbnailUrl,
         String videoLink,

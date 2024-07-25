@@ -9,11 +9,9 @@ import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.service.ContentService;
-import kr.sparta.rchive.domain.post.service.PostService;
-import kr.sparta.rchive.domain.post.service.PostTagService;
-import kr.sparta.rchive.domain.post.service.TagService;
+import kr.sparta.rchive.domain.post.service.*;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -53,12 +51,12 @@ public class PostTagCoreService {
     private final ContentService contentService;
     private final CommentService commentService;
     private final RedisService redisService;
+    private final TutorService tutorService;
 
 
     public Page<PostSearchBackOfficeRes> getPostListInBackOffice(
-            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType,
-            LocalDate startDate, LocalDate endDate,
-            Integer searchPeriod, Boolean isOpened, Pageable pageable
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, LocalDate startDate,
+            LocalDate endDate, Integer searchPeriod, Boolean isOpened, Pageable pageable
     ) {
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
@@ -70,12 +68,10 @@ public class PostTagCoreService {
         List<Post> postList;
 
         if (postType == null) {
-            postList = postService.findPostListInBackOfficePostTypeAll(managerTrack, startDate,
-                    endDate,
+            postList = postService.findPostListInBackOfficePostTypeAll(managerTrack, startDate, endDate,
                     searchPeriod, isOpened);
         } else {
-            postList = postService.findPostListInBackOffice(managerTrack, postType, startDate,
-                    endDate,
+            postList = postService.findPostListInBackOffice(managerTrack, postType, startDate, endDate,
                     searchPeriod, isOpened);
         }
 
@@ -92,7 +88,7 @@ public class PostTagCoreService {
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .postType(post.getPostType())
-                            .tutor(post.getTutor())
+                            .tutor(post.getTutor().getTutorName())
                             .period(post.getTrack().getPeriod())
                             .isOpened(post.getIsOpened())
                             .uploadedAt(post.getUploadedAt())
@@ -126,7 +122,7 @@ public class PostTagCoreService {
                     return PostSearchByTagRes.builder()
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
-                            .tutor(post.getTutor())
+                            .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
                             .postType(post.getPostType())
                             .tagList(tagInfoList)
@@ -144,13 +140,15 @@ public class PostTagCoreService {
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName,
                 request.period());
+        Tutor tutor = tutorService.findTutorById(request.tutorId());
+
         if (request.period() == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
-        Post createPost = postService.createPost(request, managerTrack);
+        Post createPost = postService.createPost(request, managerTrack, tutor);
 
         if (request.contentLink() != null) {
             createContentByPost(createPost, request.content());
@@ -253,7 +251,7 @@ public class PostTagCoreService {
                     return PostGetCategoryPostRes.builder()
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
-                            .tutor(post.getTutor())
+                            .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
                             .tagList(tagInfoList)
                             .build();

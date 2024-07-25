@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.post.service;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
@@ -23,11 +24,11 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public Post createPost(PostCreateReq request, Track track) {
+    public Post createPost(PostCreateReq request, Track track, Tutor tutor) {
         Post createPost = Post.builder()
                 .postType(request.postType())
                 .title(request.title())
-                .tutor(request.tutor())
+                .tutor(tutor)
                 .uploadedAt(request.uploadedAt())
                 .thumbnailUrl(request.thumbnailUrl())
                 .videoLink(request.videoLink())
