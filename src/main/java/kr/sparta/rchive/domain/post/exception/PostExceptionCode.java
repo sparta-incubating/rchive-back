@@ -23,6 +23,7 @@ public enum PostExceptionCode implements ExceptionCode {
     NOT_FOUND_TAG(HttpStatus.NOT_FOUND, "POST-4002", "태그를 찾을 수 없음"),
     NOT_FOUND_CONTENT(HttpStatus.NOT_FOUND, "POST-4003", "게시물 내용을 찾을 수 없음"),
     NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "POST-4004", "북마크를 찾을 수 없음"),
+    NOT_FOUND_TUTOR(HttpStatus.NOT_FOUND, "POST-4005", "튜터를 찾을 수 없음"),
 
     /*  409 CONFLICT : Resource 중복  */
     CONFLICT_TAG(HttpStatus.CONFLICT, "POST-9001", "중복된 태그");
