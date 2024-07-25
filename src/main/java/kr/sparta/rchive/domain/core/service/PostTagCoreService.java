@@ -154,7 +154,9 @@ public class PostTagCoreService {
             createContentByPost(createPost, request.content());
         }
 
-        savePostTagByPostAndTagNameList(createPost, request.tagNameList());
+        if (request.tagNameList() != null) {
+            savePostTagByPostAndTagNameList(createPost, request.tagNameList());
+        }
 
         return PostCreateRes.builder().postId(createPost.getId()).build();
     }
@@ -206,12 +208,10 @@ public class PostTagCoreService {
         Post post = postService.findPostWithDetailByPostId(postId);
 
         List<TagInfo> tagList = post.getPostTagList().stream()
-                .map(postTag -> {
-                    return TagInfo.builder()
-                            .tagId(postTag.getTag().getId())
-                            .tagName(postTag.getTag().getTagName())
-                            .build();
-                }).toList();
+                .map(postTag -> TagInfo.builder()
+                        .tagId(postTag.getTag().getId())
+                        .tagName(postTag.getTag().getTagName())
+                        .build()).toList();
 
         String detail = "";
 
@@ -225,6 +225,7 @@ public class PostTagCoreService {
 
         return PostGetSinglePostRes.builder()
                 .title(post.getTitle())
+                .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
                 .detail(detail)
                 .tagList(tagList)
