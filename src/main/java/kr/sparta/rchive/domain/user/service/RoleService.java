@@ -79,7 +79,7 @@ public class RoleService {
     public AuthEnum getResultRoleFirstLogin(User user) {
 
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
-                () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE_REQUEST));
+                () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE));
         return role.getAuth();
     }
 
@@ -96,7 +96,7 @@ public class RoleService {
 
     public Role findRoleByUserIdAndTrackId(Long userId, Long trackId) {
         return roleRepository.findByUserIdAndTrackId(userId, trackId).orElseThrow(
-                () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE_REQUEST)
+                () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE)
         );
     }
 

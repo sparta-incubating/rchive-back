@@ -23,7 +23,7 @@ public enum RoleExceptionCode implements ExceptionCode {
     FORBIDDEN_ROLE(HttpStatus.FORBIDDEN, "ROLE-3001", "해당 권한 접근 불가"),
 
     /*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
-    NOT_FOUND_ROLE_REQUEST(HttpStatus.NOT_FOUND, "ROLE-4001", "권한 신청 없음"),
+    NOT_FOUND_ROLE(HttpStatus.NOT_FOUND, "ROLE-4001", "권한을 찾을 수 없음"),
     NOT_FOUND_LAST_SELECT_ROLE(HttpStatus.NOT_FOUND, "ROLE-4002", "마지막 선택한 권한 없음")
 
     /*  409 CONFLICT : Resource 중복  */;

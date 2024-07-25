@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
-import kr.sparta.rchive.domain.user.dto.request.RoleSelectRoleReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
@@ -60,7 +60,7 @@ public class RoleController {
     @PatchMapping("/select")
     @Operation(operationId = "ROLE-003", summary = "내 권한(트랙 및 기수) 선택")
     public ResponseEntity<CommonResponseDto> selectRole(@LoginUser User user,
-            @RequestBody RoleSelectRoleReq req) {
+            @RequestBody RoleReq req) {
         userTrackRoleCoreService.selectRole(user, req);
 
         return ResponseEntity.status(RoleResponseCode.OK_SELECT_ROLE.getHttpStatus())

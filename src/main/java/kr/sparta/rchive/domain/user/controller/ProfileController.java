@@ -5,16 +5,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleReq;
+import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.response.ProfileResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,7 +31,19 @@ public class ProfileController {
     private final UserService userService;
     private final UserTrackRoleCoreService userTrackRoleCoreService;
 
-    @PatchMapping()
+    @GetMapping
+    @Operation(operationId = "PROFILE-005", summary = "프로필 조회")
+    public ResponseEntity<CommonResponseDto> updatePassword(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period) {
+        UserRes res = userTrackRoleCoreService.getProfileUserPage(user, trackName, period);
+
+        return ResponseEntity.status(ProfileResponseCode.OK_GET_PROFILE.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_GET_PROFILE, res));
+    }
+
+    @PatchMapping
     @Operation(operationId = "PROFILE-006", summary = "프로필 변경")
     public ResponseEntity<CommonResponseDto> updateProfile(
             @LoginUser User user,
