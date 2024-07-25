@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
+import kr.sparta.rchive.domain.user.enums.OrderRoleListEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
@@ -162,24 +163,26 @@ public class RoleService {
     }
 
     public List<Role> findRoleListInBackOfficeAuthNoReject(
-            Track managerTrack, Integer searchPeriod, String email, TrackRoleEnum trackRole) {
+            Track managerTrack, Integer searchPeriod, String email, TrackRoleEnum trackRole,
+            OrderRoleListEnum sort) {
         if (managerTrack.getPeriod() == 0) {
             return roleRepository.findRoleListInBackOfficeAuthNoRejectByPm(
-                    managerTrack.getTrackName(), searchPeriod, email, trackRole);
+                    managerTrack.getTrackName(), searchPeriod, email, trackRole, sort);
         }
         return roleRepository.findRoleListInBackOfficeAuthNoRejectByApm(
-                managerTrack.getTrackName(), managerTrack.getPeriod(), email, trackRole);
+                managerTrack.getTrackName(), managerTrack.getPeriod(), email, trackRole, sort);
     }
 
     public List<Role> findRoleListInBackOffice(
             Track managerTrack, Integer searchPeriod, AuthEnum auth, String email,
-            TrackRoleEnum trackRole) {
+            TrackRoleEnum trackRole, OrderRoleListEnum sort) {
         if (managerTrack.getPeriod() == 0) {
             return roleRepository.findRoleListInBackOfficeByPm(
-                    managerTrack.getTrackName(), searchPeriod, auth, email, trackRole);
+                    managerTrack.getTrackName(), searchPeriod, auth, email, trackRole, sort);
         }
         return roleRepository.findRoleListInBackOfficeByApm(
-                managerTrack.getTrackName(), managerTrack.getPeriod(), auth, email, trackRole);
+                managerTrack.getTrackName(), managerTrack.getPeriod(), auth, email, trackRole,
+                sort);
     }
 
 

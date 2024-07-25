@@ -1,11 +1,13 @@
 package kr.sparta.rchive.domain.user.repository;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Objects;
 import kr.sparta.rchive.domain.user.entity.QRole;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
+import kr.sparta.rchive.domain.user.enums.OrderRoleListEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +50,8 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
 
     @Override
     public List<Role> findRoleListInBackOfficeAuthNoRejectByPm(
-            TrackNameEnum trackName, Integer searchPeriod, String email, TrackRoleEnum trackRole) {
+            TrackNameEnum trackName, Integer searchPeriod, String email, TrackRoleEnum trackRole,
+            OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
 
@@ -62,12 +65,13 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                         .and(trackRole != null ? role.trackRole.eq(trackRole) : null)
                         .and(role.auth.ne(AuthEnum.REJECT))
                 )
-                .orderBy(role.createdAt.asc())
+                .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
     }
 
     public List<Role> findRoleListInBackOfficeAuthNoRejectByApm(
-            TrackNameEnum trackName, Integer period, String email, TrackRoleEnum trackRole) {
+            TrackNameEnum trackName, Integer period, String email, TrackRoleEnum trackRole,
+            OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
 
@@ -81,13 +85,13 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                         .and(role.trackRole.ne(TrackRoleEnum.APM))
                         .and(role.auth.ne(AuthEnum.REJECT))
                 )
-                .orderBy(role.createdAt.asc())
+                .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
     }
 
     public List<Role> findRoleListInBackOfficeByPm(
             TrackNameEnum trackName, Integer searchPeriod,
-            AuthEnum auth, String email, TrackRoleEnum trackRole) {
+            AuthEnum auth, String email, TrackRoleEnum trackRole, OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
 
@@ -101,13 +105,13 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                         .and(trackRole != null ? role.trackRole.eq(trackRole) : null)
                         .and(auth != null ? role.auth.eq(auth) : null)
                 )
-                .orderBy(role.createdAt.asc())
+                .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
     }
 
     public List<Role> findRoleListInBackOfficeByApm(
             TrackNameEnum trackName, Integer period,
-            AuthEnum auth, String email, TrackRoleEnum trackRole) {
+            AuthEnum auth, String email, TrackRoleEnum trackRole, OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
 
@@ -121,8 +125,14 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                         .and(role.trackRole.ne(TrackRoleEnum.APM))
                         .and(auth != null ? role.auth.eq(auth) : null)
                 )
-                .orderBy(role.createdAt.asc())
+                .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
     }
 
+    private OrderSpecifier<?>[] roleListOrderSpecifier(OrderRoleListEnum sort, QRole role) {
+        if (sort.equals(OrderRoleListEnum.NAME_ALPHABETICALLY)) {
+            return new OrderSpecifier[]{role.user.username.asc(), role.createdAt.desc()};
+        }
+        return new OrderSpecifier[]{role.createdAt.desc()};
+    }
 }
