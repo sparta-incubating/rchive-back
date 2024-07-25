@@ -12,6 +12,7 @@ public enum ProfileResponseCode implements ResponseCode {
     OK_GET_PROFILE(HttpStatus.OK, "PROFILE-005", "프로필 조회 성공"),
     OK_UPDATE_PROFILE(HttpStatus.OK, "PROFILE-006", "프로필 변경 성공"),
     OK_UPDATE_PASSWORD(HttpStatus.OK, "PROFILE-007", "비밀번호 변경 성공"),
+    OK_UPDATE_PHONE(HttpStatus.OK, "PROFILE-008", "휴대폰 번호 변경 성공"),
     ;
 
     private final HttpStatus httpStatus;

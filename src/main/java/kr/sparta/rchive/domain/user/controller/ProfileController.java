@@ -2,8 +2,10 @@ package kr.sparta.rchive.domain.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
@@ -63,6 +65,17 @@ public class ProfileController {
 
         return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PASSWORD.getHttpStatus())
                 .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_PASSWORD, null));
+    }
+
+    @PatchMapping("/phone")
+    @Operation(operationId = "PROFILE-008", summary = "휴대폰 번호 변경")
+    public ResponseEntity<CommonResponseDto> updatePhone(
+            @LoginUser User user,
+            @Valid @RequestBody ProfileUpdatePhoneReq req) {
+        userService.updatePhone(user, req);
+
+        return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PHONE.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_PHONE, null));
     }
 
 }

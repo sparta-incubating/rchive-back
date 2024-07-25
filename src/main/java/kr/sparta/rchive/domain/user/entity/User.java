@@ -30,13 +30,14 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @Entity
-@Table(name="tb_user")
+@Table(name = "tb_user")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 public class User extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -107,21 +108,25 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user")
     List<Comment> commentList = new ArrayList<>();
 
-    public void delete(){
+    public void delete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void updatePassword(String password){
-        this.password = password;
-    }
-
-    public void updateProfileByUser(String profileImg, String nickname){
+    public void updateProfileByUser(String profileImg, String nickname) {
         this.profileImg = profileImg;
         this.nickname = nickname;
     }
 
-    public void updateProfileByManager(String profileImg){
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updatePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void updateProfileByManager(String profileImg) {
         this.profileImg = profileImg;
     }
 }

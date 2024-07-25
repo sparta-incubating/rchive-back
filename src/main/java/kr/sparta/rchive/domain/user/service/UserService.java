@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
@@ -166,6 +167,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void updatePhone(User user, ProfileUpdatePhoneReq req) {
+        user.updatePhone(req.phone());
+        userRepository.save(user);
+    }
+
     public boolean overlapEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -184,6 +191,5 @@ public class UserService {
         return userRepository.findTrackIdByUserEmail(userEmail);
 
     }
-
 
 }
