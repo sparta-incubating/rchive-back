@@ -129,13 +129,10 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                 .fetch();
     }
 
-    private OrderSpecifier<?> roleListOrderSpecifier(OrderRoleListEnum sort, QRole role) {
-        if (sort.equals(OrderRoleListEnum.DATE_LATELY)) {
-            return role.createdAt.asc();
-        } else if (sort.equals(OrderRoleListEnum.NAME_ALPHABETICALLY)) {
-            return role.user.username.asc();
+    private OrderSpecifier<?>[] roleListOrderSpecifier(OrderRoleListEnum sort, QRole role) {
+        if (sort.equals(OrderRoleListEnum.NAME_ALPHABETICALLY)) {
+            return new OrderSpecifier[]{role.user.username.asc(), role.createdAt.desc()};
         }
-
-        return role.createdAt.asc();
+        return new OrderSpecifier[]{role.createdAt.desc()};
     }
 }
