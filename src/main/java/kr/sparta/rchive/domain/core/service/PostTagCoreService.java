@@ -269,14 +269,30 @@ public class PostTagCoreService {
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
-    public void openPost(User user, TrackNameEnum trackName, Integer period, Long postId) {
-        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
-        postService.openPost(postTrackInfo.post());
+    public void openPost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
+        List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
+        postService.openPost(postList);
     }
 
-    public void closePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
-        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
-        postService.closePost(postTrackInfo.post());
+    public void closePost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
+        List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
+        postService.closePost(postList);
+    }
+
+    private List<Post> checkPostListAndTrack(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
+        List<Post> findPostList = postService.findPostListByPostIdList(postIdList);
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        if (period == 0) {
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
+        } else {
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+        }
+
+        return findPostList.stream()
+                .filter(p -> p.getTrack().getTrackName().equals(managerTrack.getTrackName()))
+                .filter(p -> managerTrack.getPeriod() == 0 || Objects.equals(p.getTrack().getPeriod(), managerTrack.getPeriod()))
+                .collect(Collectors.toList());
     }
 
     private PostTrackInfo checkPostAndTrack(User user, TrackNameEnum trackName, Integer period,

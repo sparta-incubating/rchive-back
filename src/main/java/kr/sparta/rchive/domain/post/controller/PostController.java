@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
@@ -176,29 +177,29 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_BOOKMARK, null));
     }
 
-    @PatchMapping("/{postId}/open")
+    @PatchMapping("/open")
     @Operation(operationId = "POST-015", summary = "게시물 공개 여부 변경 - 공개")
     public ResponseEntity<CommonResponseDto> openPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("period") Integer period,
-            @PathVariable Long postId
-    ) {
-        postTagCoreService.openPost(user, trackName, period, postId);
+            @RequestBody PostOpenCloseReq request
+            ) {
+        postTagCoreService.openPost(user, trackName, period, request.postIdList());
 
         return ResponseEntity.status(PostResponseCode.OK_OPEN_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_OPEN_POST, null));
     }
 
-    @PatchMapping("/{postId}/close")
+    @PatchMapping("/close")
     @Operation(operationId = "POST-016", summary = "게시물 공개 여부 변경 - 비공개")
     public ResponseEntity<CommonResponseDto> closePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("period") Integer period,
-            @PathVariable Long postId
+            @RequestBody PostOpenCloseReq request
     ) {
-        postTagCoreService.closePost(user, trackName, period, postId);
+        postTagCoreService.closePost(user, trackName, period, request.postIdList());
 
         return ResponseEntity.status(PostResponseCode.OK_CLOSE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CLOSE_POST, null));
