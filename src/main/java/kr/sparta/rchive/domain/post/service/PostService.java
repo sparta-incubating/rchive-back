@@ -33,6 +33,7 @@ public class PostService {
                 .thumbnailUrl(request.thumbnailUrl())
                 .videoLink(request.videoLink())
                 .contentLink(request.contentLink())
+                .content(request.content())
                 .isOpened(request.isOpened())
                 .track(track)
                 .build();

@@ -12,7 +12,7 @@ public record PostGetSinglePostRes(
     String title,
     String tutor,
     String videoLink,
-    String detail,
+    String content,
     List<TagInfo> tagList
 //    List<CommentRes> commentResList  TODO: 추후에 댓글 구현하며 추가할 예정
 ) {
