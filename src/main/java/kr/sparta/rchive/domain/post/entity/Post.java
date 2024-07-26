@@ -53,6 +53,9 @@ public class Post extends BaseTimeEntity {
     @Column(name = "content_link")
     private String contentLink;
 
+    @Column(length = 65535)
+    private String content;
+
     @Column(nullable = false)
     @ColumnDefault("0")
     private Integer hits;
@@ -71,10 +74,6 @@ public class Post extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<Comment> commentList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "post")
-    private List<Content> contentList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "post")
@@ -100,6 +99,7 @@ public class Post extends BaseTimeEntity {
         this.thumbnailUrl = request.thumbnailUrl() == null ? this.thumbnailUrl : request.thumbnailUrl();
         this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
         this.contentLink = request.contentLink() == null ? this.contentLink : request.contentLink();
+        this.content = request.content() == null ? this.content : request.content();
         this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();
         this.tutor = tutor == null? this.tutor : tutor;
         this.track = track == null ? this.track : track;

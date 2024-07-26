@@ -1,13 +1,12 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.comment.service.CommentService;
-import kr.sparta.rchive.domain.post.controller.TutorRes;
+import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
-import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
@@ -49,7 +48,6 @@ public class PostTagCoreService {
     private final TagService tagService;
     private final UserService userService;
     private final RoleService roleService;
-    private final ContentService contentService;
     private final CommentService commentService;
     private final RedisService redisService;
     private final TutorService tutorService;
@@ -151,10 +149,6 @@ public class PostTagCoreService {
 
         Post createPost = postService.createPost(request, managerTrack, tutor);
 
-        if (request.contentLink() != null) {
-            createContentByPost(createPost, request.content());
-        }
-
         if (request.tagNameList() != null) {
             savePostTagByPostAndTagNameList(createPost, request.tagNameList());
         }
@@ -179,10 +173,6 @@ public class PostTagCoreService {
         Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
 
         Post updatePost = postService.updatePost(findPost, request, managerTrack, tutor);
-
-        if (request.content() != null) {
-            updateContent(updatePost, request.content());
-        }
 
         if (request.tagNameList() != null) {
             updatePostTagByPostAndTagIdList(updatePost, request.tagNameList());
@@ -214,21 +204,13 @@ public class PostTagCoreService {
                         .tagName(postTag.getTag().getTagName())
                         .build()).toList();
 
-        String detail = "";
-
-        if (!post.getContentList().isEmpty()) {
-            detail = post.getContentList().stream()
-                    .map(Content::getDetail)
-                    .collect(Collectors.joining());
-        }
-
 //        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
 
         return PostGetSinglePostRes.builder()
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
-                .detail(detail)
+                .content(post.getContent())
                 .tagList(tagList)
 //                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
                 .build();
@@ -269,14 +251,30 @@ public class PostTagCoreService {
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
-    public void openPost(User user, TrackNameEnum trackName, Integer period, Long postId) {
-        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
-        postService.openPost(postTrackInfo.post());
+    public void openPost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
+        List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
+        postService.openPost(postList);
     }
 
-    public void closePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
-        PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
-        postService.closePost(postTrackInfo.post());
+    public void closePost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
+        List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
+        postService.closePost(postList);
+    }
+
+    private List<Post> checkPostListAndTrack(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
+        List<Post> findPostList = postService.findPostListByPostIdList(postIdList);
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        if (period == 0) {
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
+        } else {
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+        }
+
+        return findPostList.stream()
+                .filter(p -> p.getTrack().getTrackName().equals(managerTrack.getTrackName()))
+                .filter(p -> managerTrack.getPeriod() == 0 || Objects.equals(p.getTrack().getPeriod(), managerTrack.getPeriod()))
+                .collect(Collectors.toList());
     }
 
     private PostTrackInfo checkPostAndTrack(User user, TrackNameEnum trackName, Integer period,
@@ -305,10 +303,6 @@ public class PostTagCoreService {
                 .build();
     }
 
-    private void createContentByPost(Post createPost, String content) {
-        contentService.createContent(content, createPost);
-    }
-
     private void savePostTagByPostAndTagNameList(Post post, List<String> tagNameList) {
         List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
         postTagService.savePostTagByPostAndTagIdList(post, tagList);
@@ -317,10 +311,6 @@ public class PostTagCoreService {
     private void updatePostTagByPostAndTagIdList(Post updatePost, List<String> tagNameList) {
         List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
         postTagService.updatePostTagByPostAndTag(updatePost, tagList);
-    }
-
-    private void updateContent(Post modifyPost, String content) {
-        contentService.updateContent(content, modifyPost);
     }
 
     private List<Tag> findTagIdListByTagNameList(List<String> tagNameList) {

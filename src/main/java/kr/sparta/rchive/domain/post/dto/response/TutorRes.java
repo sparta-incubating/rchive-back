@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.post.controller;
+package kr.sparta.rchive.domain.post.dto.response;
 
 import lombok.Builder;
 

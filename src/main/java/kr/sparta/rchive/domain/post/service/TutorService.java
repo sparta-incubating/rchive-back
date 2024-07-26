@@ -1,6 +1,6 @@
 package kr.sparta.rchive.domain.post.service;
 
-import kr.sparta.rchive.domain.post.controller.TutorRes;
+import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;

@@ -33,6 +33,7 @@ public class PostService {
                 .thumbnailUrl(request.thumbnailUrl())
                 .videoLink(request.videoLink())
                 .contentLink(request.contentLink())
+                .content(request.content())
                 .isOpened(request.isOpened())
                 .track(track)
                 .build();
@@ -63,17 +64,15 @@ public class PostService {
     }
 
     @Transactional
-    public void openPost(Post post) {
-        post.openPost();
-
-        postRepository.save(post);
+    public void openPost(List<Post> postList) {
+        postList.forEach(Post::openPost);
+        postRepository.saveAll(postList);
     }
 
     @Transactional
-    public void closePost(Post post) {
-        post.closePost();
-
-        postRepository.save(post);
+    public void closePost(List<Post> postList) {
+        postList.forEach(Post::closePost);
+        postRepository.saveAll(postList);
     }
 
     public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate,
@@ -114,5 +113,9 @@ public class PostService {
 
     public List<Post> findPostListByTagIdWithTagList(Long tagId, Long trackId) {
         return postRepository.findPostListByTagIdAndTrackIdWithTagList(tagId, trackId);
+    }
+
+    public List<Post> findPostListByPostIdList(List<Long> postIdList) {
+        return postRepository.findPostByIdIn(postIdList);
     }
 }
