@@ -77,27 +77,29 @@ public class PostService {
     }
 
     public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate,
-            LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+                                                          LocalDate endDate, Integer searchPeriod, Long tutorId,
+                                                          Boolean isOpened) {
         if (track.getPeriod() == 0) {
             return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate,
-                    isOpened, searchPeriod, track.getTrackName());
+                    isOpened, searchPeriod, track.getTrackName(), tutorId);
         }
         return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened,
-                track.getId());
+                track.getId(), tutorId);
     }
 
     public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType,
-            LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened) {
+                                               LocalDate startDate, LocalDate endDate, Integer searchPeriod,
+                                               Long tutorId, Boolean isOpened) {
         if (track.getPeriod() == 0) {
             return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate,
-                    endDate, searchPeriod, isOpened, track.getTrackName());
+                    endDate, searchPeriod, isOpened, track.getTrackName(), tutorId);
         }
         return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate,
-                endDate, track.getId(), isOpened);
+                endDate, track.getId(), isOpened, tutorId);
     }
 
     public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,
-            Track track) {
+                                                       Track track) {
         if (userRole.equals(UserRoleEnum.USER)) {
             return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
         } else {
