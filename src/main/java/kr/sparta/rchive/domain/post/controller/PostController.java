@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
+import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
