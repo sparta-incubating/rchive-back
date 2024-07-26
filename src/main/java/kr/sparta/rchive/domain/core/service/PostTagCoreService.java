@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.comment.service.CommentService;
+import kr.sparta.rchive.domain.post.controller.TutorRes;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -56,7 +57,7 @@ public class PostTagCoreService {
 
     public Page<PostSearchBackOfficeRes> getPostListInBackOffice(
             User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, LocalDate startDate,
-            LocalDate endDate, Integer searchPeriod, Boolean isOpened, Pageable pageable
+            LocalDate endDate, Integer searchPeriod, Boolean isOpened, Long tutorId, Pageable pageable
     ) {
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
@@ -69,10 +70,10 @@ public class PostTagCoreService {
 
         if (postType == null) {
             postList = postService.findPostListInBackOfficePostTypeAll(managerTrack, startDate, endDate,
-                    searchPeriod, isOpened);
+                    searchPeriod, tutorId, isOpened);
         } else {
             postList = postService.findPostListInBackOffice(managerTrack, postType, startDate, endDate,
-                    searchPeriod, isOpened);
+                    searchPeriod, tutorId, isOpened);
         }
 
         List<PostSearchBackOfficeRes> responseList = postList.stream()
@@ -154,7 +155,9 @@ public class PostTagCoreService {
             createContentByPost(createPost, request.content());
         }
 
-        savePostTagByPostAndTagNameList(createPost, request.tagNameList());
+        if (request.tagNameList() != null) {
+            savePostTagByPostAndTagNameList(createPost, request.tagNameList());
+        }
 
         return PostCreateRes.builder().postId(createPost.getId()).build();
     }
@@ -206,12 +209,10 @@ public class PostTagCoreService {
         Post post = postService.findPostWithDetailByPostId(postId);
 
         List<TagInfo> tagList = post.getPostTagList().stream()
-                .map(postTag -> {
-                    return TagInfo.builder()
-                            .tagId(postTag.getTag().getId())
-                            .tagName(postTag.getTag().getTagName())
-                            .build();
-                }).toList();
+                .map(postTag -> TagInfo.builder()
+                        .tagId(postTag.getTag().getId())
+                        .tagName(postTag.getTag().getTagName())
+                        .build()).toList();
 
         String detail = "";
 
@@ -225,6 +226,7 @@ public class PostTagCoreService {
 
         return PostGetSinglePostRes.builder()
                 .title(post.getTitle())
+                .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
                 .detail(detail)
                 .tagList(tagList)
@@ -280,8 +282,8 @@ public class PostTagCoreService {
     private PostTrackInfo checkPostAndTrack(User user, TrackNameEnum trackName, Integer period,
             Long postId) {
         Post findPost = postService.findPostById(postId);
-
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
         if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
@@ -388,4 +390,15 @@ public class PostTagCoreService {
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
     }
 
+    public List<TutorRes> searchTutor(User user, TrackNameEnum trackName, Integer period,
+                                      Integer inputPeriod, String tutorName) {
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, inputPeriod);
+        if (period == 0) {
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
+        } else {
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+        }
+
+        return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
+    }
 }

@@ -15,7 +15,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod, TrackNameEnum trackName) {
+    public List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened,
+                                                              Integer searchPeriod, TrackNameEnum trackName, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -30,6 +31,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
+                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.trackName.eq(trackName)
                 )
                 .orderBy(post.uploadedAt.desc())
@@ -37,7 +39,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId) {
+    public List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -51,6 +53,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .where(
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.id.eq(trackId)
                 )
                 .orderBy(post.uploadedAt.desc())
@@ -59,7 +62,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     @Override
     public List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, LocalDate startDate,
-                                                                  LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName) {
+                                                                  LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -75,6 +78,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.trackName.eq(trackName)
                 )
                 .orderBy(post.uploadedAt.desc())
@@ -83,7 +87,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     @Override
     public List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, LocalDate startDate,
-                                                                 LocalDate endDate, Long trackId, Boolean isOpened) {
+                                                                 LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -97,8 +101,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .where(
                         postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                        post.track.id.eq(trackId),
-                        isOpened != null ? post.isOpened.eq(isOpened) : null
+                        isOpened != null ? post.isOpened.eq(isOpened) : null,
+                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                        post.track.id.eq(trackId)
                 )
                 .orderBy(post.uploadedAt.desc())
                 .fetch();
