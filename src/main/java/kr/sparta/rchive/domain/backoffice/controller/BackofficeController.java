@@ -117,14 +117,14 @@ public class BackofficeController {
             @RequestParam(value = "endDate", required = false) LocalDate endDate,
             @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
             @RequestParam(value = "isOpened", required = false) Boolean isOpened,
+            @RequestParam(value = "tutorId", required = false) Long tutorId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostSearchBackOfficeRes> responseList =
                 postTagCoreService.getPostListInBackOffice(user, trackName, period, postType,
-                        startDate, endDate,
-                        searchPeriod, isOpened, pageable);
+                        startDate, endDate, searchPeriod, isOpened, tutorId, pageable);
         return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST,
                         responseList));

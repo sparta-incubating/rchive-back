@@ -205,7 +205,7 @@ public class PostController {
     }
 
     @GetMapping("/tutors")
-    @Operation(operationId = "POST-019", summary = "튜터를 검색")
+    @Operation(operationId = "POST-017", summary = "튜터를 검색")
     public ResponseEntity<CommonResponseDto> searchTutor(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
