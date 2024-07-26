@@ -1,10 +1,11 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.comment.service.CommentService;
+import kr.sparta.rchive.domain.post.controller.TutorRes;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Content;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -56,7 +57,7 @@ public class PostTagCoreService {
 
     public Page<PostSearchBackOfficeRes> getPostListInBackOffice(
             User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, LocalDate startDate,
-            LocalDate endDate, Integer searchPeriod, Boolean isOpened, Pageable pageable
+            LocalDate endDate, Integer searchPeriod, Boolean isOpened, Long tutorId, Pageable pageable
     ) {
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
@@ -69,10 +70,10 @@ public class PostTagCoreService {
 
         if (postType == null) {
             postList = postService.findPostListInBackOfficePostTypeAll(managerTrack, startDate, endDate,
-                    searchPeriod, isOpened);
+                    searchPeriod, tutorId, isOpened);
         } else {
             postList = postService.findPostListInBackOffice(managerTrack, postType, startDate, endDate,
-                    searchPeriod, isOpened);
+                    searchPeriod, tutorId, isOpened);
         }
 
         List<PostSearchBackOfficeRes> responseList = postList.stream()
@@ -136,17 +137,17 @@ public class PostTagCoreService {
     }
 
     @Transactional
-    public PostCreateRes createPost(User user, TrackNameEnum trackName, PostCreateReq request) {
+    public PostCreateRes createPost(User user, TrackNameEnum trackName, Integer period, PostCreateReq request) {
 
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName,
-                request.period());
-        Tutor tutor = tutorService.findTutorById(request.tutorId());
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, request.postPeriod());
 
-        if (request.period() == 0) {
+        if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
+
+        Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
 
         Post createPost = postService.createPost(request, managerTrack, tutor);
 
@@ -154,24 +155,30 @@ public class PostTagCoreService {
             createContentByPost(createPost, request.content());
         }
 
-        savePostTagByPostAndTagNameList(createPost, request.tagNameList());
+        if (request.tagNameList() != null) {
+            savePostTagByPostAndTagNameList(createPost, request.tagNameList());
+        }
 
         return PostCreateRes.builder().postId(createPost.getId()).build();
     }
 
     @Transactional
     public PostModifyRes updatePost(User user, TrackNameEnum trackName, Integer period, Long postId,
-            PostModifyReq request) {
+            PostUpdateReq request) {
 
         PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
         Post findPost = postTrackInfo.post();
         Track managerTrack = postTrackInfo.track();
 
-        if (request.period() != null) {
-            managerTrack = findTrackByTrackNameAndPeriod(request.trackName(), request.period());
+        if (request.UpdatePeriod() != null) {
+            managerTrack = findTrackByTrackNameAndPeriod(request.trackName(), request.UpdatePeriod());
+        } else if (managerTrack.getPeriod() == 0) {
+            managerTrack = findPost.getTrack();
         }
 
-        Post updatePost = postService.updatePost(findPost, request, managerTrack);
+        Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
+
+        Post updatePost = postService.updatePost(findPost, request, managerTrack, tutor);
 
         if (request.content() != null) {
             updateContent(updatePost, request.content());
@@ -202,12 +209,10 @@ public class PostTagCoreService {
         Post post = postService.findPostWithDetailByPostId(postId);
 
         List<TagInfo> tagList = post.getPostTagList().stream()
-                .map(postTag -> {
-                    return TagInfo.builder()
-                            .tagId(postTag.getTag().getId())
-                            .tagName(postTag.getTag().getTagName())
-                            .build();
-                }).toList();
+                .map(postTag -> TagInfo.builder()
+                        .tagId(postTag.getTag().getId())
+                        .tagName(postTag.getTag().getTagName())
+                        .build()).toList();
 
         String detail = "";
 
@@ -221,6 +226,7 @@ public class PostTagCoreService {
 
         return PostGetSinglePostRes.builder()
                 .title(post.getTitle())
+                .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
                 .detail(detail)
                 .tagList(tagList)
@@ -276,8 +282,8 @@ public class PostTagCoreService {
     private PostTrackInfo checkPostAndTrack(User user, TrackNameEnum trackName, Integer period,
             Long postId) {
         Post findPost = postService.findPostById(postId);
-
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
         if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
@@ -384,4 +390,15 @@ public class PostTagCoreService {
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
     }
 
+    public List<TutorRes> searchTutor(User user, TrackNameEnum trackName, Integer period,
+                                      Integer inputPeriod, String tutorName) {
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, inputPeriod);
+        if (period == 0) {
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
+        } else {
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+        }
+
+        return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
+    }
 }

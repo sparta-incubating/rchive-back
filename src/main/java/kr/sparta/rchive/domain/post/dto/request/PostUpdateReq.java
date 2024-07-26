@@ -9,10 +9,10 @@ import lombok.Builder;
 
 @Builder
 @JsonIgnoreProperties
-public record PostModifyReq(
+public record PostUpdateReq(
         PostTypeEnum postType,
         String title,
-        String tutor,
+        Long tutorId,
         LocalDate uploadedAt,
         String thumbnailUrl,
         String videoLink,
@@ -20,7 +20,7 @@ public record PostModifyReq(
         String content,
         List<String> tagNameList,
         TrackNameEnum trackName,
-        Integer period,
+        Integer UpdatePeriod,
         Boolean isOpened
 ) {
 

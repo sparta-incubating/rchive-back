@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -40,9 +40,10 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> createPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
             @RequestBody PostCreateReq request
     ) {
-        PostCreateRes response = postTagCoreService.createPost(user, trackName, request);
+        PostCreateRes response = postTagCoreService.createPost(user, trackName, period, request);
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_POST, response));
@@ -55,10 +56,9 @@ public class PostController {
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("period") Integer period,
             @PathVariable Long postId,
-            @RequestBody PostModifyReq request
+            @RequestBody PostUpdateReq request
     ) {
-        PostModifyRes response = postTagCoreService.updatePost(user, trackName, period, postId,
-                request);
+        PostModifyRes response = postTagCoreService.updatePost(user, trackName, period, postId, request);
 
         return ResponseEntity.status(PostResponseCode.OK_UPDATE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_UPDATE_POST, response));
@@ -202,5 +202,20 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_CLOSE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CLOSE_POST, null));
+    }
+
+    @GetMapping("/tutors")
+    @Operation(operationId = "POST-017", summary = "튜터를 검색")
+    public ResponseEntity<CommonResponseDto> searchTutor(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("period") Integer period,
+            @RequestParam("inputPeriod") Integer inputPeriod,
+            @RequestParam("tutorName") String tutorName
+    ) {
+        List<TutorRes> responseList = postTagCoreService.searchTutor(user, trackName, period, inputPeriod, tutorName);
+
+        return ResponseEntity.status(PostResponseCode.OK_SEARCH_TUTOR.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TUTOR, responseList));
     }
 }

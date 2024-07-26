@@ -19,7 +19,7 @@ public record PostCreateReq(
         String contentLink,
         String content,
         List<String> tagNameList,
-        Integer period,
+        Integer postPeriod,
         Boolean isOpened
 ) {
 
