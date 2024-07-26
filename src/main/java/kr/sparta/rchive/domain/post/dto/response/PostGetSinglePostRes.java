@@ -10,6 +10,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record PostGetSinglePostRes(
     String title,
+    String tutor,
     String videoLink,
     String detail,
     List<TagInfo> tagList

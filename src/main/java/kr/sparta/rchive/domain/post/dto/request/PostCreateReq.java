@@ -12,14 +12,14 @@ import lombok.Builder;
 public record PostCreateReq(
         PostTypeEnum postType,
         String title,
-        String tutor,
+        Long tutorId,
         LocalDate uploadedAt,
         String thumbnailUrl,
         String videoLink,
         String contentLink,
         String content,
         List<String> tagNameList,
-        Integer period,
+        Integer postPeriod,
         Boolean isOpened
 ) {
 

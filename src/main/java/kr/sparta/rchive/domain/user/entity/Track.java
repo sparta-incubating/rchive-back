@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.user.entity;
 
 import jakarta.persistence.*;
+import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
 import lombok.*;
@@ -42,4 +43,8 @@ public class Track extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "track")
     List<Role> roleList = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "track")
+    List<Tutor> tutorList = new ArrayList<>();
 }

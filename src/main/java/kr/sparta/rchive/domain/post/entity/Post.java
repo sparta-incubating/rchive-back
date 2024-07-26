@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
-import kr.sparta.rchive.domain.post.dto.request.PostModifyReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
@@ -40,9 +40,6 @@ public class Post extends BaseTimeEntity {
 
     @Column(nullable = false, length = 50)
     private String title;
-
-    @Column(nullable = false, length = 20)
-    private String tutor;
 
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
@@ -84,6 +81,10 @@ public class Post extends BaseTimeEntity {
     private List<PostTag> postTagList = new ArrayList<>();
 
     @ManyToOne()
+    @JoinColumn(name = "tutor_id")
+    private Tutor tutor;
+
+    @ManyToOne()
     @JoinColumn(name = "track_id")
     private Track track;
 
@@ -92,15 +93,15 @@ public class Post extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void update(PostModifyReq request, Track track) {
+    public void update(PostUpdateReq request, Track track, Tutor tutor) {
         this.postType = request.postType() == null ? this.postType : request.postType();
         this.title = request.title() == null ? this.title : request.title();
-        this.tutor = request.tutor() == null ? this.tutor : request.tutor();
         this.uploadedAt = request.uploadedAt() == null ? this.uploadedAt : request.uploadedAt();
         this.thumbnailUrl = request.thumbnailUrl() == null ? this.thumbnailUrl : request.thumbnailUrl();
         this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
         this.contentLink = request.contentLink() == null ? this.contentLink : request.contentLink();
         this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();
+        this.tutor = tutor == null? this.tutor : tutor;
         this.track = track == null ? this.track : track;
     }
 
