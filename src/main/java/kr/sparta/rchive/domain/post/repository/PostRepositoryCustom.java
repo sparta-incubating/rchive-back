@@ -22,4 +22,20 @@ public interface PostRepositoryCustom {
     List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId);
 
     List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId);
+
+    List<Post> findPostListBySearchTypeContentAndKeywordAndTrack(String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeTitleAndKeywordAndTrack(String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeTutorAndKeywordAndTrack(String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeTagAndKeywordAndTrack(String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeContentAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeTitleAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeTagAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId);
+
+    List<Post> findPostListBySearchTypeTutorAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId);
 }

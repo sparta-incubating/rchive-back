@@ -171,4 +171,170 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         post.track.id.eq(trackId))
                 .fetch();
     }
+
+    @Override
+    public List<Post> findPostListBySearchTypeContentAndKeywordAndTrack(String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.select(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.track.id.eq(trackId),
+                        post.content.contains(keyword)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeTitleAndKeywordAndTrack(String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.select(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.track.id.eq(trackId),
+                        post.title.contains(keyword)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeTutorAndKeywordAndTrack(String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.select(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.track.id.eq(trackId),
+                        post.tutor.tutorName.eq(keyword)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeTagAndKeywordAndTrack(String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.selectDistinct(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.id.in(
+                                queryFactory.select(post.id)
+                                        .from(post)
+                                        .join(post.postTagList, postTag)
+                                        .where(postTag.tag.tagName.contains(keyword))
+                        ),
+                        post.track.id.eq(trackId)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeContentAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.selectDistinct(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.track.id.eq(trackId),
+                        post.content.contains(keyword),
+                        post.postType.eq(postType)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeTitleAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.selectDistinct(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.track.id.eq(trackId),
+                        post.title.contains(keyword),
+                        post.postType.eq(postType)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeTagAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.selectDistinct(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.id.in(
+                                queryFactory.select(post.id)
+                                        .from(post)
+                                        .join(post.postTagList, postTag)
+                                        .where(postTag.tag.tagName.contains(keyword))
+                        ),
+                        post.postType.eq(postType),
+                        post.track.id.eq(trackId)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPostListBySearchTypeTutorAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        return queryFactory.select(post)
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.track.id.eq(trackId),
+                        post.tutor.tutorName.eq(keyword),
+                        post.postType.eq(postType)
+                )
+                .fetch();
+    }
 }

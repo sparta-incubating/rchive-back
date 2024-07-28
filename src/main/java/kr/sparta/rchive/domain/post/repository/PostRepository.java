@@ -12,7 +12,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
             "join fetch p.track t " +
             "left join fetch p.postTagList pt " +
             "left join fetch pt.tag tag " +
-            "left join p.contentList " +
             "where p.id = :postId")
     Post findPostWithDetailByPostId(Long postId);
 
