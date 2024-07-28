@@ -5,6 +5,7 @@ import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.enums.SearchTypeEnum;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
@@ -117,5 +118,27 @@ public class PostService {
 
     public List<Post> findPostListByPostIdList(List<Long> postIdList) {
         return postRepository.findPostByIdIn(postIdList);
+    }
+
+    public List<Post> findPostListBySearchTypeAndKeyWordAndTrackPostTypeAll(SearchTypeEnum searchType, String keyword, Long trackId) {
+        if (searchType == SearchTypeEnum.CONTENT) {
+            return postRepository.findPostListBySearchTypeContentAndKeywordAndTrack(keyword, trackId);
+        } else if (searchType == SearchTypeEnum.TITLE) {
+            return postRepository.findPostListBySearchTypeTitleAndKeywordAndTrack(keyword, trackId);
+        } else if (searchType == SearchTypeEnum.TAG) {
+            return postRepository.findPostListBySearchTypeTagAndKeywordAndTrack(keyword, trackId);
+        }
+        return postRepository.findPostListBySearchTypeTutorAndKeywordAndTrack(keyword, trackId);
+    }
+
+    public List<Post> findPostListBySearchTypeAndKeyWordAndTrackPostType(PostTypeEnum postType, SearchTypeEnum searchType, String keyword, Long trackId) {
+        if(searchType == SearchTypeEnum.CONTENT) {
+            return postRepository.findPostListBySearchTypeContentAndKeywordAndTrackAndPostType(postType, keyword, trackId);
+        } else if (searchType == SearchTypeEnum.TITLE) {
+            return postRepository.findPostListBySearchTypeTitleAndKeywordAndTrackAndPostType(postType, keyword, trackId);
+        } else if (searchType == SearchTypeEnum.TAG) {
+            return postRepository.findPostListBySearchTypeTagAndKeywordAndTrackAndPostType(postType, keyword, trackId);
+        }
+        return postRepository.findPostListBySearchTypeTutorAndKeywordAndTrackAndPostType(postType, keyword, trackId);
     }
 }
