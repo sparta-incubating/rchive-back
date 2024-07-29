@@ -43,7 +43,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> createPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestBody PostCreateReq request
     ) {
         PostCreateRes response = postTagCoreService.createPost(user, trackName, period, request);
@@ -57,7 +57,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> updatePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @PathVariable Long postId,
             @RequestBody PostUpdateReq request
     ) {
@@ -72,7 +72,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> deletePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @PathVariable Long postId
     ) {
         postTagCoreService.deletePost(user, trackName, period, postId);
@@ -86,7 +86,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> searchPosts(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam(value = "category", required = false) PostTypeEnum postType,
             @RequestParam("searchType") SearchTypeEnum searchType,
             @RequestParam("keyword") String keyword,
@@ -105,7 +105,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> getPostCategory(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam("category") PostTypeEnum postType,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
@@ -162,7 +162,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam("tagId") Long tagId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
@@ -203,7 +203,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> openPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestBody PostOpenCloseReq request
     ) {
         postTagCoreService.openPost(user, trackName, period, request.postIdList());
@@ -217,7 +217,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> closePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestBody PostOpenCloseReq request
     ) {
         postTagCoreService.closePost(user, trackName, period, request.postIdList());
@@ -231,7 +231,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> searchTutor(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam("inputPeriod") Integer inputPeriod,
             @RequestParam("tutorName") String tutorName
     ) {
