@@ -120,6 +120,7 @@ public class PostTagCoreService {
                                     .build()).collect(Collectors.toList());
 
                     return PostSearchByTagRes.builder()
+                            .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
@@ -208,6 +209,7 @@ public class PostTagCoreService {
 //        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
 
         return PostGetSinglePostRes.builder()
+                .postId(post.getId())
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
@@ -238,6 +240,7 @@ public class PostTagCoreService {
                                     .build()).toList();
 
                     return PostGetCategoryPostRes.builder()
+                            .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
@@ -293,6 +296,7 @@ public class PostTagCoreService {
                                     .build()).toList();
 
                     return PostSearchRes.builder()
+                            .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
