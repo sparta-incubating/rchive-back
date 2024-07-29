@@ -1,8 +1,11 @@
 package kr.sparta.rchive.domain.post.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.enums.SearchTypeEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import lombok.RequiredArgsConstructor;
 
@@ -173,168 +176,38 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListBySearchTypeContentAndKeywordAndTrack(String keyword, Long trackId) {
+    public List<Post> findPost(PostTypeEnum postType, SearchTypeEnum searchType, String keyword, Long trackId) {
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
         QTutor tutor = QTutor.tutor;
 
-        return queryFactory.select(post)
-                .from(post)
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(post.track.id.eq(trackId));
+
+        if (searchType == SearchTypeEnum.CONTENT) {
+            builder.and(post.content.toLowerCase().contains(keyword));
+        } else if (searchType == SearchTypeEnum.TITLE) {
+            builder.and(post.title.toLowerCase().contains(keyword));
+        } else if (searchType == SearchTypeEnum.TUTOR) {
+            builder.and(post.tutor.tutorName.toLowerCase().eq(keyword));
+        } else if (searchType == SearchTypeEnum.TAG) {
+            builder.and(post.id.in(
+                    queryFactory.select(postTag.post.id)
+                            .from(postTag)
+                            .where(postTag.tag.tagName.toLowerCase().contains(keyword))
+            ));
+        }
+
+        if (postType != null) {
+            builder.and(post.postType.eq(postType));
+        }
+
+        return queryFactory.selectFrom(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.track.id.eq(trackId),
-                        post.content.contains(keyword)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeTitleAndKeywordAndTrack(String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.select(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.track.id.eq(trackId),
-                        post.title.contains(keyword)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeTutorAndKeywordAndTrack(String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.select(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.track.id.eq(trackId),
-                        post.tutor.tutorName.eq(keyword)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeTagAndKeywordAndTrack(String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.selectDistinct(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.id.in(
-                                queryFactory.select(post.id)
-                                        .from(post)
-                                        .join(post.postTagList, postTag)
-                                        .where(postTag.tag.tagName.contains(keyword))
-                        ),
-                        post.track.id.eq(trackId)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeContentAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.selectDistinct(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.track.id.eq(trackId),
-                        post.content.contains(keyword),
-                        post.postType.eq(postType)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeTitleAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.selectDistinct(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.track.id.eq(trackId),
-                        post.title.contains(keyword),
-                        post.postType.eq(postType)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeTagAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.selectDistinct(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.id.in(
-                                queryFactory.select(post.id)
-                                        .from(post)
-                                        .join(post.postTagList, postTag)
-                                        .where(postTag.tag.tagName.contains(keyword))
-                        ),
-                        post.postType.eq(postType),
-                        post.track.id.eq(trackId)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Post> findPostListBySearchTypeTutorAndKeywordAndTrackAndPostType(PostTypeEnum postType, String keyword, Long trackId) {
-        QPost post = QPost.post;
-        QPostTag postTag = QPostTag.postTag;
-        QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
-
-        return queryFactory.select(post)
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        post.track.id.eq(trackId),
-                        post.tutor.tutorName.eq(keyword),
-                        post.postType.eq(postType)
-                )
+                .where(builder)
                 .fetch();
     }
 }

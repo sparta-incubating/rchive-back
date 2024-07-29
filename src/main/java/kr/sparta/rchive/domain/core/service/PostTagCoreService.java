@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -281,13 +282,9 @@ public class PostTagCoreService {
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        List<Post> postList;
+        keyword = keyword.toLowerCase().replaceAll("\\s", "");
 
-        if (postType == null) {
-            postList = postService.findPostListBySearchTypeAndKeyWordAndTrackPostTypeAll(searchType, keyword, track.getId());
-        } else {
-            postList = postService.findPostListBySearchTypeAndKeyWordAndTrackPostType(postType, searchType, keyword, track.getId());
-        }
+        List<Post> postList = postService.searchPost(postType, searchType, keyword, track.getId());
 
         List<PostSearchRes> responseList = postList.stream()
                 .map(post -> {

@@ -120,25 +120,7 @@ public class PostService {
         return postRepository.findPostByIdIn(postIdList);
     }
 
-    public List<Post> findPostListBySearchTypeAndKeyWordAndTrackPostTypeAll(SearchTypeEnum searchType, String keyword, Long trackId) {
-        if (searchType == SearchTypeEnum.CONTENT) {
-            return postRepository.findPostListBySearchTypeContentAndKeywordAndTrack(keyword, trackId);
-        } else if (searchType == SearchTypeEnum.TITLE) {
-            return postRepository.findPostListBySearchTypeTitleAndKeywordAndTrack(keyword, trackId);
-        } else if (searchType == SearchTypeEnum.TAG) {
-            return postRepository.findPostListBySearchTypeTagAndKeywordAndTrack(keyword, trackId);
-        }
-        return postRepository.findPostListBySearchTypeTutorAndKeywordAndTrack(keyword, trackId);
-    }
-
-    public List<Post> findPostListBySearchTypeAndKeyWordAndTrackPostType(PostTypeEnum postType, SearchTypeEnum searchType, String keyword, Long trackId) {
-        if(searchType == SearchTypeEnum.CONTENT) {
-            return postRepository.findPostListBySearchTypeContentAndKeywordAndTrackAndPostType(postType, keyword, trackId);
-        } else if (searchType == SearchTypeEnum.TITLE) {
-            return postRepository.findPostListBySearchTypeTitleAndKeywordAndTrackAndPostType(postType, keyword, trackId);
-        } else if (searchType == SearchTypeEnum.TAG) {
-            return postRepository.findPostListBySearchTypeTagAndKeywordAndTrackAndPostType(postType, keyword, trackId);
-        }
-        return postRepository.findPostListBySearchTypeTutorAndKeywordAndTrackAndPostType(postType, keyword, trackId);
+    public List<Post> searchPost(PostTypeEnum postType, SearchTypeEnum searchType, String keyword, Long trackId) {
+        return postRepository.findPost(postType, searchType, keyword, trackId);
     }
 }
