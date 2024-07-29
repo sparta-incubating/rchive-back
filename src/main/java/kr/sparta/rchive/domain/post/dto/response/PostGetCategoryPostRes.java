@@ -8,6 +8,7 @@ import java.util.List;
 
 @Builder
 public record PostGetCategoryPostRes(
+        Long postId,
         String thumbnailUrl,
         String tutor,
         String title,

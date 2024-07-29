@@ -21,7 +21,6 @@ public class PostBookmarkCoreService {
     }
 
     public void deleteBookmark(User user, Long postId) {
-
         bookmarkService.deleteBookmark(user.getId(), postId);
     }
 }

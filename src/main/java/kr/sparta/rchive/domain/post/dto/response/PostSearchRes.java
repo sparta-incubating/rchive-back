@@ -8,6 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record PostSearchRes(
+        Long postId,
         String thumbnailUrl,
         String title,
         String tutor,
