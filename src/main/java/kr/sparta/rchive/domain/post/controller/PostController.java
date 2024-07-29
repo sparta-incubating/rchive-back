@@ -11,7 +11,7 @@ import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.enums.SearchTypeEnum;
+import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -88,7 +88,7 @@ public class PostController {
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("loginPeriod") Integer period,
             @RequestParam(value = "category", required = false) PostTypeEnum postType,
-            @RequestParam("searchType") SearchTypeEnum searchType,
+            @RequestParam("searchType") PostSearchTypeEnum searchType,
             @RequestParam("keyword") String keyword,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size

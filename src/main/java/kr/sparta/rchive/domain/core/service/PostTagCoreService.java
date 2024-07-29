@@ -11,7 +11,7 @@ import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.enums.SearchTypeEnum;
+import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.service.*;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
@@ -35,9 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -276,7 +274,7 @@ public class PostTagCoreService {
         return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
     }
 
-    public Page<PostSearchRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period, SearchTypeEnum searchType,
+    public Page<PostSearchRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period, PostSearchTypeEnum searchType,
                                            String keyword, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);

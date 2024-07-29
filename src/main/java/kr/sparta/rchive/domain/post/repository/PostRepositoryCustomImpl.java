@@ -1,11 +1,10 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.enums.SearchTypeEnum;
+import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import lombok.RequiredArgsConstructor;
 
@@ -176,7 +175,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPost(PostTypeEnum postType, SearchTypeEnum searchType, String keyword, Long trackId) {
+    public List<Post> findPost(PostTypeEnum postType, PostSearchTypeEnum searchType, String keyword, Long trackId) {
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
@@ -185,13 +184,13 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(post.track.id.eq(trackId));
 
-        if (searchType == SearchTypeEnum.CONTENT) {
+        if (searchType == PostSearchTypeEnum.CONTENT) {
             builder.and(post.content.toLowerCase().contains(keyword));
-        } else if (searchType == SearchTypeEnum.TITLE) {
+        } else if (searchType == PostSearchTypeEnum.TITLE) {
             builder.and(post.title.toLowerCase().contains(keyword));
-        } else if (searchType == SearchTypeEnum.TUTOR) {
+        } else if (searchType == PostSearchTypeEnum.TUTOR) {
             builder.and(post.tutor.tutorName.toLowerCase().eq(keyword));
-        } else if (searchType == SearchTypeEnum.TAG) {
+        } else if (searchType == PostSearchTypeEnum.TAG) {
             builder.and(post.id.in(
                     queryFactory.select(postTag.post.id)
                             .from(postTag)
