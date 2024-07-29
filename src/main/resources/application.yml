@@ -1,65 +1,8 @@
 spring:
-  application:
-    name: rchive
-
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jackson:
-    time-zone: Asia/Seoul
-
+  profiles:
+    active: test
   jpa:
     properties:
       hibernate:
-        use_sql_comments: 'true'
-        format_sql: 'true'  # SQL? ???? ??
-        show_sql: 'true'    # sql ??
-        highlight_sql: 'true'   # SQL? ? ??
-    hibernate:
-      ddl-auto: update
-
-  data:
-    redis:
-      port: ${REDIS_PORT}
-      host: ${REDIS_HOST}
-#      password: ${REDIS_PASSWORD}
-  # swagger
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-
-# swagger
-springdoc:
-  show-login-endpoint: true
-  swagger-ui:
-    path: /swagger-ui.html
-    display-operation-id: true
-    tags-sorter: alpha
-#    operations-sorter: method
-#    doc-expansion: none
-
-jwt:
-  secret:
-    key: ${JWT_KEY}
-
-# S3
-cloud:
-  aws:
-    s3:
-      bucket: ${BUCKET_NAME}
-    stack:
-      auto: false
-    region:
-      static: ${REGION}
-    credentials:
-      access-key: ${S3_ACCESS_KEY}
-      secret-key: ${S3_SECRET_ACCESS_KEY}
-
-  servlet:
-    multipart:
-      max-file-size: 3MB
-      max-request-size: 5MB
-      resolve-lazily: true
+        jdbc:
+          time_zone: Asia/Seoul
