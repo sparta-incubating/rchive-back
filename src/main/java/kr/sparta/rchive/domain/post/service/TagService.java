@@ -24,35 +24,32 @@ public class TagService {
     // 내가 원하는 태그로 검색해오는 기능
     public List<TagSearchRes> searchTag(String tagName) {
 
-        List<TagSearchRes> responseList = new ArrayList<>();
+        String lowerTagName = tagName.toLowerCase();
 
-        List<Tag> tagList = tagRepository.findByTagNameContains(tagName);
+        List<Tag> tagList = tagRepository.findByTagNameContains(lowerTagName);
 
-        for (Tag t : tagList) {
-            TagSearchRes tagSearchRes = TagSearchRes.builder()
-                    .tagId(t.getId())
-                    .tagName(t.getTagName())
-                    .build();
-            responseList.add(tagSearchRes);
-        }
-
-        return responseList;
+        return tagList.stream().map(
+                tag -> TagSearchRes.builder()
+                        .tagName(tag.getTagName())
+                        .tagId(tag.getId())
+                        .build()
+        ).toList();
     }
 
     // 태그를 추가하는 로직
     @Transactional
     public TagCreateRes createTag(String name) {
 
-        String lowerName = name.toLowerCase();
+        String lowerTagName = name.toLowerCase();
 
-        Tag findTag = tagRepository.findByTagNameNotOptional(lowerName);
+        Tag findTag = tagRepository.findByTagNameNotOptional(lowerTagName);
 
         if(tagExist(findTag)) {
             throw new PostCustomException(PostExceptionCode.CONFLICT_TAG);
         }
 
         Tag createTag = Tag.builder()
-                .tagName(lowerName)
+                .tagName(lowerTagName)
                 .build();
 
         Tag savedTag = tagRepository.save(createTag);

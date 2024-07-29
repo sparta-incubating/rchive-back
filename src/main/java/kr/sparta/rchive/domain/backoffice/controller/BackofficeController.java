@@ -128,8 +128,7 @@ public class BackofficeController {
                 postTagCoreService.getPostListInBackOffice(user, trackName, period, postType,
                         startDate, endDate, searchPeriod, isOpened, tutorId, pageable);
         return ResponseEntity.status(BackofficeResponseCode.OK_SEARCH_POST_LIST.getHttpStatus())
-                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST,
-                        responseList));
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_SEARCH_POST_LIST, responseList));
     }
 
     @GetMapping("/role/select/last")

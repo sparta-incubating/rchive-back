@@ -1,8 +1,10 @@
 package kr.sparta.rchive.domain.post.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import lombok.RequiredArgsConstructor;
 
@@ -169,6 +171,42 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                                         .where(postTag.tag.id.eq(tagId))
                         ),
                         post.track.id.eq(trackId))
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findPost(PostTypeEnum postType, PostSearchTypeEnum searchType, String keyword, Long trackId) {
+        QPost post = QPost.post;
+        QPostTag postTag = QPostTag.postTag;
+        QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(post.track.id.eq(trackId));
+
+        if (searchType == PostSearchTypeEnum.CONTENT) {
+            builder.and(post.content.toLowerCase().contains(keyword));
+        } else if (searchType == PostSearchTypeEnum.TITLE) {
+            builder.and(post.title.toLowerCase().contains(keyword));
+        } else if (searchType == PostSearchTypeEnum.TUTOR) {
+            builder.and(post.tutor.tutorName.toLowerCase().eq(keyword));
+        } else if (searchType == PostSearchTypeEnum.TAG) {
+            builder.and(post.id.in(
+                    queryFactory.select(postTag.post.id)
+                            .from(postTag)
+                            .where(postTag.tag.tagName.toLowerCase().contains(keyword))
+            ));
+        }
+
+        if (postType != null) {
+            builder.and(post.postType.eq(postType));
+        }
+
+        return queryFactory.selectFrom(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(builder)
                 .fetch();
     }
 }
