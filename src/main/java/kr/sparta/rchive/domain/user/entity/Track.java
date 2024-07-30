@@ -47,4 +47,8 @@ public class Track extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "track")
     List<Tutor> tutorList = new ArrayList<>();
+
+    public void trackPermissionTrue() {
+        this.isPermission = true;
+    }
 }
