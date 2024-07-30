@@ -13,6 +13,7 @@ public record PostSearchRes(
         String title,
         String tutor,
         LocalDate uploadedAt,
-        List<TagInfo> tagList
+        List<TagInfo> tagList,
+        Boolean isBookmarked
 ) {
 }

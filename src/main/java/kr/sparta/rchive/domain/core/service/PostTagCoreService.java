@@ -1,7 +1,7 @@
 package kr.sparta.rchive.domain.core.service;
 
+import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.comment.service.CommentService;
-import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -10,9 +10,12 @@ import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
-import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
-import kr.sparta.rchive.domain.post.service.*;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.service.PostService;
+import kr.sparta.rchive.domain.post.service.PostTagService;
+import kr.sparta.rchive.domain.post.service.TagService;
+import kr.sparta.rchive.domain.post.service.TutorService;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -49,6 +52,7 @@ public class PostTagCoreService {
     private final TagService tagService;
     private final UserService userService;
     private final RoleService roleService;
+    private final BookmarkService bookmarkService;
     private final CommentService commentService;
     private final RedisService redisService;
     private final TutorService tutorService;
@@ -103,7 +107,7 @@ public class PostTagCoreService {
     }
 
     // TODO : Redis 만들기
-    public Page<PostSearchByTagRes> searchPostByTag(TrackNameEnum trackName, Integer period,
+    public Page<PostGetRes> searchPostByTag(TrackNameEnum trackName, Integer period,
                                                     Long tagId, User user, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
@@ -111,7 +115,9 @@ public class PostTagCoreService {
 
         List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId());
 
-        List<PostSearchByTagRes> responseList = postList.stream()
+        List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
+
+        List<PostGetRes> responseList = postList.stream()
                 .map(post -> {
                     List<TagInfo> tagInfoList = post.getPostTagList().stream()
                             .map(postTag -> TagInfo.builder()
@@ -119,14 +125,14 @@ public class PostTagCoreService {
                                     .tagName(postTag.getTag().getTagName())
                                     .build()).collect(Collectors.toList());
 
-                    return PostSearchByTagRes.builder()
+                    return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
-                            .postType(post.getPostType())
                             .tagList(tagInfoList)
+                            .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
                             .build();
                 }).collect(Collectors.toList());
 
@@ -199,6 +205,7 @@ public class PostTagCoreService {
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         Post post = postService.findPostWithDetailByPostId(postId);
+        Boolean isBookmarked = bookmarkService.existsBookmarkByUserIdAndPostId(user.getId(), post.getId());
 
         List<TagInfo> tagList = post.getPostTagList().stream()
                 .map(postTag -> TagInfo.builder()
@@ -215,11 +222,12 @@ public class PostTagCoreService {
                 .videoLink(post.getVideoLink())
                 .content(post.getContent())
                 .tagList(tagList)
+                .isBookmarked(isBookmarked)
 //                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
                 .build();
     }
 
-    public Page<PostGetCategoryPostRes> getPostListByCategory(
+    public Page<PostGetRes> getPostListByCategory(
             User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType,
             Pageable pageable) {
 
@@ -231,7 +239,9 @@ public class PostTagCoreService {
         List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(),
                 postType, track);
 
-        List<PostGetCategoryPostRes> responseList = postList.stream()
+        List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
+
+        List<PostGetRes> responseList = postList.stream()
                 .map(post -> {
                     List<TagInfo> tagInfoList = post.getPostTagList().stream()
                             .map(postTag -> TagInfo.builder()
@@ -239,13 +249,14 @@ public class PostTagCoreService {
                                     .tagName(postTag.getTag().getTagName())
                                     .build()).toList();
 
-                    return PostGetCategoryPostRes.builder()
+                    return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
                             .tagList(tagInfoList)
+                            .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
                             .build();
                 }).collect(Collectors.toList());
 
@@ -287,6 +298,8 @@ public class PostTagCoreService {
 
         List<Post> postList = postService.searchPost(postType, searchType, keyword, track.getId());
 
+        List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
+
         List<PostSearchRes> responseList = postList.stream()
                 .map(post -> {
                     List<TagInfo> tagInfoList = post.getPostTagList().stream()
@@ -302,6 +315,7 @@ public class PostTagCoreService {
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
                             .tagList(tagInfoList)
+                            .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
                             .build();
                 }).collect(Collectors.toList());
 

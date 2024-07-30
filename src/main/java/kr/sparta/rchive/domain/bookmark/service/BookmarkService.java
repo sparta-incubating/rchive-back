@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.post.dto.response.PostRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
+import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
+    private final PostRepository postRepository;
 
     public void createBookmark(User user, Post findPost) {
         Bookmark bookmark = Bookmark.builder()
@@ -59,5 +61,13 @@ public class BookmarkService {
                             .tagInfoList(tagInfoList).build();
                 }
         ).collect(Collectors.toList());
+    }
+
+    public List<Long> findPostIdListByUserId(Long userId) {
+        return bookmarkRepository.findPostIdListByUserId(userId);
+    }
+
+    public Boolean existsBookmarkByUserIdAndPostId(Long userId, Long postId) {
+        return bookmarkRepository.existsBookmarkByUserIdAndPostId(userId, postId);
     }
 }

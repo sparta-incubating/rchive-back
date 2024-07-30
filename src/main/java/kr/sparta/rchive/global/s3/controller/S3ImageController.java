@@ -30,7 +30,7 @@ public class S3ImageController {
                 .body(CommonResponseDto.of(S3ResponseCode.OK_FILE_UPLOAD, thumbnailImageUrl));
     }
 
-    @GetMapping("/thumnail/delete")
+    @GetMapping("/thumbnail/delete")
     @Operation(operationId = "S3-002", summary = "썸네일 파일 삭제")
     public ResponseEntity<CommonResponseDto> deleteThumbnail(
             @RequestParam(value = "thumbnailUrl") String thumbnailUrl
