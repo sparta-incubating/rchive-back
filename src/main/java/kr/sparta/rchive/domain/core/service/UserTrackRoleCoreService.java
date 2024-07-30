@@ -278,5 +278,16 @@ public class UserTrackRoleCoreService {
 
     }
 
+    @Transactional
+    public void trackPermission(User user, TrackNameEnum trackName, Integer period, Long trackId) {
+        if(period != 0) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
+        }
 
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        roleService.existByUserAndTrackByPmThrowException(user.getId(), managerTrack.getTrackName());
+
+        trackService.trackPermissionTrue(trackId);
+    }
 }
