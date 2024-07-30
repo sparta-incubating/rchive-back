@@ -7,12 +7,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record PostGetCategoryPostRes(
+public record PostGetRes(
         Long postId,
         String thumbnailUrl,
         String tutor,
         String title,
         LocalDate uploadedAt,
-        List<TagInfo> tagList
+        List<TagInfo> tagList,
+        Boolean isBookmarked
 ) {
 }
