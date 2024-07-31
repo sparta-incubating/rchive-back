@@ -108,6 +108,20 @@ public class BackofficeController {
                         BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT, res));
     }
 
+    @PatchMapping("/permission")
+    @Operation(operationId = "BACKOFFICE-005", summary = "트랙의 일반 유저 열람 권한 변경")
+    public ResponseEntity<CommonResponseDto> userTrackPermission(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("loginPeriod") Integer period,
+            @RequestParam("trackId") Long trackId
+    ) {
+        userTrackRoleCoreService.trackPermission(user, trackName, period, trackId);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_USER_TRACK_PERMISSION.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_USER_TRACK_PERMISSION, null));
+    }
+
     @GetMapping("/post/search")
     @Operation(operationId = "BACKOFFICE-006", summary = "백오피스에서 교육자료 검색")
     public ResponseEntity<CommonResponseDto> searchPostInBackOffice(
