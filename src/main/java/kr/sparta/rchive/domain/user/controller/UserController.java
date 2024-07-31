@@ -11,6 +11,7 @@ import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
+import kr.sparta.rchive.global.execption.statement.SignupException;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class UserController {
 
     @PostMapping("/signup")
     @Operation(operationId = "USER-001", summary = "회원가입")
+    @ApiExceptionCodeExample(SignupException.class)
     public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserSignupReq req) {
         userService.signup(req);
         return ResponseEntity.status(UserResponseCode.OK_SIGNUP.getHttpStatus())
