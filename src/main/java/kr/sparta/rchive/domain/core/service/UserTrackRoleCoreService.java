@@ -105,7 +105,7 @@ public class UserTrackRoleCoreService {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
-        List<Role> roleList = new ArrayList<>();
+        List<Role> roleList;
         if (status == null) {
             roleList = roleService.findRoleListInBackOfficeAuthNoReject(
                     managerTrack, searchPeriod, email, trackRole, sort);
