@@ -71,4 +71,12 @@ public class TrackService {
     public List<Track> findTrackListByTrackName(TrackNameEnum trackName) {
         return trackRepository.findAllByTrackName(trackName);
     }
+
+    public void trackPermissionTrue(Long trackId) {
+        Track track = findTrackById(trackId);
+
+        track.trackPermissionTrue();
+
+        trackRepository.save(track);
+    }
 }

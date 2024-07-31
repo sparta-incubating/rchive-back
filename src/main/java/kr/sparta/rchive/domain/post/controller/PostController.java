@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
-import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
+import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.TagService;
@@ -42,7 +42,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> createPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestBody PostCreateReq request
     ) {
         PostCreateRes response = postTagCoreService.createPost(user, trackName, period, request);
@@ -56,7 +56,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> updatePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @PathVariable Long postId,
             @RequestBody PostUpdateReq request
     ) {
@@ -71,7 +71,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> deletePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @PathVariable Long postId
     ) {
         postTagCoreService.deletePost(user, trackName, period, postId);
@@ -80,18 +80,37 @@ public class PostController {
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_POST, null));
     }
 
+    @GetMapping("/search")
+    @Operation(operationId = "POST-004", summary = "게시물 검색")
+    public ResponseEntity<CommonResponseDto> searchPosts(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("loginPeriod") Integer period,
+            @RequestParam(value = "category", required = false) PostTypeEnum postType,
+            @RequestParam("searchType") PostSearchTypeEnum searchType,
+            @RequestParam("keyword") String keyword,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
+        Page<PostSearchRes> responseList = postTagCoreService.searchPosts(user, postType, trackName, period, searchType, keyword, pageable);
+
+        return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST, responseList));
+    }
+
     @GetMapping("/category")
     @Operation(operationId = "POST-005", summary = "게시물 목록 조회")
     public ResponseEntity<CommonResponseDto> getPostCategory(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam("category") PostTypeEnum postType,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostGetCategoryPostRes> responseList =
+        Page<PostGetRes> responseList =
                 postTagCoreService.getPostListByCategory(user, trackName, period, postType,
                         pageable);
         return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
@@ -138,17 +157,17 @@ public class PostController {
     }
 
     @GetMapping("/tags/search")
-    @Operation(operationId = "POST-012", summary = "태그를 이용하여 검색하는 기능")
+    @Operation(operationId = "POST-012", summary = "태그를 클릭하여 검색하는 기능")
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam("tagId") Long tagId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostSearchByTagRes> responseList = postTagCoreService
+        Page<PostGetRes> responseList = postTagCoreService
                 .searchPostByTag(trackName, period, tagId, user, pageable);
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
@@ -183,9 +202,9 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> openPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestBody PostOpenCloseReq request
-            ) {
+    ) {
         postTagCoreService.openPost(user, trackName, period, request.postIdList());
 
         return ResponseEntity.status(PostResponseCode.OK_OPEN_POST.getHttpStatus())
@@ -197,7 +216,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> closePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestBody PostOpenCloseReq request
     ) {
         postTagCoreService.closePost(user, trackName, period, request.postIdList());
@@ -211,7 +230,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> searchTutor(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("period") Integer period,
+            @RequestParam("loginPeriod") Integer period,
             @RequestParam("inputPeriod") Integer inputPeriod,
             @RequestParam("tutorName") String tutorName
     ) {

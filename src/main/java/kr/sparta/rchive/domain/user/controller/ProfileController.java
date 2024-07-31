@@ -3,11 +3,12 @@ package kr.sparta.rchive.domain.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
+import kr.sparta.rchive.domain.post.dto.response.PostRes;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
-import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -17,12 +18,9 @@ import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +30,18 @@ public class ProfileController {
 
     private final UserService userService;
     private final UserTrackRoleCoreService userTrackRoleCoreService;
+    private final BookmarkService bookmarkService;
+
+    @GetMapping("/bookmark")
+    @Operation(operationId = "PROFILE-002", summary = "북마크 목록 조회")
+    public ResponseEntity<CommonResponseDto> getBookmark(
+            @LoginUser User user
+    ) {
+        List<PostRes> responseList = bookmarkService.getUserBookmark(user.getId());
+
+        return ResponseEntity.status(ProfileResponseCode.OK_GET_BOOKMARK.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_GET_BOOKMARK, responseList));
+    }
 
     @GetMapping
     @Operation(operationId = "PROFILE-005", summary = "프로필 조회")

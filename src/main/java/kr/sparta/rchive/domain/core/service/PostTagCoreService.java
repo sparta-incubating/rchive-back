@@ -1,7 +1,7 @@
 package kr.sparta.rchive.domain.core.service;
 
+import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.comment.service.CommentService;
-import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -10,8 +10,12 @@ import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
+import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.service.*;
+import kr.sparta.rchive.domain.post.service.PostService;
+import kr.sparta.rchive.domain.post.service.PostTagService;
+import kr.sparta.rchive.domain.post.service.TagService;
+import kr.sparta.rchive.domain.post.service.TutorService;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -48,6 +52,7 @@ public class PostTagCoreService {
     private final TagService tagService;
     private final UserService userService;
     private final RoleService roleService;
+    private final BookmarkService bookmarkService;
     private final CommentService commentService;
     private final RedisService redisService;
     private final TutorService tutorService;
@@ -102,15 +107,17 @@ public class PostTagCoreService {
     }
 
     // TODO : Redis 만들기
-    public Page<PostSearchByTagRes> searchPostByTag(TrackNameEnum trackName, Integer period,
-            Long tagId, User user, Pageable pageable) {
+    public Page<PostGetRes> searchPostByTag(TrackNameEnum trackName, Integer period,
+                                                    Long tagId, User user, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId());
 
-        List<PostSearchByTagRes> responseList = postList.stream()
+        List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
+
+        List<PostGetRes> responseList = postList.stream()
                 .map(post -> {
                     List<TagInfo> tagInfoList = post.getPostTagList().stream()
                             .map(postTag -> TagInfo.builder()
@@ -118,13 +125,14 @@ public class PostTagCoreService {
                                     .tagName(postTag.getTag().getTagName())
                                     .build()).collect(Collectors.toList());
 
-                    return PostSearchByTagRes.builder()
+                    return PostGetRes.builder()
+                            .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
-                            .postType(post.getPostType())
                             .tagList(tagInfoList)
+                            .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
                             .build();
                 }).collect(Collectors.toList());
 
@@ -158,7 +166,7 @@ public class PostTagCoreService {
 
     @Transactional
     public PostModifyRes updatePost(User user, TrackNameEnum trackName, Integer period, Long postId,
-            PostUpdateReq request) {
+                                    PostUpdateReq request) {
 
         PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
         Post findPost = postTrackInfo.post();
@@ -191,12 +199,13 @@ public class PostTagCoreService {
     }
 
     public PostGetSinglePostRes getPost(User user, Long postId, TrackNameEnum trackName,
-            Integer period) {
+                                        Integer period) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         Post post = postService.findPostWithDetailByPostId(postId);
+        Boolean isBookmarked = bookmarkService.existsBookmarkByUserIdAndPostId(user.getId(), post.getId());
 
         List<TagInfo> tagList = post.getPostTagList().stream()
                 .map(postTag -> TagInfo.builder()
@@ -207,16 +216,18 @@ public class PostTagCoreService {
 //        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
 
         return PostGetSinglePostRes.builder()
+                .postId(post.getId())
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
                 .content(post.getContent())
                 .tagList(tagList)
+                .isBookmarked(isBookmarked)
 //                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
                 .build();
     }
 
-    public Page<PostGetCategoryPostRes> getPostListByCategory(
+    public Page<PostGetRes> getPostListByCategory(
             User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType,
             Pageable pageable) {
 
@@ -228,7 +239,9 @@ public class PostTagCoreService {
         List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(),
                 postType, track);
 
-        List<PostGetCategoryPostRes> responseList = postList.stream()
+        List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
+
+        List<PostGetRes> responseList = postList.stream()
                 .map(post -> {
                     List<TagInfo> tagInfoList = post.getPostTagList().stream()
                             .map(postTag -> TagInfo.builder()
@@ -236,12 +249,14 @@ public class PostTagCoreService {
                                     .tagName(postTag.getTag().getTagName())
                                     .build()).toList();
 
-                    return PostGetCategoryPostRes.builder()
+                    return PostGetRes.builder()
+                            .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
                             .tagList(tagInfoList)
+                            .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
                             .build();
                 }).collect(Collectors.toList());
 
@@ -261,6 +276,55 @@ public class PostTagCoreService {
         postService.closePost(postList);
     }
 
+    public List<TutorRes> searchTutor(User user, TrackNameEnum trackName, Integer period,
+                                      Integer inputPeriod, String tutorName) {
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, inputPeriod);
+        if (period == 0) {
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
+        } else {
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+        }
+
+        return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
+    }
+
+    public Page<PostSearchRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period, PostSearchTypeEnum searchType,
+                                           String keyword, Pageable pageable) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+        Role role = userRoleAndTrackCheck(user, track);
+        userCheckPermission(user.getUserRole(), track, role.getTrackRole());
+
+        keyword = keyword.toLowerCase().replaceAll("\\s", "");
+
+        List<Post> postList = postService.searchPost(postType, searchType, keyword, track.getId());
+
+        List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
+
+        List<PostSearchRes> responseList = postList.stream()
+                .map(post -> {
+                    List<TagInfo> tagInfoList = post.getPostTagList().stream()
+                            .map(postTag -> TagInfo.builder()
+                                    .tagId(postTag.getTag().getId())
+                                    .tagName(postTag.getTag().getTagName())
+                                    .build()).toList();
+
+                    return PostSearchRes.builder()
+                            .postId(post.getId())
+                            .thumbnailUrl(post.getThumbnailUrl())
+                            .title(post.getTitle())
+                            .tutor(post.getTutor().getTutorName())
+                            .uploadedAt(post.getUploadedAt())
+                            .tagList(tagInfoList)
+                            .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
+                            .build();
+                }).collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), responseList.size());
+
+        return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
+    }
+
     private List<Post> checkPostListAndTrack(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
         List<Post> findPostList = postService.findPostListByPostIdList(postIdList);
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
@@ -278,7 +342,7 @@ public class PostTagCoreService {
     }
 
     private PostTrackInfo checkPostAndTrack(User user, TrackNameEnum trackName, Integer period,
-            Long postId) {
+                                            Long postId) {
         Post findPost = postService.findPostById(postId);
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
 
@@ -322,7 +386,7 @@ public class PostTagCoreService {
     }
 
     private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag,
-            Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
+                                                                Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
 
         List<Long> postIdList;
 //        postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
@@ -367,8 +431,8 @@ public class PostTagCoreService {
         }
 
         for (Role r : roleList) {
-            if (userTrackRoleIsPm(r.getTrackRole()) && track.getTrackName()
-                    .equals(r.getTrack().getTrackName())) {
+            if (userTrackRoleIsPm(r.getTrackRole()) &&
+                    track.getTrackName().equals(r.getTrack().getTrackName())) {
                 return r;
             }
 
@@ -378,17 +442,5 @@ public class PostTagCoreService {
         }
 
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
-    }
-
-    public List<TutorRes> searchTutor(User user, TrackNameEnum trackName, Integer period,
-                                      Integer inputPeriod, String tutorName) {
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, inputPeriod);
-        if (period == 0) {
-            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
-        } else {
-            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
-        }
-
-        return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
     }
 }
