@@ -16,7 +16,7 @@ public interface RoleRepository extends JpaRepository<Role, RoleId>, RoleReposit
 
     Optional<Role> findByUserIdAndTrackId(Long trackId, Long userId);
 
-    Optional<Role> findFirstByUserIdOrderByCreatedAtAsc(Long userId);
+    Optional<Role> findFirstByUserIdOrderByCreatedAtDesc(Long userId);
 
     boolean existsRoleByUserId(Long userId);
 
