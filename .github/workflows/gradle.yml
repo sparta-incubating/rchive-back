@@ -4,7 +4,8 @@ name: Java CI with Gradle
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
   pull_request:
-    branches: [ "dev" ]
+    #branches: [ "dev" ]
+    branches: [ "feat/cicd/cd-65" ]
 
 env:
   DB_URL: ${{secrets.DB_URL}}
@@ -48,8 +49,15 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: '8.4'
+          gradle-version: '8.6'
           arguments: build test
+
+      # dockerfile을 통해 이미지를 빌드하고, 이를 docker repo로 push 합니다.
+      - name: Docker build & push to docker repo
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/directors-dev .
+          docker push ${{ secrets.DOCKER_REPO }}/directors-dev
 
       # 빌드해서 생긴 JAR 파일을 깃허브 아티팩트로 업로드!!
       - name: Upload build artifact
@@ -102,7 +110,6 @@ jobs:
           VERSION=$(grep VERSION back.env | cut -d '=' -f2)
           scp -i ssh_key.pem -o StrictHostKeyChecking=no build/libs/flash-0.0.1-SNAPSHOT.jar ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/flashh-back-$VERSION.jar
           ssh -i ssh_key.pem -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "pgrep java | xargs kill -9; nohup java -jar /home/${{ secrets.USER }}/flashh-back-$VERSION.jar > app.log 2>&1 &"
-          scp -i ssh_key.pem -o StrictHostKeyChecking=no back.env ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/back.env
           scp -i ssh_key.pem -o StrictHostKeyChecking=no Dockerfile ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/Dockerfile
           scp -i ssh_key.pem -o StrictHostKeyChecking=no docker/docker-compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/docker-compose.yml
           ssh -i ssh_key.pem -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
