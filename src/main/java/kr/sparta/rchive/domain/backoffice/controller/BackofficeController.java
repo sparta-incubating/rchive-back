@@ -108,8 +108,8 @@ public class BackofficeController {
                         BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_COUNT, res));
     }
 
-    @PatchMapping("/permission")
-    @Operation(operationId = "BACKOFFICE-005", summary = "트랙의 일반 유저 열람 권한 변경")
+    @PatchMapping("/track/permission")
+    @Operation(operationId = "BACKOFFICE-005", summary = "트랙의 일반 유저 열람 권한 수락")
     public ResponseEntity<CommonResponseDto> userTrackPermission(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -165,5 +165,19 @@ public class BackofficeController {
 
         return ResponseEntity.status(BackofficeResponseCode.OK_GET_PROFILE.getHttpStatus())
                 .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_PROFILE, res));
+    }
+
+    @PatchMapping("/track/rejection")
+    @Operation(operationId = "BACKOFFICE-009", summary = "트랙의 일반 유저 열람 권한 거절")
+    public ResponseEntity<CommonResponseDto> userTrackRejection(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("loginPeriod") Integer period,
+            @RequestParam("trackId") Long trackId
+    ) {
+        userTrackRoleCoreService.trackRejection(user, trackName, period, trackId);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_USER_TRACK_REJECTION.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_USER_TRACK_REJECTION, null));
     }
 }
