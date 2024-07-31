@@ -68,6 +68,9 @@ jobs:
           username: ${{secrets.DOCKER_USERNAME}}
           password: ${{secrets.DOCKER_HUB_TOKEN}}
 
+      - name: Verify Docker login
+        run: docker info
+
       # Docker Hub에 올리기
       - name: Docker Build and Push
         uses: docker/build-push-action@v2
