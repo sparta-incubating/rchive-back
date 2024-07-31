@@ -62,7 +62,7 @@ jobs:
       #        run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}/directors-dev:latest
 
       - name: Docker build
-        run: docker build --tag first-image ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}/directors-dev:first-image
+        run: docker build -f Dockerfile --tag first-image ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}/directors-dev:first-image
 
       - name: Docker push to docker repo
         run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}/directors-dev:first-image
