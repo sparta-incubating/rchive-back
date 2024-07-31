@@ -61,12 +61,8 @@ public class TagService {
     }
 
     // 태그가 존재하는지 체크하는 로직
-    public Boolean tagExist(Tag tag) {
-        if (tag == null) {
-            return false;
-        }
-
-        return true;
+    private Boolean tagExist(Tag tag) {
+        return tag != null;
     }
 
     // 태그 ID로 태그를 검색해오는 로직
