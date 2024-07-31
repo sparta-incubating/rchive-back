@@ -51,4 +51,8 @@ public class Track extends BaseTimeEntity {
     public void trackPermissionTrue() {
         this.isPermission = true;
     }
+
+    public void trackPermissionFalse() {
+        this.isPermission = false;
+    }
 }
