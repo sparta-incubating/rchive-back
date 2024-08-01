@@ -10,7 +10,6 @@ import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
-import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -288,15 +287,15 @@ public class PostTagCoreService {
         return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
     }
 
-    public Page<PostSearchRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period, PostSearchTypeEnum searchType,
-                                           String keyword, Pageable pageable) {
+    public Page<PostSearchRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period,
+                                           String keyword, Long tutorId, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         keyword = keyword.toLowerCase().replaceAll("\\s", "");
 
-        List<Post> postList = postService.searchPost(postType, searchType, keyword, track.getId());
+        List<Post> postList = postService.searchPost(postType, keyword, tutorId, track.getId());
 
         List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
 
