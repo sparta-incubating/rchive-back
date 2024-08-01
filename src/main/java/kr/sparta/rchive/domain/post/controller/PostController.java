@@ -9,7 +9,6 @@ import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
-import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.TagService;
@@ -87,13 +86,13 @@ public class PostController {
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("loginPeriod") Integer period,
             @RequestParam(value = "category", required = false) PostTypeEnum postType,
-            @RequestParam("searchType") PostSearchTypeEnum searchType,
             @RequestParam("keyword") String keyword,
+            @RequestParam(value = "tutorId", required = false) Long tutorId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostSearchRes> responseList = postTagCoreService.searchPosts(user, postType, trackName, period, searchType, keyword, pageable);
+        Page<PostSearchRes> responseList = postTagCoreService.searchPosts(user, postType, trackName, period, keyword, tutorId, pageable);
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST, responseList));
@@ -232,7 +231,7 @@ public class PostController {
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("loginPeriod") Integer period,
             @RequestParam("inputPeriod") Integer inputPeriod,
-            @RequestParam("tutorName") String tutorName
+            @RequestParam(value = "tutorName", required = false) String tutorName
     ) {
         List<TutorRes> responseList = postTagCoreService.searchTutor(user, trackName, period, inputPeriod, tutorName);
 
