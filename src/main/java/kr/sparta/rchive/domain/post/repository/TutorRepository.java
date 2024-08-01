@@ -6,9 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface TutorRepository extends JpaRepository<Tutor, Long> {
+public interface TutorRepository extends JpaRepository<Tutor, Long>, TutorRepositoryCustom {
 
-    @Query("select t from Tutor t where t.tutorName like %:tutorName% " +
-            "and t.track.id = :trackId")
-    List<Tutor> findTutorListByTutorNameAndTrackId(String tutorName, Long trackId);
 }
