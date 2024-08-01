@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.post.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,7 +39,7 @@ public class TagService {
     @Transactional
     public TagCreateRes createTag(String name) {
 
-        String lowerTagName = name.toLowerCase();
+        String lowerTagName = name.toLowerCase().trim();
 
         Tag findTag = tagRepository.findByTagNameNotOptional(lowerTagName);
 
