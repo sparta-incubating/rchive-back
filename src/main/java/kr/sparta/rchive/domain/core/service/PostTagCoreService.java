@@ -292,11 +292,7 @@ public class PostTagCoreService {
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        if(searchType != PostSearchTypeEnum.TAG) {
-            keyword = keyword.toLowerCase().replaceAll("\\s", "");
-        } else {
-            keyword = keyword.toLowerCase();
-        }
+        keyword = keyword.toLowerCase().replaceAll("\\s", "");
 
         List<Post> postList = postService.searchPost(postType, keyword, tutorId, track.getId());
 
