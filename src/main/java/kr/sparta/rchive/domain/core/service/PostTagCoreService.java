@@ -227,8 +227,7 @@ public class PostTagCoreService {
     }
 
     public Page<PostGetRes> getPostListByCategory(
-            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType,
-            Pageable pageable) {
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, Pageable pageable) {
 
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
 
@@ -293,7 +292,11 @@ public class PostTagCoreService {
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        keyword = keyword.toLowerCase().replaceAll("\\s", "");
+        if(searchType != PostSearchTypeEnum.TAG) {
+            keyword = keyword.toLowerCase().replaceAll("\\s", "");
+        } else {
+            keyword = keyword.toLowerCase();
+        }
 
         List<Post> postList = postService.searchPost(postType, keyword, tutorId, track.getId());
 

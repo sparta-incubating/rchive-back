@@ -23,6 +23,13 @@ public class BookmarkService {
     private final PostRepository postRepository;
 
     public void createBookmark(User user, Post findPost) {
+
+        Boolean checkBookmark = bookmarkRepository.existsBookmarkByUserIdAndPostId(user.getId(), findPost.getId());
+
+        if(checkBookmark) {
+            throw new PostCustomException(PostExceptionCode.CONFLICT_BOOKMARK);
+        }
+
         Bookmark bookmark = Bookmark.builder()
                 .post(findPost)
                 .user(user)

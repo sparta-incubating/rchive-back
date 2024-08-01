@@ -79,4 +79,12 @@ public class TrackService {
 
         trackRepository.save(track);
     }
+
+    public void trackRejection(Long trackId) {
+        Track track = findTrackById(trackId);
+
+        track.trackPermissionFalse();
+
+        trackRepository.save(track);
+    }
 }

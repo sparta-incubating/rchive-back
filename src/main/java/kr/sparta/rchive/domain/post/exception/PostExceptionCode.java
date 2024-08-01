@@ -26,7 +26,9 @@ public enum PostExceptionCode implements ExceptionCode {
     NOT_FOUND_TUTOR(HttpStatus.NOT_FOUND, "POST-4005", "튜터를 찾을 수 없음"),
 
     /*  409 CONFLICT : Resource 중복  */
-    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-9001", "중복된 태그");
+    CONFLICT_TAG(HttpStatus.CONFLICT, "POST-9001", "중복된 태그"),
+    CONFLICT_BOOKMARK(HttpStatus.CONFLICT, "POST-9002", "중복된 북마크"),
+    ;
 
     private final HttpStatus httpStatus;
     private final String errorCode;
