@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum S3ExceptionCode {
     /*  400 BAD_REQUEST : 잘못된 요청  */
     BAD_REQUEST_IMAGE_EXTENSION_NOT_EXIST(HttpStatus.BAD_REQUEST,"S3-0001","이미지의 확장자가 존재하지 않음"),
-    BAD_REQUEST_IMAGE_EXTENSION_MISMATCH(HttpStatus.BAD_REQUEST, "S3-0002","확장자가 옳바르지 않음"),
+    BAD_REQUEST_IMAGE_EXTENSION_MISMATCH(HttpStatus.BAD_REQUEST, "S3-0002","확장자가 올바르지 않음"),
     BAD_REQUEST_IMAGE_NOT_UPLOAD(HttpStatus.BAD_REQUEST, "S3-0003","업로드한 이미지가 존재하지 않음"),
     /*  401 UNAUTHORIZED : 인증 안됨  */
 

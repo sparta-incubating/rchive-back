@@ -111,8 +111,7 @@ public class PostController {
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostGetRes> responseList =
-                postTagCoreService.getPostListByCategory(user, trackName, period, postType,
-                        pageable);
+                postTagCoreService.getPostListByCategory(user, trackName, period, postType, pageable);
         return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_CATEGORY_POST, responseList));
     }

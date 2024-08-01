@@ -105,7 +105,7 @@ public class UserTrackRoleCoreService {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
         }
 
-        List<Role> roleList = new ArrayList<>();
+        List<Role> roleList;
         if (status == null) {
             roleList = roleService.findRoleListInBackOfficeAuthNoReject(
                     managerTrack, searchPeriod, email, trackRole, sort);
@@ -289,5 +289,18 @@ public class UserTrackRoleCoreService {
         roleService.existByUserAndTrackByPmThrowException(user.getId(), managerTrack.getTrackName());
 
         trackService.trackPermissionTrue(trackId);
+    }
+
+    @Transactional
+    public void trackRejection(User user, TrackNameEnum trackName, Integer period, Long trackId) {
+        if(period != 0) {
+            throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
+        }
+
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        roleService.existByUserAndTrackByPmThrowException(user.getId(), managerTrack.getTrackName());
+
+        trackService.trackRejection(trackId);
     }
 }
