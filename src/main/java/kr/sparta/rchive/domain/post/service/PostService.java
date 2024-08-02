@@ -5,7 +5,6 @@ import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.enums.PostSearchTypeEnum;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
@@ -120,7 +119,7 @@ public class PostService {
         return postRepository.findPostByIdIn(postIdList);
     }
 
-    public List<Post> searchPost(PostTypeEnum postType, PostSearchTypeEnum searchType, String keyword, Long trackId) {
-        return postRepository.findPost(postType, searchType, keyword, trackId);
+    public List<Post> searchPost(PostTypeEnum postType, String keyword, Long tutorId, Long trackId) {
+        return postRepository.findPost(postType, keyword, tutorId, trackId);
     }
 }

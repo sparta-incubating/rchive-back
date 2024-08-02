@@ -79,7 +79,7 @@ public class RoleService {
 
     public AuthEnum getResultRoleFirstLogin(User user) {
 
-        Role role = roleRepository.findFirstByUserIdOrderByCreatedAtAsc(user.getId()).orElseThrow(
+        Role role = roleRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).orElseThrow(
                 () -> new RoleCustomException(RoleExceptionCode.NOT_FOUND_ROLE));
         return role.getAuth();
     }
