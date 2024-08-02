@@ -64,32 +64,20 @@ jobs:
       # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속하고, script를 실행합니다.
       # script의 내용은 도커의 기존 프로세스들을 제거하고, docker repo로부터 방금 위에서 push한 내용을 pull 받아 실행하는 것입니다.
       # 실행 시, docker-compose를 사용합니다.
-      #      - name: Deploy to EC2
-      #        uses: appleboy/ssh-action@master
-      #        id: deploy
-      #        with:
-      #          host: ${{secrets.HOST}}
-      #          username: ${{secrets.USER}}
-      #          key: ${{secrets.SSH_PEM_KEY}}
-      #          envs: GITHUB_SHA
-      #          script: |
-      #            sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
-      #            if [ "$(docker ps -qa)" ]; then
-      #              sudo docker rm -f $(docker ps -qa)
-      #            fi
-      #            sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
-      #            sudo docker run -d --name rchive-api-${VERSION} -p 8080:8080 -e VERSION=${VERSION} -e SPRING_PROFILES_ACTIVE=prod ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
-      #            sudo docker image prune -f
-      #
-      - name: Docker login
-        run: echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
-
-      - name: Check Docker login
-        run: |
-          echo "Checking Docker login..."
-          if echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin | grep -q "Login Succeeded"; then
-            echo "Docker login succeeded!"
-          else
-            echo "Docker login failed!"
-            exit 1
-          fi
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        id: deploy
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{secrets.USER}}
+          key: ${{secrets.SSH_PEM_KEY}}
+          envs: GITHUB_SHA
+          script: |
+            sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
+            sudo docker info
+            if [ "$(docker ps -qa)" ]; then
+              sudo docker rm -f $(docker ps -qa)
+            fi
+            sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+            sudo docker run -d --name rchive-api-${VERSION} -p 8080:8080 -e VERSION=${VERSION} -e SPRING_PROFILES_ACTIVE=prod ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+            sudo docker image prune -f
