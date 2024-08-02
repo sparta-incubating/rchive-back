@@ -73,8 +73,10 @@ jobs:
           key: ${{secrets.SSH_PEM_KEY}}
           envs: GITHUB_SHA
           script: |
-            sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
-            sudo docker rm -f $(docker ps -qa)
+            sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin --config /home/***/.docker
+            if [ "$(docker ps -qa)" ]; then
+              sudo docker rm -f $(docker ps -qa)
+            fi
             sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
             sudo docker-compose up -d
             sudo docker image prune -f
