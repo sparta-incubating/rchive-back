@@ -74,10 +74,9 @@ jobs:
           envs: GITHUB_SHA
           script: |
             sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
-            sudo docker info
             if [ "$(docker ps -qa)" ]; then
               sudo docker rm -f $(docker ps -qa)
             fi
-            sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+            docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
             sudo docker run -d --name rchive-api-${VERSION} -p 8080:8080 -e VERSION=${VERSION} -e SPRING_PROFILES_ACTIVE=prod ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
             sudo docker image prune -f
