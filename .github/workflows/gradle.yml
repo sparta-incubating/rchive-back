@@ -23,6 +23,7 @@ env:
 permissions:
   contents: read
 
+# test
 # 워크플로우에서 할 작업 정의한다.
 jobs:
   # 작업 환경 = 우분투 최신 버전
