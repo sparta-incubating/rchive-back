@@ -32,7 +32,7 @@ public class TutorService {
     }
 
     public List<TutorRes> findTutorListByTutorNameAndTrackId(String tutorName, Long trackId) {
-        return tutorRepository.findTutorListByTutorNameAndTrackId(tutorName, trackId).stream()
+        return tutorRepository.findTutorList(tutorName, trackId).stream()
                 .map(tutor -> TutorRes.builder()
                         .tutorId(tutor.getId())
                         .tutorName(tutor.getTutorName())
