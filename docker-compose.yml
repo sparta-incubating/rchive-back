@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: .
+      context: docker
       dockerfile: Dockerfile
       args:
         JAR_FILE: rchive-back-${VERSION}.jar
