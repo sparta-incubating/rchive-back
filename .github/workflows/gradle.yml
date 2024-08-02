@@ -78,7 +78,7 @@ jobs:
               docker rm -f $(docker ps -qa)
             fi
             docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
-            sudo docker-compose up -d
+            docker-compose up -d
             docker image prune -f
 
 #docker run -d --name rchive-api-${VERSION} -p 8080:8080 -e VERSION=${VERSION} -e SPRING_PROFILES_ACTIVE=prod ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
