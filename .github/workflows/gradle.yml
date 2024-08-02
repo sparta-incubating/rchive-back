@@ -73,7 +73,7 @@ jobs:
           key: ${{secrets.SSH_PEM_KEY}}
           envs: GITHUB_SHA
           script: |
-            sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin --config /home/***/.docker
+            sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
             if [ "$(docker ps -qa)" ]; then
               sudo docker rm -f $(docker ps -qa)
             fi
