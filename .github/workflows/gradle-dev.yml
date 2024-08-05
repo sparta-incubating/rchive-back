@@ -1,5 +1,5 @@
 # 워크 플로우 이름
-name: Java CI with Gradle for Test
+name: Java CI with Gradle for Dev
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
@@ -55,10 +55,10 @@ jobs:
         run: echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
 
       - name: Docker build
-        run: docker build -f Dockerfile --tag ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest .
+        run: docker build -f Dockerfile --tag ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev .
 
       - name: Docker push to docker repo
-        run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+        run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev
 
       # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속하고, script를 실행합니다.
       # script의 내용은 도커의 기존 프로세스들을 제거하고, docker repo로부터 방금 위에서 push한 내용을 pull 받아 실행하는 것입니다.
@@ -81,7 +81,7 @@ jobs:
             fi
             
             # Pull the latest image
-            docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+            docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev
             
             # Docker run
             docker run -d \
@@ -98,9 +98,7 @@ jobs:
               -e REGION=${{secrets.REGION}} \
               -e S3_ACCESS_KEY=${{secrets.S3_ACCESS_KEY}} \
               -e S3_SECRET_ACCESS_KEY=${{secrets.S3_SECRET_ACCESS_KEY}} \
-              ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+              ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev
             
             # Remove unused images to free up space
             docker image prune -f
-
-#test 2yml file
