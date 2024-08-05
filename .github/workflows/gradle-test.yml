@@ -1,5 +1,5 @@
 # 워크 플로우 이름
-name: Java CI with Gradle
+name: Java CI with Gradle for Test
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
