@@ -1,6 +1,5 @@
 package kr.sparta.rchive.domain.core.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
@@ -90,7 +89,7 @@ public class UserTrackRoleCoreService {
             }
         }
 
-        redisService.setSelectRole(user, track.getId());
+        redisService.setLastSelectRole(user, track.getId());
     }
 
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
@@ -139,11 +138,11 @@ public class UserTrackRoleCoreService {
 
     public RoleGetLastSelectRoleRes getLastSelectRoleUserPage(User user) {
 
-        Long trackId = redisService.getSelectRole(user);
+        Long trackId = redisService.getLastSelectRole(user);
         if (trackId == null) {
             List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
             if (roleList.size() == 1) {
-                redisService.setSelectRole(user, roleList.get(0).getTrack().getId());
+                redisService.setLastSelectRole(user, roleList.get(0).getTrack().getId());
                 trackId = roleList.get(0).getTrack().getId();
             } else {
                 throw new RoleCustomException(RoleExceptionCode.NOT_FOUND_LAST_SELECT_ROLE);
@@ -152,6 +151,11 @@ public class UserTrackRoleCoreService {
 
         Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
         Track track = role.getTrack();
+
+        if (role.getAuth() != AuthEnum.APPROVE) {
+            redisService.deleteLastSelectRole(user);
+            throw new RoleCustomException(RoleExceptionCode.NOT_FOUND_LAST_SELECT_ROLE);
+        }
 
         return RoleGetLastSelectRoleRes.builder()
                 .trackId(track.getId())
@@ -280,26 +284,28 @@ public class UserTrackRoleCoreService {
 
     @Transactional
     public void trackPermission(User user, TrackNameEnum trackName, Integer period, Long trackId) {
-        if(period != 0) {
+        if (period != 0) {
             throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
         }
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
 
-        roleService.existByUserAndTrackByPmThrowException(user.getId(), managerTrack.getTrackName());
+        roleService.existByUserAndTrackByPmThrowException(user.getId(),
+                managerTrack.getTrackName());
 
         trackService.trackPermissionTrue(trackId);
     }
 
     @Transactional
     public void trackRejection(User user, TrackNameEnum trackName, Integer period, Long trackId) {
-        if(period != 0) {
+        if (period != 0) {
             throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
         }
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
 
-        roleService.existByUserAndTrackByPmThrowException(user.getId(), managerTrack.getTrackName());
+        roleService.existByUserAndTrackByPmThrowException(user.getId(),
+                managerTrack.getTrackName());
 
         trackService.trackRejection(trackId);
     }
