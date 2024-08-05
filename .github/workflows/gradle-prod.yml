@@ -85,7 +85,7 @@ jobs:
             
             # Docker run
             docker run -d \
-              --name rchive-api-${VERSION} \
+              --name rchive-api-${VERSION}:prod \
               -p 8080:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL=${{secrets.DB_URL}} \
