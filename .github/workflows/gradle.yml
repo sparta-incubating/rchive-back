@@ -84,7 +84,7 @@ jobs:
             # Pull the latest image
             docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
             
-            #docker run -d --name rchive-api-${VERSION} -p 8080:8080 -e VERSION=${VERSION} -e SPRING_PROFILES_ACTIVE=prod ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+            # Docker run
             docker run -d \
               --name rchive-api-${VERSION} \
               -p 8080:8080 \
@@ -103,5 +103,3 @@ jobs:
             
             # Remove unused images to free up space
             docker image prune -f
-
-#sudo docker-compose up -d
