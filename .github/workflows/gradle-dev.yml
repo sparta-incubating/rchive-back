@@ -1,5 +1,5 @@
 # 워크 플로우 이름
-name: Java with Gradle for Dev
+name: Java CI and CD with Gradle for Dev
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:

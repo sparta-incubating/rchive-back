@@ -1,9 +1,9 @@
 # 워크 플로우 이름
-name: Java with Gradle for Prod
+name: Java CI and CD with Gradle for Prod
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 env:
