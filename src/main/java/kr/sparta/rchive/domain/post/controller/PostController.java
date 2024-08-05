@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.post.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
+import kr.sparta.rchive.domain.comment.dto.response.CommentRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
@@ -158,6 +159,18 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_DELETE_COMMENT.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_COMMENT, null));
+    }
+
+    @GetMapping("/{postId}/comments")
+    @Operation(operationId = "POST-009", summary = "게시물 부모 댓글 리스트 조회")
+    public ResponseEntity<CommonResponseDto> getParentCommentList(
+            @LoginUser User user,
+            @PathVariable Long postId
+    ) {
+        List<CommentRes> responseList = commentService.getParentCommentList(postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_GET_PARENT_COMMENT.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_GET_PARENT_COMMENT, responseList));
     }
 
     @PostMapping("/tags")
