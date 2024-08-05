@@ -8,11 +8,15 @@ import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
+import kr.sparta.rchive.domain.user.exception.RoleCustomException;
+import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,5 +51,20 @@ public class CommentService {
         return commentRepository.findById(commentId).orElseThrow(
                 () -> new PostCustomException(PostExceptionCode.NOT_FOUND_COMMENT)
         );
+    }
+
+    @Transactional
+    public void deleteComment(User user, Long commentId) {
+        Comment findComment = findCommentByCommentId(commentId);
+
+        if(user.getUserRole() == UserRoleEnum.USER) {
+            if(!Objects.equals(findComment.getUser().getId(), user.getId())) {
+                throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
+            }
+        }
+
+        findComment.delete();
+
+        commentRepository.save(findComment);
     }
 }
