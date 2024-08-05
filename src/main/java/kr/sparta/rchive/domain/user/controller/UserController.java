@@ -7,10 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
-import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
+import kr.sparta.rchive.domain.user.exception.statement.ReissueException;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
+import kr.sparta.rchive.domain.user.exception.statement.SignupException;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,10 @@ public class UserController {
 
     @PostMapping("/signup")
     @Operation(operationId = "USER-001", summary = "회원가입")
-    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserSignupReq req) {
+    @ApiExceptionCodeExample(SignupException.class)
+    public ResponseEntity<CommonResponseDto> signup(
+            @Valid @RequestBody UserSignupReq req
+    ) {
         userService.signup(req);
         return ResponseEntity.status(UserResponseCode.OK_SIGNUP.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_SIGNUP, null));
@@ -48,6 +52,7 @@ public class UserController {
 
     @PostMapping("/reissue")
     @Operation(operationId = "USER-005", summary = "토큰 재발급")
+    @ApiExceptionCodeExample(ReissueException.class)
     public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req,
             HttpServletResponse res)
             throws UnsupportedEncodingException, ParseException {
