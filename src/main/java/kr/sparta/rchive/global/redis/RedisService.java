@@ -58,7 +58,7 @@ public class RedisService {
         return String.format("select-role-user-%d", user.getId());
     }
 
-    public Long getSelectRole(User user) {
+    public Long getLastSelectRole(User user) {
         String key = keySelectRole(user);
         String stringValue = redisUtil.get(key);
         if (stringValue == null) {
@@ -68,9 +68,14 @@ public class RedisService {
         return Long.parseLong(redisUtil.get(key));
     }
 
-    public void setSelectRole(User user, Long trackId) {
+    public void setLastSelectRole(User user, Long trackId) {
         String key = keySelectRole(user);
         redisUtil.set(key, trackId.toString(), SELECT_ROLE_TIME);
+    }
+
+    public void deleteLastSelectRole(User user) {
+        String key = keySelectRole(user);
+        redisUtil.delete(key);
     }
 
 }
