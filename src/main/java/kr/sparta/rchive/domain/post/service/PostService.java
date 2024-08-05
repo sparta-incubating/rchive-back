@@ -51,7 +51,7 @@ public class PostService {
     @Transactional
     public void deletePost(Post post) {
 
-        post.delete(true);
+        post.delete();
 
         postRepository.save(post);
     }
