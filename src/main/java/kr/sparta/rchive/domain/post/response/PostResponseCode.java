@@ -16,6 +16,7 @@ public enum PostResponseCode implements ResponseCode {
     OK_SEARCH_POST(HttpStatus.OK, "POST-004", "교육자료 검색 성공"),
     OK_GET_CATEGORY_POST(HttpStatus.OK, "POST-005", "교육자료 카테고리 별 조회 성공"),
     OK_GET_SINGLE_POST(HttpStatus.OK, "POST-006", "교육자료 단건 조회 성공"),
+    OK_CREATE_COMMENT(HttpStatus.OK, "POST-007", "댓글 작성 성공"),
     OK_CREATE_TAG(HttpStatus.OK, "POST-010", "태그 생성 성공"),
     OK_SEARCH_TAG(HttpStatus.OK, "POST-011", "태그 검색 성공"),
     OK_SEARCH_POST_BY_TAG(HttpStatus.OK, "POST-012", "태그를 이용한 교육자료 검색 성공"),
