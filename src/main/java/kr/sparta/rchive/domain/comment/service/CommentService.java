@@ -26,16 +26,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    public List<CommentRes> findCommentResListByPostId(Long postId) {
-        return commentRepository.findByPostId(postId).stream()
-                .map(comment -> CommentRes.builder()
-                        .id(comment.getId())
-                        .content(comment.getContent())
-                        .createdAt(comment.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
     public void createComment(User user, Post post, Comment comment, CommentCreateReq request) {
         Comment createComment = Comment.builder()
                 .content(request.content())
@@ -57,8 +47,8 @@ public class CommentService {
     public void deleteComment(User user, Long commentId) {
         Comment findComment = findCommentByCommentId(commentId);
 
-        if(user.getUserRole() == UserRoleEnum.USER) {
-            if(!Objects.equals(findComment.getUser().getId(), user.getId())) {
+        if (user.getUserRole() == UserRoleEnum.USER) {
+            if (!Objects.equals(findComment.getUser().getId(), user.getId())) {
                 throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
             }
         }
@@ -66,5 +56,16 @@ public class CommentService {
         findComment.delete();
 
         commentRepository.save(findComment);
+    }
+
+    public List<CommentRes> getParentCommentList(Long postId) {
+
+        return commentRepository.findParentCommentListNotDeletedByPostId(postId).stream().map(
+                comment -> CommentRes.builder()
+                        .id(comment.getId())
+                        .content(comment.getContent())
+                        .createdAt(comment.getCreatedAt())
+                        .build()
+        ).toList();
     }
 }
