@@ -1,5 +1,5 @@
 # 워크 플로우 이름
-name: Java CI with Gradle for Prod
+name: Java with Gradle for Prod
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  DB_URL: ${{secrets.DB_URL}}
+  DB_URL: ${{secrets.DB_URL_PROD}}
   DB_USER: ${{secrets.DB_USER}}
   DB_PASSWORD: ${{secrets.DB_PASSWORD}}
   REDIS_HOST: ${{secrets.REDIS_HOST}}
@@ -67,7 +67,7 @@ jobs:
         uses: appleboy/ssh-action@master
         id: deploy
         with:
-          host: ${{secrets.HOST}}
+          host: ${{secrets.HOST_DEV}}
           username: ${{secrets.USER}}
           key: ${{secrets.SSH_PEM_KEY}}
           envs: GITHUB_SHA
@@ -85,10 +85,10 @@ jobs:
             
             # Docker run
             docker run -d \
-              --name rchive-api-${VERSION}:prod \
+              --name rchive-api-${VERSION} \
               -p 8080:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
-              -e DB_URL=${{secrets.DB_URL}} \
+              -e DB_URL=${{secrets.DB_URL_PROD}} \
               -e DB_USER=${{secrets.DB_USER}} \
               -e DB_PASSWORD=${{secrets.DB_PASSWORD}} \
               -e REDIS_HOST=${{secrets.REDIS_HOST}} \
