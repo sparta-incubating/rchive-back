@@ -2,6 +2,8 @@ package kr.sparta.rchive.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
+import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -34,6 +36,7 @@ public class PostController {
 
     private final PostTagCoreService postTagCoreService;
     private final PostBookmarkCoreService postBookmarkCoreService;
+    private final PostCommentCoreService postCommentCoreService;
     private final TagService tagService;
 
     @PostMapping
@@ -127,6 +130,20 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_GET_SINGLE_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_SINGLE_POST, response));
+    }
+
+    @PostMapping("/{postId}/comments")
+    @Operation(operationId = "POST-007", summary = "게시물 댓글 작성")
+    public ResponseEntity<CommonResponseDto> createComment(
+            @LoginUser User user,
+            @PathVariable Long postId,
+            @RequestParam(value = "parentComment", required = false) Long parentCommentId,
+            @RequestBody CommentCreateReq request
+    ) {
+        postCommentCoreService.createComment(user, postId, parentCommentId, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_CREATE_COMMENT.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_COMMENT, null));
     }
 
     @PostMapping("/tags")
