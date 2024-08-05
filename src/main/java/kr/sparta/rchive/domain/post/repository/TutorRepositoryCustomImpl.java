@@ -19,7 +19,7 @@ public class TutorRepositoryCustomImpl implements TutorRepositoryCustom{
             .select(tutor)
             .from(tutor)
             .where(
-                tutorName != null ? tutor.tutorName.like(tutorName) : null,
+                tutorName != null ? tutor.tutorName.contains(tutorName) : null,
                 tutor.track.id.eq(trackId)
             )
             .fetch();
