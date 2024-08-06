@@ -1,7 +1,8 @@
 package kr.sparta.rchive.domain.comment.service;
 
+import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
-import kr.sparta.rchive.domain.comment.dto.response.CommentRes;
+import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
 import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.comment.repository.CommentRepository;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,14 +58,24 @@ public class CommentService {
         commentRepository.save(findComment);
     }
 
-    public List<CommentRes> getParentCommentList(Long postId) {
+    public List<CommentGetRes> getParentCommentList(Long postId) {
+        return commentRepository.findParentCommentListByPostId(postId).stream()
+            .map(commentRes -> {
+                if(commentRes.comment().getIsDeleted()) {
+                    return CommentGetRes.builder()
+                        .id(null)
+                        .content("삭제된 댓글입니다.")
+                        .hasChild(commentRes.hasChild())
+                        .build();
+                }
 
-        return commentRepository.findParentCommentListNotDeletedByPostId(postId).stream().map(
-                comment -> CommentRes.builder()
-                        .id(comment.getId())
-                        .content(comment.getContent())
-                        .createdAt(comment.getCreatedAt())
-                        .build()
-        ).toList();
+                return CommentGetRes.builder()
+                    .id(commentRes.comment().getId())
+                    .content(commentRes.comment().getContent())
+                    .createdAt(commentRes.comment().getCreatedAt())
+                    .hasChild(commentRes.hasChild())
+                    .build();
+            }
+        ).collect(Collectors.toList());
     }
 }
