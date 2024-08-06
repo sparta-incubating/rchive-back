@@ -1,14 +1,11 @@
 package kr.sparta.rchive.domain.comment.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.global.entity.BaseTimeEntity;
@@ -18,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Table(name="tb_comment")
@@ -25,13 +23,11 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column
-    private Long parentsCommentId;
 
     @Column(nullable = false)
     private String content;
@@ -50,4 +46,17 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parentComment;
+
+    @OneToMany(mappedBy = "parentComment")
+    @Builder.Default
+    private List<Comment> childrenCommentList = new ArrayList<>();
+
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }
