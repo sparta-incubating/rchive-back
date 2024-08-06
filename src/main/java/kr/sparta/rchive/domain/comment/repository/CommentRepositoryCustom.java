@@ -1,9 +1,10 @@
 package kr.sparta.rchive.domain.comment.repository;
 
-import kr.sparta.rchive.domain.comment.entity.Comment;
+import kr.sparta.rchive.domain.comment.dto.CommentRes;
+import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
 
 import java.util.List;
 
 public interface CommentRepositoryCustom {
-    List<Comment> findParentCommentListNotDeletedByPostId(Long postId);
+    List<CommentRes> findParentCommentListByPostId(Long postId);
 }
