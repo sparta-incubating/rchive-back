@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod, TrackNameEnum trackName, Long tutorId);
+    List<Post> findPostListInBackOfficePostTypeAllByPm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened, Integer searchPeriod, TrackNameEnum trackName, Long tutorId);
 
-    List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId, Long tutorId);
+    List<Post> findPostListInBackOfficePostTypeAllByApm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId, Long tutorId);
 
-    List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName, Long tutorId);
+    List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, String title, LocalDate startDate, LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName, Long tutorId);
 
-    List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, LocalDate startDate, LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId);
+    List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, String title, LocalDate startDate, LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId);
 
     List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId);
 

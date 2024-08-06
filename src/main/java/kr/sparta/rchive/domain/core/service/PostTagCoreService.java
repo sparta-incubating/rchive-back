@@ -58,7 +58,7 @@ public class PostTagCoreService {
 
 
     public Page<PostSearchBackOfficeRes> getPostListInBackOffice(
-            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, LocalDate startDate,
+            User user, TrackNameEnum trackName, Integer period, String title, PostTypeEnum postType, LocalDate startDate,
             LocalDate endDate, Integer searchPeriod, Boolean isOpened, Long tutorId, Pageable pageable
     ) {
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
@@ -71,10 +71,10 @@ public class PostTagCoreService {
         List<Post> postList;
 
         if (postType == null) {
-            postList = postService.findPostListInBackOfficePostTypeAll(managerTrack, startDate, endDate,
+            postList = postService.findPostListInBackOfficePostTypeAll(managerTrack, title, startDate, endDate,
                     searchPeriod, tutorId, isOpened);
         } else {
-            postList = postService.findPostListInBackOffice(managerTrack, postType, startDate, endDate,
+            postList = postService.findPostListInBackOffice(managerTrack, postType, title, startDate, endDate,
                     searchPeriod, tutorId, isOpened);
         }
 
