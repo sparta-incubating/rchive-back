@@ -75,25 +75,25 @@ public class PostService {
         postRepository.saveAll(postList);
     }
 
-    public List<Post> findPostListInBackOfficePostTypeAll(Track track, LocalDate startDate,
+    public List<Post> findPostListInBackOfficePostTypeAll(Track track, String title, LocalDate startDate,
                                                           LocalDate endDate, Integer searchPeriod, Long tutorId,
                                                           Boolean isOpened) {
         if (track.getPeriod() == 0) {
-            return postRepository.findPostListInBackOfficePostTypeAllByPm(startDate, endDate,
+            return postRepository.findPostListInBackOfficePostTypeAllByPm(title, startDate, endDate,
                     isOpened, searchPeriod, track.getTrackName(), tutorId);
         }
-        return postRepository.findPostListInBackOfficePostTypeAllByApm(startDate, endDate, isOpened,
+        return postRepository.findPostListInBackOfficePostTypeAllByApm(title, startDate, endDate, isOpened,
                 track.getId(), tutorId);
     }
 
     public List<Post> findPostListInBackOffice(Track track, PostTypeEnum postType,
-                                               LocalDate startDate, LocalDate endDate, Integer searchPeriod,
+        String title, LocalDate startDate, LocalDate endDate, Integer searchPeriod,
                                                Long tutorId, Boolean isOpened) {
         if (track.getPeriod() == 0) {
-            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, startDate,
+            return postRepository.findPostListInBackOfficePostTypeNotNullByPM(postType, title, startDate,
                     endDate, searchPeriod, isOpened, track.getTrackName(), tutorId);
         }
-        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, startDate,
+        return postRepository.findPostListInBackOfficePostTypeNotNullApm(postType, title, startDate,
                 endDate, track.getId(), isOpened, tutorId);
     }
 

@@ -16,7 +16,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByPm(LocalDate startDate, LocalDate endDate, Boolean isOpened,
+    public List<Post> findPostListInBackOfficePostTypeAllByPm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened,
                                                               Integer searchPeriod, TrackNameEnum trackName, Long tutorId) {
 
         QPost post = QPost.post;
@@ -29,6 +29,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
+                        title != null? post.title.contains(title) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
@@ -40,7 +41,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByApm(LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId, Long tutorId) {
+    public List<Post> findPostListInBackOfficePostTypeAllByApm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -52,6 +53,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
+                        title != null? post.title.contains(title) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
@@ -62,7 +64,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, LocalDate startDate,
+    public List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, String title, LocalDate startDate,
                                                                   LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName, Long tutorId) {
 
         QPost post = QPost.post;
@@ -75,6 +77,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
+                        title != null? post.title.contains(title) : null,
                         postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
@@ -87,7 +90,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, LocalDate startDate,
+    public List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, String title, LocalDate startDate,
                                                                  LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId) {
 
         QPost post = QPost.post;
@@ -100,6 +103,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
+                        title != null? post.title.contains(title) : null,
                         postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
