@@ -61,17 +61,21 @@ public class CommentService {
     public List<CommentGetRes> getParentCommentList(Long postId) {
         return commentRepository.findParentCommentListByPostId(postId).stream()
             .map(commentRes -> {
-                if(commentRes.comment().getIsDeleted()) {
-                    return CommentGetRes.builder()
-                        .id(null)
-                        .content("삭제된 댓글입니다.")
-                        .hasChild(commentRes.hasChild())
-                        .build();
+                if (commentRes.comment().getIsDeleted()) {
+                    if (commentRes.hasChild()) {
+                        return CommentGetRes.builder()
+                            .content("삭제된 댓글입니다.")
+                            .hasChild(true)
+                            .build();
+                    }
+
+                    return null;
                 }
 
                 return CommentGetRes.builder()
                     .id(commentRes.comment().getId())
                     .content(commentRes.comment().getContent())
+                    .username(commentRes.user().getUsername())
                     .createdAt(commentRes.comment().getCreatedAt())
                     .hasChild(commentRes.hasChild())
                     .build();

@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.comment.dto.CommentRes;
 import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
 import kr.sparta.rchive.domain.comment.entity.QComment;
 import kr.sparta.rchive.domain.post.entity.QPost;
+import kr.sparta.rchive.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
 
         QComment comment = QComment.comment;
         QPost post = QPost.post;
+        QUser user = QUser.user;
         QComment childComment = new QComment("childComment");
 
         BooleanExpression hasChild = queryFactory
@@ -34,10 +36,12 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
             .select(Projections.constructor(
                 CommentRes.class,
                 comment,
+                user,
                 hasChild.as("hasChild")
             ))
             .from(comment)
             .join(comment.post, post)
+            .join(comment.user, user)
             .where(
                 post.id.eq(postId),
                 comment.parentComment.isNull()

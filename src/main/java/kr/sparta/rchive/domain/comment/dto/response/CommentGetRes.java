@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record CommentGetRes(
         Long id,
         String content,
+        String username,
         Boolean hasChild,
         LocalDateTime createdAt
 ) {
