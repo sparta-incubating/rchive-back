@@ -5,7 +5,7 @@ import kr.sparta.rchive.domain.user.entity.User;
 import lombok.Builder;
 
 @Builder
-public record CommentRes(
+public record CommentUserInfo(
     Comment comment,
     User user,
     Boolean hasChild

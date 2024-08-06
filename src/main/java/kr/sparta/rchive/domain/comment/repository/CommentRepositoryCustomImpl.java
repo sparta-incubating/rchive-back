@@ -3,14 +3,12 @@ package kr.sparta.rchive.domain.comment.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.sparta.rchive.domain.comment.dto.CommentRes;
-import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
+import java.util.List;
+import kr.sparta.rchive.domain.comment.dto.CommentUserInfo;
 import kr.sparta.rchive.domain.comment.entity.QComment;
 import kr.sparta.rchive.domain.post.entity.QPost;
 import kr.sparta.rchive.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
@@ -18,7 +16,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<CommentRes> findParentCommentListByPostId(Long postId) {
+    public List<CommentUserInfo> findParentCommentListByPostId(Long postId) {
 
         QComment comment = QComment.comment;
         QPost post = QPost.post;
@@ -34,7 +32,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
 
         return queryFactory
             .select(Projections.constructor(
-                CommentRes.class,
+                CommentUserInfo.class,
                 comment,
                 user,
                 hasChild.as("hasChild")

@@ -1,10 +1,8 @@
 package kr.sparta.rchive.domain.comment.repository;
 
-import kr.sparta.rchive.domain.comment.dto.CommentRes;
-import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
-
 import java.util.List;
+import kr.sparta.rchive.domain.comment.dto.CommentUserInfo;
 
 public interface CommentRepositoryCustom {
-    List<CommentRes> findParentCommentListByPostId(Long postId);
+    List<CommentUserInfo> findParentCommentListByPostId(Long postId);
 }

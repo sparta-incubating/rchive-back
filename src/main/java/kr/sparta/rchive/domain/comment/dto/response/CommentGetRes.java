@@ -9,6 +9,8 @@ public record CommentGetRes(
         Long id,
         String content,
         String username,
+        String email,
+        String nickname,
         Boolean hasChild,
         LocalDateTime createdAt
 ) {
