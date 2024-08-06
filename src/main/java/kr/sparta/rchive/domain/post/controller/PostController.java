@@ -3,7 +3,7 @@ package kr.sparta.rchive.domain.post.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
-import kr.sparta.rchive.domain.comment.dto.response.CommentRes;
+import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
@@ -167,7 +167,7 @@ public class PostController {
             @LoginUser User user,
             @PathVariable Long postId
     ) {
-        List<CommentRes> responseList = commentService.getParentCommentList(postId);
+        List<CommentGetRes> responseList = commentService.getParentCommentList(postId);
 
         return ResponseEntity.status(PostResponseCode.OK_GET_PARENT_COMMENT.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_PARENT_COMMENT, responseList));
