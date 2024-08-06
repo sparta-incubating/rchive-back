@@ -3,6 +3,8 @@ package kr.sparta.rchive.domain.post.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
+import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
+import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
@@ -38,6 +40,7 @@ public class PostController {
     private final PostBookmarkCoreService postBookmarkCoreService;
     private final PostCommentCoreService postCommentCoreService;
     private final TagService tagService;
+    private final CommentService commentService;
 
     @PostMapping
     @Operation(operationId = "POST-001", summary = "게시물 생성")
@@ -144,6 +147,30 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_COMMENT.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_COMMENT, null));
+    }
+
+    @DeleteMapping("/comment/{commentId}")
+    @Operation(operationId = "POST-008", summary = "게시물 댓글 삭제")
+    public ResponseEntity<CommonResponseDto> deleteComment(
+            @LoginUser User user,
+            @PathVariable Long commentId
+    ) {
+        commentService.deleteComment(user, commentId);
+
+        return ResponseEntity.status(PostResponseCode.OK_DELETE_COMMENT.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_COMMENT, null));
+    }
+
+    @GetMapping("/{postId}/comments")
+    @Operation(operationId = "POST-009", summary = "게시물 부모 댓글 리스트 조회")
+    public ResponseEntity<CommonResponseDto> getParentCommentList(
+            @LoginUser User user,
+            @PathVariable Long postId
+    ) {
+        List<CommentGetRes> responseList = commentService.getParentCommentList(postId);
+
+        return ResponseEntity.status(PostResponseCode.OK_GET_PARENT_COMMENT.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_GET_PARENT_COMMENT, responseList));
     }
 
     @PostMapping("/tags")

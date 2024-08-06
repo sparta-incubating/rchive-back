@@ -54,4 +54,9 @@ public class Comment extends BaseTimeEntity {
     @OneToMany(mappedBy = "parentComment")
     @Builder.Default
     private List<Comment> childrenCommentList = new ArrayList<>();
+
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

@@ -16,6 +16,5 @@ public record PostGetSinglePostRes(
         String content,
         List<TagInfo> tagList,
         Boolean isBookmarked
-//    List<CommentRes> commentResList  TODO: 추후에 댓글 구현하며 추가할 예정
 ) {
 }

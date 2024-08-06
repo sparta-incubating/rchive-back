@@ -27,6 +27,10 @@ public class PostCommentCoreService {
 
         if(parentCommentId != null) {
             findComment = commentService.findCommentByCommentId(parentCommentId);
+
+            if(findComment.getIsDeleted()) {
+                findComment = null;
+            }
         }
 
         commentService.createComment(user, findPost, findComment, request);

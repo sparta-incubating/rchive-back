@@ -212,8 +212,6 @@ public class PostTagCoreService {
                         .tagName(postTag.getTag().getTagName())
                         .build()).toList();
 
-//        List<CommentRes> commentResList = commentService.findCommentResListByPostId(postId); TODO: 추후에 댓글 추가하며 구현할 예정
-
         return PostGetSinglePostRes.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
@@ -222,7 +220,6 @@ public class PostTagCoreService {
                 .content(post.getContent())
                 .tagList(tagList)
                 .isBookmarked(isBookmarked)
-//                .commentResList(commentResList) // TODO: 추후에 댓글 추가하며 구현할 예정
                 .build();
     }
 
