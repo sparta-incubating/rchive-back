@@ -68,7 +68,7 @@ jobs:
         uses: appleboy/ssh-action@master
         id: deploy
         with:
-          host: ${{secrets.HOST_PROD}}
+          host: ${{secrets.HOST_DEV}}
           username: ${{secrets.USER}}
           key: ${{secrets.SSH_PEM_KEY}}
           envs: GITHUB_SHA
