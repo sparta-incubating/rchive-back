@@ -12,8 +12,12 @@ import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.exception.statement.profile.UpdatePasswordException;
+import kr.sparta.rchive.domain.user.exception.statement.profile.UpdateProfileException;
+import kr.sparta.rchive.domain.user.exception.statement.role.GetLastSelectRoleUserPageException;
 import kr.sparta.rchive.domain.user.response.ProfileResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
+import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +61,7 @@ public class ProfileController {
 
     @PatchMapping
     @Operation(operationId = "PROFILE-006", summary = "프로필 변경")
+    @ApiExceptionCodeExample(UpdateProfileException.class)
     public ResponseEntity<CommonResponseDto> updateProfile(
             @LoginUser User user,
             @RequestBody ProfileUpdateReq req) {
@@ -68,6 +73,7 @@ public class ProfileController {
 
     @PatchMapping("/password")
     @Operation(operationId = "PROFILE-007", summary = "비밀번호 변경")
+    @ApiExceptionCodeExample(UpdatePasswordException.class)
     public ResponseEntity<CommonResponseDto> updatePassword(
             @LoginUser User user,
             @RequestBody ProfileUpdatePasswordReq req) {
