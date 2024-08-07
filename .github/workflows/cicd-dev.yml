@@ -81,8 +81,8 @@ jobs:
             # Stop and remove existing containers
             if [ "$(docker ps -q --filter "name=rchive-api-")" ]; then
               docker stop $(docker ps -q --filter "name=rchive-api-")
-              docker rm $(docker ps -a -q -f status=exited)
             fi
+            docker rm $(docker ps -a -q -f status=exited)
             
             # Pull the latest image
             docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev
