@@ -78,11 +78,10 @@ jobs:
             # Docker login
             sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
             
-            # Stop and remove existing containers            
-            container_ids=$(docker ps -q --filter "name=rchive-api-")
-            if [ -n "$container_ids" ]; then
-              docker stop $container_ids
-              docker rm $container_ids
+            # Stop and remove existing containers
+            if [ "$(docker ps -q --filter "name=rchive-api-")" ]; then
+              docker stop $(docker ps -q --filter "name=rchive-api-")
+              docker rm $(docker ps -a -q -f status=exited)
             fi
             
             # Pull the latest image
