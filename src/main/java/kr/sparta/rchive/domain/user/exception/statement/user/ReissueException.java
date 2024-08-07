@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.user.exception.statement;
+package kr.sparta.rchive.domain.user.exception.statement.user;
 
 import kr.sparta.rchive.global.execption.ExceptionCode;
 import kr.sparta.rchive.global.execption.ExceptionReason;
