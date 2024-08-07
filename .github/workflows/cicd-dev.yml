@@ -78,6 +78,11 @@ jobs:
             # Docker login
             sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
             
+            # Check if network exists, create if it does not
+            if [ -z "$(docker network ls | grep rchive-network)" ]; then
+              docker network create rchive-network
+            fi
+            
             # Stop and remove existing containers
             if [ "$(docker ps -q --filter "name=rchive-api-")" ]; then
               docker stop $(docker ps -q --filter "name=rchive-api-")
