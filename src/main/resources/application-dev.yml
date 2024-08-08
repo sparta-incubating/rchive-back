@@ -18,6 +18,8 @@ spring:
         format_sql: 'true'
         show_sql: 'true'
         highlight_sql: 'true'
+        jdbc:
+          time_zone: Asia/Seoul
     hibernate:
       ddl-auto: update
 
@@ -26,7 +28,7 @@ spring:
       port: ${REDIS_PORT}
       host: ${REDIS_HOST}
   #      password: ${REDIS_PASSWORD}
-  # swagger
+
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -40,6 +42,10 @@ springdoc:
     tags-sorter: alpha
 #    operations-sorter: method
 #    doc-expansion: none
+
+swagger:
+  server:
+    url: https://dev.rchive.kr
 
 jwt:
   secret:

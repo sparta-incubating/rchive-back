@@ -22,6 +22,7 @@ import kr.sparta.rchive.global.execption.ExceptionCode;
 import kr.sparta.rchive.global.execption.ExceptionReason;
 import kr.sparta.rchive.global.execption.ExceptionResponse;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
@@ -36,6 +37,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 public class SwaggerConfig {
+
+    @Value("${swagger.server.url}")
+    private String serverUrl;
 
     private Docket testDocket(String groupName, Predicate<String> selector) {
         return new Docket(DocumentationType.OAS_30)
@@ -82,7 +86,12 @@ public class SwaggerConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                .servers(List.of(
+                        new io.swagger.v3.oas.models.servers.Server()
+                                .url(serverUrl)
+//                                .description("API Server")
+                ));
 
     }
 
