@@ -90,7 +90,6 @@ public class SwaggerConfig {
                 .servers(List.of(
                         new io.swagger.v3.oas.models.servers.Server()
                                 .url(serverUrl)
-//                                .description("API Server")
                 ));
 
     }

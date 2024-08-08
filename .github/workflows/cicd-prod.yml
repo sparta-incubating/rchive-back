@@ -3,8 +3,6 @@ name: Java CI/CD with Gradle for Prod
 
 # 워크 플로우가 언제 실행 될지를 정한다.
 on:
-  pull_request:
-    branches: [ "dev" ]
   push:
     branches: [ "main" ]
 
