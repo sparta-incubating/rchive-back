@@ -6,6 +6,7 @@ import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.user.exception.RoleExceptionCode;
 import kr.sparta.rchive.domain.user.exception.TrackExceptionCode;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
+import kr.sparta.rchive.global.s3.exception.S3ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,5 +46,11 @@ public class ExceptionController {
     @Operation(operationId = "EXCEPTION-POST", summary = "Track 관련 Exception 입니다.")
     @ApiExceptionCodeExample(PostExceptionCode.class)
     public void getPostExceptionCode() {
+    }
+
+    @GetMapping("/s3")
+    @Operation(operationId = "EXCEPTION-S3", summary = "S3 관련 Exception 입니다.")
+    @ApiExceptionCodeExample(S3ExceptionCode.class)
+    public void getS3ExceptionCode() {
     }
 }
