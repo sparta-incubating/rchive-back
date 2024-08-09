@@ -1,0 +1,73 @@
+# 워크 플로우 이름
+name: Java CI with Gradle for Dev
+
+# 워크 플로우가 언제 실행 될지를 정한다.
+on:
+  pull_request:
+    branches: [ "dev" ]
+
+env:
+  DB_URL: ${{secrets.DB_URL_DEV}}
+  DB_USER: ${{secrets.DB_USER}}
+  DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+  REDIS_HOST: ${{secrets.REDIS_HOST}}
+  REDIS_PORT: ${{secrets.REDIS_PORT}}
+  JWT_KEY: ${{secrets.JWT_KEY}}
+  BUCKET_NAME: ${{secrets.BUCKET_NAME}}
+  REGION: ${{secrets.REGION}}
+  S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
+  S3_SECRET_ACCESS_KEY: ${{secrets.S3_SECRET_ACCESS_KEY}}
+  TZ: Asia/Seoul
+
+# 워크 플로우가 깃 레포에 대한 권한을 읽기 만 가능하게 설정한다.
+permissions:
+  contents: read
+
+# 워크플로우에서 할 작업 정의한다.
+jobs:
+  # 작업 환경 = 우분투 최신 버전
+  build:
+    runs-on: ubuntu-latest
+
+    # 깃허브에서 제공하는 checkout 엑션 사용
+    steps:
+      - uses: actions/checkout@v4
+
+      # temurin = Adoptium에서 제공하는 JDK
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches/modules-2/files-2.1/
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Enable Gradle Daemon
+        run: ./gradlew --daemon
+
+      # gradle wrapper 파일에 실행 권한을 부여
+      # gradle wrapper = 개발자가 특정 버전의 Gradle을 미리 설치하지 않고도 Gradle 빌드를 실행할 수 있게 해주는 편리한 도구
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Gradle 빌드 엑션을 이용해서 프로젝트 빌드
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: '8.6'
+          arguments: build test
+
+#      - name: Test with Gradle
+#        run: ./gradlew --info test -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2
+#
+#      - name: Publish unit test results
+#        uses: EnricoMi/publish-unit-test-result-action@v2
+#        if: ${{ always() }}
+#        with:
+#          files: build/test-results/**/*.xml
