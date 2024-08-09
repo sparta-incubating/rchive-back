@@ -174,6 +174,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                                         .where(postTag.tag.id.eq(tagId))
                         ),
                         post.track.id.eq(trackId))
+                .orderBy(post.uploadedAt.desc())
                 .fetch();
     }
 
@@ -192,9 +193,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                     postType != null ? post.postType.eq(postType) : null,
                     tutorId != null ? post.tutor.id.eq(tutorId) : null,
                     post.track.id.eq(trackId),
-                    post.title.like(keyword),
-                    post.content.like(keyword)
+                    post.title.contains(keyword).or(post.content.contains(keyword))
                 )
+                .orderBy(post.uploadedAt.desc())
                 .fetch();
     }
 }
