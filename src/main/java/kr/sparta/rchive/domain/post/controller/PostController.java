@@ -14,11 +14,13 @@ import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.exception.statement.*;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.global.custom.CustomPageable;
+import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class PostController {
 
     @PostMapping
     @Operation(operationId = "POST-001", summary = "게시물 생성")
+    @ApiExceptionCodeExample(CreatePostException.class)
     public ResponseEntity<CommonResponseDto> createPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -58,6 +61,7 @@ public class PostController {
 
     @PatchMapping("/{postId}")
     @Operation(operationId = "POST-002", summary = "게시물 관리 - 수정")
+    @ApiExceptionCodeExample(UpdatePostException.class)
     public ResponseEntity<CommonResponseDto> updatePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -73,6 +77,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @Operation(operationId = "POST-003", summary = "게시물 관리 - 삭제")
+    @ApiExceptionCodeExample(DeletePostException.class)
     public ResponseEntity<CommonResponseDto> deletePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -87,6 +92,7 @@ public class PostController {
 
     @GetMapping("/search")
     @Operation(operationId = "POST-004", summary = "게시물 검색")
+    @ApiExceptionCodeExample(SearchPostException.class)
     public ResponseEntity<CommonResponseDto> searchPosts(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -106,6 +112,7 @@ public class PostController {
 
     @GetMapping("/category")
     @Operation(operationId = "POST-005", summary = "게시물 목록 조회")
+    @ApiExceptionCodeExample(GetPostCategoryException.class)
     public ResponseEntity<CommonResponseDto> getPostCategory(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -123,6 +130,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     @Operation(operationId = "POST-006", summary = "게시물 단건 조회")
+    @ApiExceptionCodeExample(GetPostException.class)
     public ResponseEntity<CommonResponseDto> getPost(
             @LoginUser User user,
             @PathVariable Long postId,
@@ -137,6 +145,7 @@ public class PostController {
 
     @PostMapping("/{postId}/comments")
     @Operation(operationId = "POST-007", summary = "게시물 댓글 작성")
+    @ApiExceptionCodeExample(CreateCommentException.class)
     public ResponseEntity<CommonResponseDto> createComment(
             @LoginUser User user,
             @PathVariable Long postId,
@@ -151,6 +160,7 @@ public class PostController {
 
     @DeleteMapping("/comment/{commentId}")
     @Operation(operationId = "POST-008", summary = "게시물 댓글 삭제")
+    @ApiExceptionCodeExample(DeletePostException.class)
     public ResponseEntity<CommonResponseDto> deleteComment(
             @LoginUser User user,
             @PathVariable Long commentId
@@ -174,6 +184,7 @@ public class PostController {
 
     @PostMapping("/tags")
     @Operation(operationId = "POST-010", summary = "사용할 태그 생성")
+    @ApiExceptionCodeExample(CreateTagException.class)
     public ResponseEntity<CommonResponseDto> createTag(
             @RequestBody TagCreateReq request
     ) {
@@ -197,6 +208,7 @@ public class PostController {
 
     @GetMapping("/tags/search")
     @Operation(operationId = "POST-012", summary = "태그를 클릭하여 검색하는 기능")
+    @ApiExceptionCodeExample(SearchPostByTagException.class)
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -214,6 +226,7 @@ public class PostController {
 
     @PostMapping("/{postId}/bookmark")
     @Operation(operationId = "POST-013", summary = "북마크 생성")
+    @ApiExceptionCodeExample(CreateBookmarkException.class)
     public ResponseEntity<CommonResponseDto> createBookmark(
             @LoginUser User user,
             @PathVariable Long postId
@@ -226,6 +239,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}/bookmark")
     @Operation(operationId = "POST-014", summary = "북마크 삭제")
+    @ApiExceptionCodeExample(DeleteBookmarkException.class)
     public ResponseEntity<CommonResponseDto> deleteBookmark(
             @LoginUser User user,
             @PathVariable Long postId
@@ -238,6 +252,7 @@ public class PostController {
 
     @PatchMapping("/open")
     @Operation(operationId = "POST-015", summary = "게시물 공개 여부 변경 - 공개")
+    @ApiExceptionCodeExample(OpenPostException.class)
     public ResponseEntity<CommonResponseDto> openPost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -252,6 +267,7 @@ public class PostController {
 
     @PatchMapping("/close")
     @Operation(operationId = "POST-016", summary = "게시물 공개 여부 변경 - 비공개")
+    @ApiExceptionCodeExample(ClosePostException.class)
     public ResponseEntity<CommonResponseDto> closePost(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
@@ -266,6 +282,7 @@ public class PostController {
 
     @GetMapping("/tutors")
     @Operation(operationId = "POST-017", summary = "튜터를 검색")
+    @ApiExceptionCodeExample(SearchTutorException.class)
     public ResponseEntity<CommonResponseDto> searchTutor(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
