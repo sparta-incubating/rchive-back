@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.user.exception.statement;
+package kr.sparta.rchive.domain.post.exception.statement;
 
 import kr.sparta.rchive.global.execption.ExceptionCode;
 import kr.sparta.rchive.global.execption.ExceptionReason;
@@ -12,10 +12,11 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
-public enum ReissueException implements ExceptionCode {
-    BAD_REQUEST_REFRESH_TOKEN_NULL(HttpStatus.BAD_REQUEST, "USER-0005", "리프레시 토큰 없음"),
-    BAD_REQUEST_REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "USER-0006", "리프레시 토큰이 일치하지 않음"),
-    BAD_REQUEST_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "USER-0007", "토큰 시간 만료");
+public enum UpdatePostException implements ExceptionCode {
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "POST-4001", "자료를 찾을 수 없음"),
+    NOT_FOUND_TRACK(HttpStatus.NOT_FOUND, "TRACK-4001", "트랙을 찾을 수 없음"),
+    FORBIDDEN_ROLE(HttpStatus.FORBIDDEN, "ROLE-3001", "해당 권한 접근 불가")
+    ;
 
     private final HttpStatus httpStatus;
     private final String errorCode;
