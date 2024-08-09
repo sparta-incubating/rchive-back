@@ -33,6 +33,12 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 5MB
+      resolve-lazily: true
+
 # swagger
 springdoc:
   show-login-endpoint: true
