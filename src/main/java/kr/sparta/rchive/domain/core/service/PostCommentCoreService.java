@@ -4,6 +4,8 @@ import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
 import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
+import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.service.TrackService;
@@ -29,7 +31,7 @@ public class PostCommentCoreService {
             findComment = commentService.findCommentByCommentId(parentCommentId);
 
             if(findComment.getIsDeleted()) {
-                findComment = null;
+                throw new PostCustomException(PostExceptionCode.NOT_FOUND_COMMENT);
             }
         }
 

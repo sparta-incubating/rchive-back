@@ -164,7 +164,6 @@ public class PostController {
     @GetMapping("/{postId}/comments")
     @Operation(operationId = "POST-009", summary = "게시물 부모 댓글 리스트 조회")
     public ResponseEntity<CommonResponseDto> getParentCommentList(
-            @LoginUser User user,
             @PathVariable Long postId
     ) {
         List<CommentGetRes> responseList = commentService.getParentCommentList(postId);
@@ -176,7 +175,6 @@ public class PostController {
     @PostMapping("/tags")
     @Operation(operationId = "POST-010", summary = "사용할 태그 생성")
     public ResponseEntity<CommonResponseDto> createTag(
-            @LoginUser User user,
             @RequestBody TagCreateReq request
     ) {
         TagCreateRes response = tagService.createTag(request.tagName());
@@ -188,7 +186,6 @@ public class PostController {
     @GetMapping("/tags")
     @Operation(operationId = "POST-011", summary = "사용할 태그 검색")
     public ResponseEntity<CommonResponseDto> searchTag(
-            @LoginUser User user,
             @RequestParam("tagName") String tagName
     ) {
 
@@ -280,5 +277,16 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_TUTOR.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_TUTOR, responseList));
+    }
+
+    @GetMapping("/comment/{parentCommentId}")
+    @Operation(operationId = "POST-018", summary = "댓글의 대댓글 조회")
+    public ResponseEntity<CommonResponseDto> getReply(
+            @PathVariable Long parentCommentId
+    ) {
+        List<CommentGetRes> responseList = commentService.getReply(parentCommentId);
+
+        return ResponseEntity.status(PostResponseCode.OK_GET_REPLY.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_GET_REPLY, responseList));
     }
 }

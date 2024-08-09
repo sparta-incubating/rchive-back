@@ -82,4 +82,18 @@ public class CommentService {
             }
         ).collect(Collectors.toList());
     }
+
+    public List<CommentGetRes> getReply(Long commentId) {
+        return commentRepository.findByParentCommentIdAndIsDeletedFalse(commentId).stream()
+                .map(
+                        comment -> CommentGetRes.builder()
+                                .id(comment.getId())
+                                .content(comment.getContent())
+                                .username(comment.getUser().getUsername())
+                                .email(comment.getUser().getEmail())
+                                .nickname(comment.getUser().getNickname())
+                                .createdAt(comment.getCreatedAt())
+                                .build()
+                ).collect(Collectors.toList());
+    }
 }
