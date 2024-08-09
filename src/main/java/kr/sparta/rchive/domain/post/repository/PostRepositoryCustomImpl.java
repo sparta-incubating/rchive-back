@@ -1,6 +1,6 @@
 package kr.sparta.rchive.domain.post.repository;
 
-import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -29,14 +29,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
-                        title != null? post.title.contains(title) : null,
+                        title != null ? post.title.contains(title) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.trackName.eq(trackName)
                 )
-                .orderBy(post.uploadedAt.desc())
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -53,13 +53,13 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
-                        title != null? post.title.contains(title) : null,
+                        title != null ? post.title.contains(title) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.id.eq(trackId)
                 )
-                .orderBy(post.uploadedAt.desc())
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -77,7 +77,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
-                        title != null? post.title.contains(title) : null,
+                        title != null ? post.title.contains(title) : null,
                         postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
@@ -85,7 +85,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.trackName.eq(trackName)
                 )
-                .orderBy(post.uploadedAt.desc())
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -103,14 +103,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
-                        title != null? post.title.contains(title) : null,
+                        title != null ? post.title.contains(title) : null,
                         postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
                         post.track.id.eq(trackId)
                 )
-                .orderBy(post.uploadedAt.desc())
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -131,7 +131,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         post.track.id.eq(trackId),
                         post.isOpened.eq(true)
                 )
-                .orderBy(post.uploadedAt.desc())
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -151,7 +151,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         post.postType.eq(postType),
                         post.track.id.eq(trackId)
                 )
-                .orderBy(post.uploadedAt.desc())
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -162,7 +162,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
-        return queryFactory.selectDistinct(post)
+        return queryFactory
+                .select(post).distinct()
                 .from(post)
                 .join(post.postTagList, postTag).fetchJoin()
                 .join(postTag.tag, tag).fetchJoin()
@@ -174,6 +175,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                                         .where(postTag.tag.id.eq(tagId))
                         ),
                         post.track.id.eq(trackId))
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
@@ -184,17 +186,20 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QTag tag = QTag.tag;
         QTutor tutor = QTutor.tutor;
 
-        return queryFactory.selectFrom(post)
+        return queryFactory
+                .select(post).distinct()
+                .from(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .leftJoin(post.tutor, tutor).fetchJoin()
                 .where(
-                    postType != null ? post.postType.eq(postType) : null,
-                    tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                    post.track.id.eq(trackId),
-                    post.title.like(keyword),
-                    post.content.like(keyword)
+                        postType != null ? post.postType.eq(postType) : null,
+                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                        post.track.id.eq(trackId),
+                        Expressions.stringTemplate("function('replace', {0}, {1}, {2})", post.title, " ", "")
+                                .toLowerCase().contains(keyword).or(post.content.toLowerCase().contains(keyword))
                 )
+                .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 }

@@ -13,7 +13,7 @@ public record PostGetSinglePostRes(
         String title,
         String tutor,
         String videoLink,
-        String content,
+        String contentLink,
         List<TagInfo> tagList,
         Boolean isBookmarked
 ) {
