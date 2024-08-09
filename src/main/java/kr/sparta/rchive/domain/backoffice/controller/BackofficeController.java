@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.backoffice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.sparta.rchive.domain.backoffice.exception.*;
 import kr.sparta.rchive.domain.backoffice.respoonse.BackofficeResponseCode;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
@@ -18,6 +19,7 @@ import kr.sparta.rchive.domain.user.enums.OrderRoleListEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.global.custom.CustomPageable;
+import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class BackofficeController {
 
     @GetMapping("/role")
     @Operation(operationId = "BACKOFFICE-001", summary = "유저의 트랙 권한 신청 목록 조회 - 백오피스")
+    @ApiExceptionCodeExample(GetUserTrackRoleRquestListException.class)
     public ResponseEntity<CommonResponseDto> getUserTrackRoleRequestList(
         @LoginUser User user,
         @RequestParam(value = "sort") OrderRoleListEnum sort,
@@ -67,6 +70,7 @@ public class BackofficeController {
 
     @PostMapping("/role/approve")
     @Operation(operationId = "BACKOFFICE-002", summary = "유저의 트랙 권한 수락 - 백오피스")
+    @ApiExceptionCodeExample(UserTrackRoleApproveException.class)
     public ResponseEntity<CommonResponseDto> userTrackRoleApprove(
         @LoginUser User user,
         @RequestBody List<RoleRequestListReq> reqList
@@ -81,6 +85,7 @@ public class BackofficeController {
 
     @DeleteMapping("/role/reject")
     @Operation(operationId = "BACKOFFICE-003", summary = "유저의 트랙 권한 거절 - 백오피스")
+    @ApiExceptionCodeExample(UserTrackRoleRejectException.class)
     public ResponseEntity<CommonResponseDto> userTrackRoleReject(
         @LoginUser User user,
         @RequestBody List<RoleRequestListReq> reqList
@@ -94,6 +99,7 @@ public class BackofficeController {
 
     @GetMapping("/role/count")
     @Operation(operationId = "BACKOFFICE-004", summary = "유저의 트랙 권한 신청 건수 - 백오피스")
+    @ApiExceptionCodeExample(GetTrackRoleRequestCount.class)
     public ResponseEntity<CommonResponseDto> getTrackRoleRequestCount(
         @LoginUser User user,
         @RequestParam("trackName") TrackNameEnum trackName,
@@ -111,6 +117,7 @@ public class BackofficeController {
 
     @PatchMapping("/track/permission")
     @Operation(operationId = "BACKOFFICE-005", summary = "트랙의 일반 유저 열람 권한 수락")
+    @ApiExceptionCodeExample(UserTrackPermissionException.class)
     public ResponseEntity<CommonResponseDto> userTrackPermission(
         @LoginUser User user,
         @RequestParam("trackName") TrackNameEnum trackName,
@@ -125,6 +132,7 @@ public class BackofficeController {
 
     @GetMapping("/post/search")
     @Operation(operationId = "BACKOFFICE-006", summary = "백오피스에서 교육자료 검색")
+    @ApiExceptionCodeExample(SearchPostInBackOfficeException.class)
     public ResponseEntity<CommonResponseDto> searchPostInBackOffice(
         @LoginUser User user,
         @RequestParam("trackName") TrackNameEnum trackName,
@@ -149,6 +157,7 @@ public class BackofficeController {
 
     @GetMapping("/role/select/last")
     @Operation(operationId = "BACKOFFICE-007", summary = "마지막에 선택한 권한 조회 - 백오피스")
+    @ApiExceptionCodeExample(GetLastSelectRoleBackOfficeException.class)
     public ResponseEntity<CommonResponseDto> getLastSelectRoleBackoffice(
         @LoginUser User user
     ) {
@@ -160,6 +169,7 @@ public class BackofficeController {
 
     @GetMapping("/profile")
     @Operation(operationId = "BACKOFFICE-008", summary = "프로필 조회 - 백오피스")
+    @ApiExceptionCodeExample(GetProfileBackOfficeException.class)
     public ResponseEntity<CommonResponseDto> getProfileBackoffice(
         @LoginUser User user
     ) {
@@ -171,6 +181,7 @@ public class BackofficeController {
 
     @PatchMapping("/track/rejection")
     @Operation(operationId = "BACKOFFICE-009", summary = "트랙의 일반 유저 열람 권한 거절")
+    @ApiExceptionCodeExample(UserTrackRejectionException.class)
     public ResponseEntity<CommonResponseDto> userTrackRejection(
         @LoginUser User user,
         @RequestParam("trackName") TrackNameEnum trackName,

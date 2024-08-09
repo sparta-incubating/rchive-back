@@ -1,4 +1,4 @@
-package kr.sparta.rchive.domain.user.exception.statement;
+package kr.sparta.rchive.domain.post.exception.statement;
 
 import kr.sparta.rchive.global.execption.ExceptionCode;
 import kr.sparta.rchive.global.execption.ExceptionReason;
@@ -12,15 +12,9 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
-public enum SignupException implements ExceptionCode {
-    /*  400 BAD_REQUEST : 잘못된 요청  */
-    BAD_REQUEST_MANAGER_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0002", "매니저 닉네임 입력 불가"),
-    BAD_REQUEST_DISAGREE_TERMS(HttpStatus.BAD_REQUEST, "USER-0003", "이용약관 미동의"),
-
-    /*  409 CONFLICT : Resource 중복  */
-    CONFLICT_EMAIL(HttpStatus.CONFLICT, "USER-9001", "이메일 중복"),
-    CONFLICT_NICKNAME(HttpStatus.CONFLICT, "USER-9002", "닉네임 중복")
-    ;
+public enum SearchTutorException implements ExceptionCode {
+    NOT_FOUND_TRACK(HttpStatus.NOT_FOUND, "TRACK-4001", "트랙을 찾을 수 없음"),
+    FORBIDDEN_ROLE(HttpStatus.FORBIDDEN, "ROLE-3001", "해당 권한 접근 불가");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

@@ -13,9 +13,15 @@ import kr.sparta.rchive.domain.user.dto.response.RoleRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.exception.statement.role.GetLastSelectRoleUserPageException;
+import kr.sparta.rchive.domain.user.exception.statement.role.GetResultRoleFirstLoginException;
+import kr.sparta.rchive.domain.user.exception.statement.role.RequestRoleException;
+import kr.sparta.rchive.domain.user.exception.statement.role.SelectRoleException;
+import kr.sparta.rchive.domain.user.exception.statement.user.SignupException;
 import kr.sparta.rchive.domain.user.response.RoleResponseCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
+import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +55,7 @@ public class RoleController {
 
     @PostMapping
     @Operation(operationId = "ROLE-002", summary = "내 권한(트랙 및 기수) 요청")
+    @ApiExceptionCodeExample(RequestRoleException.class)
     public ResponseEntity<CommonResponseDto> requestRole(@LoginUser User user,
             @RequestBody RoleRequestReq req) {
         userTrackRoleCoreService.requestRole(user, req);
@@ -59,6 +66,7 @@ public class RoleController {
 
     @PatchMapping("/select")
     @Operation(operationId = "ROLE-003", summary = "내 권한(트랙 및 기수) 선택")
+    @ApiExceptionCodeExample(SelectRoleException.class)
     public ResponseEntity<CommonResponseDto> selectRole(@LoginUser User user,
             @RequestBody RoleReq req) {
         userTrackRoleCoreService.selectRole(user, req);
@@ -88,6 +96,7 @@ public class RoleController {
 
     @GetMapping("/result")
     @Operation(operationId = "ROLE-006", summary = "권한 신청 결과 조회 - 최초 로그인")
+    @ApiExceptionCodeExample(GetResultRoleFirstLoginException.class)
     public ResponseEntity<CommonResponseDto> getResultRoleFirstLogin(@LoginUser User user) {
         AuthEnum auth = roleService.getResultRoleFirstLogin(user);
 
@@ -109,6 +118,7 @@ public class RoleController {
 
     @GetMapping("/select/last")
     @Operation(operationId = "ROLE-008", summary = "마지막에 선택한 권한 조회")
+    @ApiExceptionCodeExample(GetLastSelectRoleUserPageException.class)
     public ResponseEntity<CommonResponseDto> getLastSelectRoleUserPage(@LoginUser User user) {
         RoleGetLastSelectRoleRes res = userTrackRoleCoreService.getLastSelectRoleUserPage(user);
 

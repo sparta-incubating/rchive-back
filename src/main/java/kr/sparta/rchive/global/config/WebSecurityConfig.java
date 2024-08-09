@@ -9,6 +9,7 @@ import kr.sparta.rchive.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -66,13 +67,20 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("api/v1/users/role/**").hasAnyRole(UserRoleEnum.USER.toString(), UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers("/api/v1/role/**").hasAnyRole(UserRoleEnum.USER.toString(), UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers("/api/v1/profile/**").hasAnyRole(UserRoleEnum.USER.toString(), UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers("/api/v1/backoffice/**").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers("/api/v1/s3/**").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/posts").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/posts/{postId}").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/{postId}").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers("/api/v1/posts/tags").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/posts/open").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/posts/close").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/posts/tutors").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
                         .requestMatchers("/api/v1/users/**").permitAll()
-                        .requestMatchers("/api/v1/role/**").permitAll()
                         .requestMatchers("/api/v1/posts/**").permitAll()
-                        .requestMatchers("/api/v1/backoffice/**").hasRole(UserRoleEnum.MANAGER.toString())
-                        .requestMatchers("/api/v1/s3/**").hasRole(UserRoleEnum.MANAGER.toString())
-//                        .requestMatchers("/api/v1/**").permitAll()
-//                        .requestMatchers("/api/v1/admin").hasRole(UserRoleEnum.ADMIN.toString())
                         .anyRequest().authenticated()
         );
 
