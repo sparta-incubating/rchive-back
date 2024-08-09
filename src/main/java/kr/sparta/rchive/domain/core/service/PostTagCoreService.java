@@ -217,7 +217,7 @@ public class PostTagCoreService {
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
-                .content(post.getContent())
+                .contentLink(post.getContentLink())
                 .tagList(tagList)
                 .isBookmarked(isBookmarked)
                 .build();
@@ -289,7 +289,7 @@ public class PostTagCoreService {
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        keyword = keyword.toLowerCase().replaceAll("\\s", "");
+        keyword = keyword.toLowerCase().replace(" ", "");
 
         List<Post> postList = postService.searchPost(postType, keyword, tutorId, track.getId());
 
