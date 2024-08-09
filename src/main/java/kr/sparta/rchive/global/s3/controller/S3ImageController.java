@@ -2,8 +2,11 @@ package kr.sparta.rchive.global.s3.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
 import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.response.GlobalResponseCode;
+import kr.sparta.rchive.global.s3.exception.statement.DeleteThumbnailException;
+import kr.sparta.rchive.global.s3.exception.statement.UploadThumbnailException;
 import kr.sparta.rchive.global.s3.response.S3ResponseCode;
 import kr.sparta.rchive.global.s3.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class S3ImageController {
 
     @PostMapping(value = "/thumbnail/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(operationId = "S3-001", summary = "썸네일 파일 업로드")
+    @ApiExceptionCodeExample(UploadThumbnailException.class)
     public ResponseEntity<CommonResponseDto> uploadThumbnail(
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
@@ -32,6 +36,7 @@ public class S3ImageController {
 
     @GetMapping("/thumbnail/delete")
     @Operation(operationId = "S3-002", summary = "썸네일 파일 삭제")
+    @ApiExceptionCodeExample(DeleteThumbnailException.class)
     public ResponseEntity<CommonResponseDto> deleteThumbnail(
             @RequestParam(value = "thumbnailUrl") String thumbnailUrl
     ) {

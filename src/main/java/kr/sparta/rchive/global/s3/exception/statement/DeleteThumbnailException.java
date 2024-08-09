@@ -1,4 +1,4 @@
-package kr.sparta.rchive.global.execption.statement;
+package kr.sparta.rchive.global.s3.exception.statement;
 
 import kr.sparta.rchive.global.execption.ExceptionCode;
 import kr.sparta.rchive.global.execption.ExceptionReason;
@@ -12,15 +12,8 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
-public enum SignupException implements ExceptionCode {
-    /*  400 BAD_REQUEST : 잘못된 요청  */
-    BAD_REQUEST_MANAGER_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0002", "매니저 닉네임 입력 불가"),
-    BAD_REQUEST_DISAGREE_TERMS(HttpStatus.BAD_REQUEST, "USER-0003", "이용약관 미동의"),
-
-    /*  409 CONFLICT : Resource 중복  */
-    CONFLICT_EMAIL(HttpStatus.CONFLICT, "USER-9001", "이메일 중복"),
-    CONFLICT_NICKNAME(HttpStatus.CONFLICT, "USER-9002", "닉네임 중복")
-    ;
+public enum DeleteThumbnailException implements ExceptionCode {
+    INTERNAL_SERVER_ERROR_IMAGE_DELETE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"S3-5002", "이미지 삭제 실패");
 
     private final HttpStatus httpStatus;
     private final String errorCode;
@@ -40,4 +33,5 @@ public enum SignupException implements ExceptionCode {
         ExplainException annotation = field.getAnnotation(ExplainException.class);
         return Objects.nonNull(annotation) ? annotation.value() : this.getMessage();
     }
+
 }
