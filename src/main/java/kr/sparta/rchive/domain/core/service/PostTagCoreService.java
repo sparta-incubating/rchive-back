@@ -6,6 +6,7 @@ import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
@@ -437,5 +438,11 @@ public class PostTagCoreService {
         }
 
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
+    }
+
+    public void saveRecentSearchKeyword(User user, RecentSearchKeywordReq request) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(request.trackName(), request.period());
+
+        redisService.saveRecentSearchKeyword(user.getId(), track.getId(), request.keyword());
     }
 }
