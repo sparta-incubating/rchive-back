@@ -6,6 +6,7 @@ import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
@@ -92,6 +93,7 @@ public class PostTagCoreService {
                             .title(post.getTitle())
                             .postType(post.getPostType())
                             .tutor(post.getTutor().getTutorName())
+                            .contentLink(post.getContentLink())
                             .period(post.getTrack().getPeriod())
                             .isOpened(post.getIsOpened())
                             .uploadedAt(post.getUploadedAt())
@@ -266,6 +268,7 @@ public class PostTagCoreService {
         postService.openPost(postList);
     }
 
+    @Transactional
     public void closePost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
         List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
         postService.closePost(postList);
@@ -437,5 +440,28 @@ public class PostTagCoreService {
         }
 
         throw new RoleCustomException(RoleExceptionCode.FORBIDDEN_ROLE);
+    }
+
+    public void saveRecentSearchKeyword(User user, RecentSearchKeywordReq request) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(request.trackName(), request.period());
+
+        redisService.saveRecentSearchKeyword(user.getId(), track.getId(), request.keyword());
+    }
+
+    public List<PostGetRecentKeywordRes> getRecentSearchKeyword(User user, TrackNameEnum trackName, Integer period) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        List<String> keywordList = redisService.getRecentSearchKeyword(user.getId(), track.getId());
+
+        if(keywordList.isEmpty()) {
+            return null;
+        }
+
+        return keywordList.stream()
+            .map(
+                keyword -> PostGetRecentKeywordRes.builder()
+                    .keyword(keyword)
+                    .build()
+            ).collect(Collectors.toList());
     }
 }

@@ -46,6 +46,21 @@ public class RedisUtil {
                 .collect(Collectors.toList());
     }
 
+    public void setStringList(String key, String value) {
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
+        listOps.leftPush(key, value);
+    }
+
+    public void checkSearchLength(String key) {
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
+
+        Long size = listOps.size(key);
+
+        if(size != null && size > 5) {
+            listOps.trim(key, 0, 4);
+        }
+    }
+
     public boolean delete(String key) {
         log.info("[delete] key {}", key);
         boolean isDelete = Boolean.TRUE.equals(stringRedisTemplate.delete(key));
@@ -58,5 +73,25 @@ public class RedisUtil {
         boolean hasKey = Boolean.TRUE.equals(stringRedisTemplate.hasKey(key));
         log.info("[hasKey] hasKey : {}", hasKey);
         return hasKey;
+    }
+
+    public void removeDuplicateKeywordSearch(String key, String keyword) {
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
+
+        listOps.remove(key, 1, keyword);
+    }
+
+    public List<String> getSearchKeywordList(String key) {
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
+
+        List<Object> keywordList = listOps.range(key, 0, -1);
+
+        if(keywordList == null) {
+            return null;
+        }
+
+        return keywordList.stream()
+            .map(Object::toString)
+            .collect(Collectors.toList());
     }
 }

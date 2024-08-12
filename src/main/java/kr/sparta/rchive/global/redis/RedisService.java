@@ -78,4 +78,21 @@ public class RedisService {
         redisUtil.delete(key);
     }
 
+    public void saveRecentSearchKeyword(Long userId, Long trackId, String keyword) {
+        String key = keySearchKeyword(userId, trackId);
+
+        redisUtil.removeDuplicateKeywordSearch(key, keyword);
+        redisUtil.setStringList(key, keyword);
+        redisUtil.checkSearchLength(key);
+    }
+
+    private String keySearchKeyword(Long userId, Long trackId) {
+        return String.format("search-keyword-%d-%d", userId, trackId);
+    }
+
+    public List<String> getRecentSearchKeyword(Long userId, Long trackId) {
+        String key = keySearchKeyword(userId, trackId);
+
+        return redisUtil.getSearchKeywordList(key);
+    }
 }
