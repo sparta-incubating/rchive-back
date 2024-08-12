@@ -446,4 +446,21 @@ public class PostTagCoreService {
 
         redisService.saveRecentSearchKeyword(user.getId(), track.getId(), request.keyword());
     }
+
+    public List<PostGetRecentKeywordRes> getRecentSearchKeyword(User user, TrackNameEnum trackName, Integer period) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        List<String> keywordList = redisService.getRecentSearchKeyword(user.getId(), track.getId());
+
+        if(keywordList.isEmpty()) {
+            return null;
+        }
+
+        return keywordList.stream()
+            .map(
+                keyword -> PostGetRecentKeywordRes.builder()
+                    .keyword(keyword)
+                    .build()
+            ).collect(Collectors.toList());
+    }
 }
