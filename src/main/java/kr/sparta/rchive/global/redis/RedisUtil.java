@@ -80,4 +80,18 @@ public class RedisUtil {
 
         listOps.remove(key, 1, keyword);
     }
+
+    public List<String> getSearchKeywordList(String key) {
+        ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
+
+        List<Object> keywordList = listOps.range(key, 0, -1);
+
+        if(keywordList == null) {
+            return null;
+        }
+
+        return keywordList.stream()
+            .map(Object::toString)
+            .collect(Collectors.toList());
+    }
 }

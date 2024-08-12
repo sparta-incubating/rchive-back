@@ -93,6 +93,7 @@ public class PostTagCoreService {
                             .title(post.getTitle())
                             .postType(post.getPostType())
                             .tutor(post.getTutor().getTutorName())
+                            .contentLink(post.getContentLink())
                             .period(post.getTrack().getPeriod())
                             .isOpened(post.getIsOpened())
                             .uploadedAt(post.getUploadedAt())
@@ -445,5 +446,22 @@ public class PostTagCoreService {
         Track track = trackService.findTrackByTrackNameAndPeriod(request.trackName(), request.period());
 
         redisService.saveRecentSearchKeyword(user.getId(), track.getId(), request.keyword());
+    }
+
+    public List<PostGetRecentKeywordRes> getRecentSearchKeyword(User user, TrackNameEnum trackName, Integer period) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        List<String> keywordList = redisService.getRecentSearchKeyword(user.getId(), track.getId());
+
+        if(keywordList.isEmpty()) {
+            return null;
+        }
+
+        return keywordList.stream()
+            .map(
+                keyword -> PostGetRecentKeywordRes.builder()
+                    .keyword(keyword)
+                    .build()
+            ).collect(Collectors.toList());
     }
 }

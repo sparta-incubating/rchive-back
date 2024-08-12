@@ -28,7 +28,8 @@ public enum PostResponseCode implements ResponseCode {
     OK_CLOSE_POST(HttpStatus.OK, "POST-016", "게시물 공개 여부 비공개로 변경"),
     OK_SEARCH_TUTOR(HttpStatus.OK, "POST-017", "튜터 검색 성공"),
     OK_GET_REPLY(HttpStatus.OK, "POST-018", "대댓글 조회 성공"),
-    OK_SAVE_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-019", "최근 검색어 저장 성공");
+    OK_SAVE_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-019", "최근 검색어 저장 성공"),
+    OK_GET_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-020", "최근 검색어 조회 성공");
 
     private final HttpStatus httpStatus;
     private final String responseCode;

@@ -90,5 +90,9 @@ public class RedisService {
         return String.format("search-keyword-%d-%d", userId, trackId);
     }
 
+    public List<String> getRecentSearchKeyword(Long userId, Long trackId) {
+        String key = keySearchKeyword(userId, trackId);
 
+        return redisUtil.getSearchKeywordList(key);
+    }
 }

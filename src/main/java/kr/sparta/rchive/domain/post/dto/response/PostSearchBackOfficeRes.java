@@ -13,6 +13,7 @@ public record PostSearchBackOfficeRes(
         String thumbnailUrl,
         String title,
         PostTypeEnum postType,
+        String contentLink,
         String tutor,
         Integer period,
         Boolean isOpened,
