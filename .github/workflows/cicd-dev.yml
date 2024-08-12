@@ -5,6 +5,8 @@ name: Java CI/CD with Gradle for Dev
 on:
   push:
     branches: [ "dev" ]
+  pull_request:
+    branches-ignore: [ "*" ]
 
 env:
   DB_URL: ${{secrets.DB_URL_DEV}}

@@ -5,6 +5,8 @@ name: Java CI/CD with Gradle for Prod
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches-ignore: [ "*" ]
 
 env:
   DB_URL: ${{secrets.DB_URL_PROD}}
