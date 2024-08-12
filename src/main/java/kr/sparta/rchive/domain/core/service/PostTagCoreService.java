@@ -267,6 +267,7 @@ public class PostTagCoreService {
         postService.openPost(postList);
     }
 
+    @Transactional
     public void closePost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
         List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
         postService.closePost(postList);
