@@ -8,10 +8,7 @@ import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
-import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
-import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
-import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.*;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.exception.statement.*;
@@ -305,5 +302,17 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_GET_REPLY.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_REPLY, responseList));
+    }
+
+    @PostMapping("/search/recent")
+    @Operation(operationId = "POST-019", summary = "유저의 최근 검색어 저장")
+    public ResponseEntity<CommonResponseDto> saveRecentSearchKeyword(
+            @LoginUser User user,
+            @RequestBody RecentSearchKeywordReq request
+    ) {
+        postTagCoreService.saveRecentSearchKeyword(user, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_SAVE_RECENT_SEARCH_KEYWORD.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_SAVE_RECENT_SEARCH_KEYWORD, null));
     }
 }
