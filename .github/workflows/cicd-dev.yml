@@ -5,8 +5,6 @@ name: Java CI/CD with Gradle for Dev
 on:
   push:
     branches: [ "dev" ]
-  pull_request:
-    branches-ignore: [ "*" ]
 
 env:
   DB_URL: ${{secrets.DB_URL_DEV}}
@@ -30,7 +28,7 @@ jobs:
   # 작업 환경 = 우분투 최신 버전
   build:
     runs-on: ubuntu-latest
-
+    if: github.base_ref != 'main' && github.event.pull_request.base.ref != 'main'
     # 깃허브에서 제공하는 checkout 엑션 사용
     steps:
       - uses: actions/checkout@v4
