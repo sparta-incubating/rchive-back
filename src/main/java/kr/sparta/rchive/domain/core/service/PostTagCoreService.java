@@ -93,6 +93,7 @@ public class PostTagCoreService {
                             .title(post.getTitle())
                             .postType(post.getPostType())
                             .tutor(post.getTutor().getTutorName())
+                            .contentLink(post.getContentLink())
                             .period(post.getTrack().getPeriod())
                             .isOpened(post.getIsOpened())
                             .uploadedAt(post.getUploadedAt())
