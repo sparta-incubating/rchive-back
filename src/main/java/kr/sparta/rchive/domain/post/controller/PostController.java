@@ -315,4 +315,17 @@ public class PostController {
         return ResponseEntity.status(PostResponseCode.OK_SAVE_RECENT_SEARCH_KEYWORD.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SAVE_RECENT_SEARCH_KEYWORD, null));
     }
+
+    @GetMapping("/search/recent")
+    @Operation(operationId = "POST-020", summary = "유저의 최근 검색어 조회")
+    public ResponseEntity<CommonResponseDto> getRecentSearchKeyword(
+        @LoginUser User user,
+        @RequestParam("trackName") TrackNameEnum trackName,
+        @RequestParam("loginPeriod") Integer period
+    ) {
+        List<PostGetRecentKeywordRes> responseList = postTagCoreService.getRecentSearchKeyword(user, trackName, period);
+
+        return ResponseEntity.status(PostResponseCode.OK_GET_RECENT_SEARCH_KEYWORD.getHttpStatus())
+            .body(CommonResponseDto.of(PostResponseCode.OK_GET_RECENT_SEARCH_KEYWORD, responseList));
+    }
 }

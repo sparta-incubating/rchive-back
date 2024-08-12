@@ -69,7 +69,6 @@ public class PostService {
         postRepository.saveAll(postList);
     }
 
-    @Transactional
     public void closePost(List<Post> postList) {
         postList.forEach(Post::closePost);
         postRepository.saveAll(postList);
