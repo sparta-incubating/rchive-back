@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 public interface ResponseCode {
 
     public HttpStatus getHttpStatus();
+    public String getResponseCode();
     public String getMessage();
 
 }

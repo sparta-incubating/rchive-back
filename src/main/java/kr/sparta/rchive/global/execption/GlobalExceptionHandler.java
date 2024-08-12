@@ -5,6 +5,7 @@ import java.util.Map;
 
 
 import kr.sparta.rchive.global.response.CommonResponseDto;
+import kr.sparta.rchive.global.s3.exception.S3ExceptionCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @Slf4j
 @RestControllerAdvice
@@ -29,15 +31,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> httpMessageNotReadableExceptionHandler(
             HttpMessageNotReadableException exception) {
         log.error("HttpMessageNotReadableException: ", exception);
-        return ResponseEntity.status(GlobalExceptionCode.INVALID_PARAMETER.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalExceptionCode.INVALID_PARAMETER));
+        return ResponseEntity.status(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> IllegalArgumentHandler(IllegalArgumentException exception) {
         log.error("IllegalArgumentException: ", exception);
-        return ResponseEntity.status(GlobalExceptionCode.INVALID_VALUE.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalExceptionCode.INVALID_VALUE));
+        return ResponseEntity.status(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -49,8 +51,8 @@ public class GlobalExceptionHandler {
         bindingResult.getAllErrors().forEach(
                 error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
 
-        return ResponseEntity.status(GlobalExceptionCode.INVALID_VALUE.getHttpStatus())
-                .body(CommonResponseDto.of(GlobalExceptionCode.INVALID_VALUE));
+        return ResponseEntity.status(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER.getHttpStatus())
+                .body(CommonResponseDto.of(GlobalExceptionCode.BAD_REQUEST_INVALID_PARAMETER));
     }
 
     @ExceptionHandler(CustomException.class)
@@ -60,5 +62,11 @@ public class GlobalExceptionHandler {
                 .body(CommonResponseDto.of(exception));
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> uploadSizeExceededExceptionHandler(CustomException exception) {
+        log.error("uploadSizeExceededException: ", exception);
+        return ResponseEntity.status(GlobalExceptionCode.INTERNAL_SERVER_ERROR_FILE_SIZE_OVERFLOW.getHttpStatus())
+            .body(CommonResponseDto.of(GlobalExceptionCode.INTERNAL_SERVER_ERROR_FILE_SIZE_OVERFLOW));
+    }
 }
 
