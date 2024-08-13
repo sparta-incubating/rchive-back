@@ -49,7 +49,7 @@ public class SwaggerConfig {
                 .groupName("testApi")
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("kr.sparta.rchive"))
-//                .paths(PathSelectors.ant("/api/v1/**"))
+//                .paths(PathSelectors.ant("/apis/v1/**"))
                 .paths(PathSelectors.any())
                 .build();
     }
