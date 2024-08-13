@@ -6,5 +6,6 @@ public enum PostTypeEnum {
     Level_Challenge,
     Level_Standard,
     Level_Basic,
+    Level_All,
     Project_Description
 }
