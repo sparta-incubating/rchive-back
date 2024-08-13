@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/role")
+@RequestMapping("/apis/v1/role")
 @Tag(name = "2. Role API", description = "Role 관련 API 입니다.")
 public class RoleController {
 
