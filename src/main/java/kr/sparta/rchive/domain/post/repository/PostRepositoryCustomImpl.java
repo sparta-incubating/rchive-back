@@ -1,14 +1,17 @@
 package kr.sparta.rchive.domain.post.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 
 @RequiredArgsConstructor
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
@@ -17,101 +20,102 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     @Override
     public List<Post> findPostListInBackOfficePostTypeAllByPm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened,
-                                                              Integer searchPeriod, TrackNameEnum trackName, Long tutorId) {
+        Integer searchPeriod, TrackNameEnum trackName, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .where(
-                        title != null ? post.title.contains(title) : null,
-                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                        isOpened != null ? post.isOpened.eq(isOpened) : null,
-                        searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
-                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.track.trackName.eq(trackName)
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .where(
+                title != null ? post.title.contains(title) : null,
+                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                isOpened != null ? post.isOpened.eq(isOpened) : null,
+                searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
+                tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                post.track.trackName.eq(trackName)
+            )
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
-    public List<Post> findPostListInBackOfficePostTypeAllByApm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened, Long trackId, Long tutorId) {
+    public List<Post> findPostListInBackOfficePostTypeAllByApm(String title, LocalDate startDate, LocalDate endDate, Boolean isOpened,
+        Long trackId, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .where(
-                        title != null ? post.title.contains(title) : null,
-                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                        isOpened != null ? post.isOpened.eq(isOpened) : null,
-                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.track.id.eq(trackId)
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .where(
+                title != null ? post.title.contains(title) : null,
+                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                isOpened != null ? post.isOpened.eq(isOpened) : null,
+                tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                post.track.id.eq(trackId)
+            )
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
     public List<Post> findPostListInBackOfficePostTypeNotNullByPM(PostTypeEnum postType, String title, LocalDate startDate,
-                                                                  LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName, Long tutorId) {
+        LocalDate endDate, Integer searchPeriod, Boolean isOpened, TrackNameEnum trackName, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .where(
-                        title != null ? post.title.contains(title) : null,
-                        postType != null ? post.postType.eq(postType) : null,
-                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                        searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
-                        isOpened != null ? post.isOpened.eq(isOpened) : null,
-                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.track.trackName.eq(trackName)
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .where(
+                title != null ? post.title.contains(title) : null,
+                postType != null ? post.postType.eq(postType) : null,
+                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
+                isOpened != null ? post.isOpened.eq(isOpened) : null,
+                tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                post.track.trackName.eq(trackName)
+            )
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
     public List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, String title, LocalDate startDate,
-                                                                 LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId) {
+        LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .where(
-                        title != null ? post.title.contains(title) : null,
-                        postType != null ? post.postType.eq(postType) : null,
-                        startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
-                        isOpened != null ? post.isOpened.eq(isOpened) : null,
-                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.track.id.eq(trackId)
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .where(
+                title != null ? post.title.contains(title) : null,
+                postType != null ? post.postType.eq(postType) : null,
+                startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
+                isOpened != null ? post.isOpened.eq(isOpened) : null,
+                tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                post.track.id.eq(trackId)
+            )
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
@@ -121,18 +125,24 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (postType == PostTypeEnum.Level_All) {
+            builder.and(post.postType.stringValue().contains("Level"));
+        } else {
+            builder.and(post.postType.eq(postType));
+        }
+        builder.and(post.track.id.eq(trackId));
+        builder.and(post.isOpened.eq(true));
+
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .where(
-                        post.postType.eq(postType),
-                        post.track.id.eq(trackId),
-                        post.isOpened.eq(true)
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .where(builder)
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
@@ -142,17 +152,23 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
 
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (postType == PostTypeEnum.Level_All) {
+            builder.and(post.postType.stringValue().contains("Level"));
+        } else {
+            builder.and(post.postType.eq(postType));
+        }
+        builder.and(post.track.id.eq(trackId));
+
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .where(
-                        post.postType.eq(postType),
-                        post.track.id.eq(trackId)
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .where(builder)
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
@@ -163,20 +179,20 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QTag tag = QTag.tag;
 
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .join(post.postTagList, postTag).fetchJoin()
-                .join(postTag.tag, tag).fetchJoin()
-                .where(
-                        post.id.in(
-                                queryFactory.select(post.id)
-                                        .from(post)
-                                        .join(post.postTagList, postTag)
-                                        .where(postTag.tag.id.eq(tagId))
-                        ),
-                        post.track.id.eq(trackId))
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .join(post.postTagList, postTag).fetchJoin()
+            .join(postTag.tag, tag).fetchJoin()
+            .where(
+                post.id.in(
+                    queryFactory.select(post.id)
+                        .from(post)
+                        .join(post.postTagList, postTag)
+                        .where(postTag.tag.id.eq(tagId))
+                ),
+                post.track.id.eq(trackId))
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 
     @Override
@@ -186,20 +202,36 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QTag tag = QTag.tag;
         QTutor tutor = QTutor.tutor;
 
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (postType != null) {
+            if (postType == PostTypeEnum.Level_All) {
+                builder.and(post.postType.stringValue().contains("Level"));
+            } else {
+                builder.and(post.postType.eq(postType));
+            }
+        }
+
+        if (tutorId != null) {
+            builder.and(post.tutor.id.eq(tutorId));
+        }
+
+        builder.and(post.track.id.eq(trackId));
+
+        builder.and(
+            Expressions.stringTemplate("function('replace', {0}, {1}, {2})", post.title, " ", "")
+                .toLowerCase().contains(keyword.toLowerCase())
+                .or(post.content.toLowerCase().contains(keyword.toLowerCase()))
+        );
+
         return queryFactory
-                .select(post).distinct()
-                .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(
-                        postType != null ? post.postType.eq(postType) : null,
-                        tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.track.id.eq(trackId),
-                        Expressions.stringTemplate("function('replace', {0}, {1}, {2})", post.title, " ", "")
-                                .toLowerCase().contains(keyword).or(post.content.toLowerCase().contains(keyword))
-                )
-                .orderBy(post.uploadedAt.desc(), post.id.desc())
-                .fetch();
+            .select(post).distinct()
+            .from(post)
+            .leftJoin(post.postTagList, postTag).fetchJoin()
+            .leftJoin(postTag.tag, tag).fetchJoin()
+            .leftJoin(post.tutor, tutor).fetchJoin()
+            .where(builder)
+            .orderBy(post.uploadedAt.desc(), post.id.desc())
+            .fetch();
     }
 }
