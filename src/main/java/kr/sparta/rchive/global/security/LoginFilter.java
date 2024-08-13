@@ -74,7 +74,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         redisService.setRefreshToken(user, refreshToken);
 
         response.addHeader(AUTHORIZATION_HEADER, accessToken);
-        response.addCookie(jwtUtil.addRefreshTokenToCookie(refreshToken));
+//        response.addCookie(jwtUtil.addRefreshTokenToCookie(refreshToken));
+        response.addHeader("Set-Cookie", jwtUtil.addRefreshTokenToCookie(refreshToken).toString());
         response.setStatus(HttpStatus.OK.value());
     }
 
