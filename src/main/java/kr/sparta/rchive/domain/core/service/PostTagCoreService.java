@@ -286,7 +286,7 @@ public class PostTagCoreService {
         return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
     }
 
-    public Page<PostSearchRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period,
+    public Page<PostGetRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period,
                                            String keyword, Long tutorId, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
@@ -298,7 +298,7 @@ public class PostTagCoreService {
 
         List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
 
-        List<PostSearchRes> responseList = postList.stream()
+        List<PostGetRes> responseList = postList.stream()
                 .map(post -> {
                     List<TagInfo> tagInfoList = post.getPostTagList().stream()
                             .map(postTag -> TagInfo.builder()
@@ -306,9 +306,10 @@ public class PostTagCoreService {
                                     .tagName(postTag.getTag().getTagName())
                                     .build()).toList();
 
-                    return PostSearchRes.builder()
+                    return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
+                            .postType(post.getPostType())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())

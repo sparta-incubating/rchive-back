@@ -23,7 +23,7 @@ import java.text.ParseException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/apis/v1/users")
 @Tag(name = "1. User API", description = "User 관련 API 입니다.")
 public class UserController {
 

@@ -31,7 +31,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/apis/v1/posts")
 @Tag(name = "4. Post API", description = "Post 관련 API입니다.")
 public class PostController {
 
@@ -101,7 +101,7 @@ public class PostController {
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostSearchRes> responseList = postTagCoreService.searchPosts(user, postType, trackName, period, keyword, tutorId, pageable);
+        Page<PostGetRes> responseList = postTagCoreService.searchPosts(user, postType, trackName, period, keyword, tutorId, pageable);
 
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST, responseList));
