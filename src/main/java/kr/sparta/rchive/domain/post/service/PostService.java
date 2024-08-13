@@ -101,8 +101,7 @@ public class PostService {
         if (userRole.equals(UserRoleEnum.USER)) {
             return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
         } else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType,
-                    track.getId());
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
         }
     }
 
