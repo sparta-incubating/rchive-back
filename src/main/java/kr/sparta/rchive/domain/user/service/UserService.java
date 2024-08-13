@@ -25,6 +25,7 @@ import kr.sparta.rchive.global.execption.GlobalExceptionCode;
 import kr.sparta.rchive.global.redis.RedisService;
 import kr.sparta.rchive.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,9 +88,11 @@ public class UserService {
             throws UnsupportedEncodingException {
         redisService.deleteRefreshToken(user);
 
-        Cookie refresh = jwtUtil.addRefreshTokenToCookie("");
-        refresh.setMaxAge(0);
-        res.addCookie(refresh);
+//        Cookie refresh = jwtUtil.addRefreshTokenToCookie("");
+//        refresh.setMaxAge(0);
+//        res.addCookie(refresh);
+        res.addHeader("Set-Cookie", jwtUtil.removeRefreshTokenToCookie().toString());
+
     }
 
     public void reissue(HttpServletRequest req, HttpServletResponse res)
@@ -97,10 +100,16 @@ public class UserService {
 
         String refreshToken = null;
         Cookie[] cookies = req.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("Refresh")) {
-                refreshToken = cookie.getValue();
+
+        if (cookies != null) {
+            System.out.println("yes cookieeeeeeeee");
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("Refresh")) {
+                    refreshToken = cookie.getValue();
+                }
             }
+        } else {
+            System.out.println("no cookieeeeeeeee");
         }
 
         if (refreshToken == null) {
@@ -132,7 +141,9 @@ public class UserService {
         if (!issuedAt.equals(date)) {
             String newRefresh = jwtUtil.createRefreshToken(user);
             redisService.setRefreshToken(user, newRefresh);
-            res.addCookie(jwtUtil.addRefreshTokenToCookie(newRefresh));
+//            res.addCookie(jwtUtil.addRefreshTokenToCookie(newRefresh));
+            res.addHeader("Set-Cookie", jwtUtil.addRefreshTokenToCookie(newRefresh).toString());
+
         }
 
         String newAccess = jwtUtil.createAccessToken(user);

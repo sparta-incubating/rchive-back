@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/exceptions")
+@RequestMapping("/apis/v1/exceptions")
 @Tag(name = "0. Exception API", description = "Exception 관련 API 입니다.")
 public class ExceptionController {
 

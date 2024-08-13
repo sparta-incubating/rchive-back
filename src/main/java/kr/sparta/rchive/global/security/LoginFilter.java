@@ -32,13 +32,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @PostConstruct
     public void init() {
-        setFilterProcessesUrl("/api/v1/users/login");
+        setFilterProcessesUrl("/apis/v1/users/login");
     }
 
     @Override
     public Authentication attemptAuthentication(
             HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException{
+            throws AuthenticationException {
 
         try {
             UserLoginReq loginReq = new ObjectMapper().readValue(
@@ -58,7 +58,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication)
+    protected void successfulAuthentication(HttpServletRequest request,
+            HttpServletResponse response, FilterChain chain, Authentication authentication)
             throws UnsupportedEncodingException {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -70,15 +71,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String accessToken = jwtUtil.createAccessToken(user);
         String refreshToken = jwtUtil.createRefreshToken(user);
 
-        redisService.setRefreshToken(user,refreshToken);
+        redisService.setRefreshToken(user, refreshToken);
 
         response.addHeader(AUTHORIZATION_HEADER, accessToken);
-        response.addCookie(jwtUtil.addRefreshTokenToCookie(refreshToken));
+//        response.addCookie(jwtUtil.addRefreshTokenToCookie(refreshToken));
+        response.addHeader("Set-Cookie", jwtUtil.addRefreshTokenToCookie(refreshToken).toString());
         response.setStatus(HttpStatus.OK.value());
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+            HttpServletResponse response, AuthenticationException failed) {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
