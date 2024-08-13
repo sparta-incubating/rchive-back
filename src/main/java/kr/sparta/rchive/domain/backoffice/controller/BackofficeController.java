@@ -35,7 +35,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/backoffice")
+@RequestMapping("/apis/v1/backoffice")
 @Tag(name = "5. BackOffice API", description = "BackOffice 관련 API 입니다.")
 public class BackofficeController {
 
