@@ -249,6 +249,7 @@ public class PostTagCoreService {
                     return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
+                            .postType(post.getPostType())
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
