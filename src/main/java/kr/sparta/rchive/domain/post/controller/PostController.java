@@ -328,4 +328,16 @@ public class PostController {
         return ResponseEntity.status(PostResponseCode.OK_GET_RECENT_SEARCH_KEYWORD.getHttpStatus())
             .body(CommonResponseDto.of(PostResponseCode.OK_GET_RECENT_SEARCH_KEYWORD, responseList));
     }
+
+    @DeleteMapping("/search/recent")
+    @Operation(operationId = "POST-021", summary = "유저의 최근 검색어 삭제")
+    public ResponseEntity<CommonResponseDto> deleteRecentSearchKeyword(
+            @LoginUser User user,
+            @RequestBody RecentSearchKeywordReq request
+    ) {
+        postTagCoreService.deleteRecentSearchKeyword(user, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_DELETE_RECENT_SEARCH_KEYWORD.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_RECENT_SEARCH_KEYWORD, null));
+    }
 }
