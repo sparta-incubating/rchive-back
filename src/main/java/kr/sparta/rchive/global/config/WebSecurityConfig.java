@@ -67,6 +67,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/apis/v1/users/reissue").permitAll()
                         .requestMatchers("/apis/v1/role/**").hasAnyRole(UserRoleEnum.USER.toString(), UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
                         .requestMatchers("/apis/v1/profile/**").hasAnyRole(UserRoleEnum.USER.toString(), UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
                         .requestMatchers("/apis/v1/backoffice/**").hasAnyRole(UserRoleEnum.MANAGER.toString(), UserRoleEnum.ADMIN.toString())
