@@ -306,6 +306,7 @@ public class PostController {
 
     @PostMapping("/search/recent")
     @Operation(operationId = "POST-019", summary = "유저의 최근 검색어 저장")
+    @ApiExceptionCodeExample(SaveRecentSearchKeywordException.class)
     public ResponseEntity<CommonResponseDto> saveRecentSearchKeyword(
             @LoginUser User user,
             @RequestBody RecentSearchKeywordReq request
@@ -318,6 +319,7 @@ public class PostController {
 
     @GetMapping("/search/recent")
     @Operation(operationId = "POST-020", summary = "유저의 최근 검색어 조회")
+    @ApiExceptionCodeExample(GetRecentSearchKeywordException.class)
     public ResponseEntity<CommonResponseDto> getRecentSearchKeyword(
         @LoginUser User user,
         @RequestParam("trackName") TrackNameEnum trackName,
@@ -331,6 +333,7 @@ public class PostController {
 
     @DeleteMapping("/search/recent")
     @Operation(operationId = "POST-021", summary = "유저의 최근 검색어 삭제")
+    @ApiExceptionCodeExample(DeleteRecentSearchKeywordException.class)
     public ResponseEntity<CommonResponseDto> deleteRecentSearchKeyword(
             @LoginUser User user,
             @RequestBody RecentSearchKeywordReq request

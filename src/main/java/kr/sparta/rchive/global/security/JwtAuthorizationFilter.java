@@ -34,9 +34,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         String token = accessAuth.split(" ")[1];
-        try{
+        try {
             jwtUtil.isExpired(token);
-        }catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e){
             PrintWriter writer = response.getWriter();
             writer.print("access token expired");
 
