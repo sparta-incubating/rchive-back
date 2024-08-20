@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface BookmarkRepositoryCustom {
     List<Bookmark> findBookmarkListByUserId(Long userId);
+
+    List<Bookmark> findBookmarkListByUserIdAndKeyword(Long userId, String keyword);
 }

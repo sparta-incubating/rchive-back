@@ -203,4 +203,15 @@ public class UserService {
 
     }
 
+    public Boolean tokenExpired(HttpServletRequest req) {
+        String accessToken = req.getHeader("Authorization");
+
+        String token = accessToken.split(" ")[1];
+
+        try {
+            return jwtUtil.isExpired(token);
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+    }
 }
