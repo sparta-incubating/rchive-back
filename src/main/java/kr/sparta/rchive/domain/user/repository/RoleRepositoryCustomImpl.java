@@ -43,6 +43,7 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                 .from(role)
                 .where(role.track.trackName.eq(trackName)
                         .and(role.track.period.eq(period))
+                        .and(role.trackRole.ne(TrackRoleEnum.APM))
                         .and(auth != null ? role.auth.eq(auth) : role.auth.ne(AuthEnum.REJECT))
                 )
                 .fetchFirst()).intValue();
