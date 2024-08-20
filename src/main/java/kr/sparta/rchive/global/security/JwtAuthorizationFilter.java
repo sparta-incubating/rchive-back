@@ -26,6 +26,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        if ("/apis/v1/users/token/expired".equals(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String accessAuth = request.getHeader("Authorization");
 
         if (accessAuth == null || !accessAuth.startsWith("Bearer ")) {
@@ -34,9 +41,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         String token = accessAuth.split(" ")[1];
-        try{
+        try {
             jwtUtil.isExpired(token);
-        }catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e){
             PrintWriter writer = response.getWriter();
             writer.print("access token expired");
 

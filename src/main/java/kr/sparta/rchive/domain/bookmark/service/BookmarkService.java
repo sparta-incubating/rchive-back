@@ -50,9 +50,29 @@ public class BookmarkService {
         bookmarkRepository.delete(findBookmark);
     }
 
+    // TODO: 페이징 적용
     public List<PostRes> getUserBookmark(Long userId) {
         List<Bookmark> bookmarkList = bookmarkRepository.findBookmarkListByUserId(userId);
 
+        return getBookmarkPostRes(bookmarkList);
+    }
+
+    public List<Long> findPostIdListByUserId(Long userId) {
+        return bookmarkRepository.findPostIdListByUserId(userId);
+    }
+
+    public Boolean existsBookmarkByUserIdAndPostId(Long userId, Long postId) {
+        return bookmarkRepository.existsBookmarkByUserIdAndPostId(userId, postId);
+    }
+    
+    // TODO: 페이징 적용
+    public List<PostRes> searchBookmark(User user, String keyword) {
+        List<Bookmark> bookmarkList = bookmarkRepository.findBookmarkListByUserIdAndKeyword(user.getId(), keyword);
+
+        return getBookmarkPostRes(bookmarkList);
+    }
+
+    private List<PostRes> getBookmarkPostRes(List<Bookmark> bookmarkList) {
         return bookmarkList.stream().map(
                 bookmark -> {
                     List<TagInfo> tagInfoList = bookmark.getPost().getPostTagList().stream()
@@ -62,19 +82,14 @@ public class BookmarkService {
                                     .build()).collect(Collectors.toList());
 
                     return PostRes.builder()
+                            .postId(bookmark.getPost().getId())
                             .title(bookmark.getPost().getTitle())
+                            .thumbnailUrl(bookmark.getPost().getThumbnailUrl())
+                            .postType(bookmark.getPost().getPostType())
                             .tutor(bookmark.getPost().getTutor().getTutorName())
                             .uploadedAt(bookmark.getPost().getUploadedAt())
-                            .tagInfoList(tagInfoList).build();
+                            .tagList(tagInfoList).build();
                 }
         ).collect(Collectors.toList());
-    }
-
-    public List<Long> findPostIdListByUserId(Long userId) {
-        return bookmarkRepository.findPostIdListByUserId(userId);
-    }
-
-    public Boolean existsBookmarkByUserIdAndPostId(Long userId, Long postId) {
-        return bookmarkRepository.existsBookmarkByUserIdAndPostId(userId, postId);
     }
 }

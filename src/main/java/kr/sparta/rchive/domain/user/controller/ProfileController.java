@@ -94,4 +94,15 @@ public class ProfileController {
                 .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_PHONE, null));
     }
 
+    @GetMapping("/bookmark/search")
+    @Operation(operationId = "PROFILE-009", summary = "북마크 목록 검색")
+    public ResponseEntity<CommonResponseDto> searchBookmark(
+            @LoginUser User user,
+            @RequestParam("keyword") String keyword
+    ) {
+        List<PostRes> responseList = bookmarkService.searchBookmark(user, keyword);
+
+        return ResponseEntity.status(ProfileResponseCode.OK_SEARCH_BOOKMARK.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_SEARCH_BOOKMARK, responseList));
+    }
 }

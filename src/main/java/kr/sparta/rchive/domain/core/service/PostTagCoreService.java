@@ -466,4 +466,10 @@ public class PostTagCoreService {
                     .build()
             ).collect(Collectors.toList());
     }
+
+    public void deleteRecentSearchKeyword(User user, RecentSearchKeywordReq request) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(request.trackName(), request.period());
+
+        redisService.deleteSearchKeyword(user.getId(), track.getId(), request.keyword());
+    }
 }
