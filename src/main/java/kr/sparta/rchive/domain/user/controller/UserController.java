@@ -43,7 +43,7 @@ public class UserController {
     @DeleteMapping("/logout")
     @Operation(operationId = "USER-004", summary = "로그아웃")
     public ResponseEntity<CommonResponseDto> logout(HttpServletResponse res,
-            @LoginUser User user)
+                                                    @LoginUser User user)
             throws UnsupportedEncodingException {
         userService.logout(res, user);
         return ResponseEntity.status(UserResponseCode.OK_LOGOUT.getHttpStatus())
@@ -54,7 +54,7 @@ public class UserController {
     @Operation(operationId = "USER-005", summary = "토큰 재발급")
     @ApiExceptionCodeExample(ReissueException.class)
     public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req,
-            HttpServletResponse res)
+                                                     HttpServletResponse res)
             throws UnsupportedEncodingException, ParseException {
         userService.reissue(req, res);
         return ResponseEntity.status(UserResponseCode.OK_REISSUE.getHttpStatus())
@@ -64,7 +64,7 @@ public class UserController {
     @DeleteMapping
     @Operation(operationId = "USER-006", summary = "회원 탈퇴")
     public ResponseEntity<CommonResponseDto> withdraw(HttpServletResponse res,
-            @LoginUser User user)
+                                                      @LoginUser User user)
             throws UnsupportedEncodingException {
         userService.logout(res, user);
         userService.withdraw(user);
@@ -98,6 +98,17 @@ public class UserController {
             return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
                     .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, false));
         }
+    }
+
+    @GetMapping("/token/expired")
+    @Operation(operationId = "USER-009", summary = "유저 토큰 만료 여부 조회")
+    public ResponseEntity<CommonResponseDto> tokenExpired (
+            HttpServletRequest req
+    ) throws UnsupportedEncodingException, ParseException {
+        Boolean isExpired = userService.tokenExpired(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED, isExpired));
     }
 
 }
