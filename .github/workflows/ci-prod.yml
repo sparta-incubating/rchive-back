@@ -17,6 +17,7 @@ env:
   REGION: ${{secrets.REGION}}
   S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
   S3_SECRET_ACCESS_KEY: ${{secrets.S3_SECRET_ACCESS_KEY}}
+  EFFIC_ACCESS_KEY: ${{secrets.EFFIC_ACCESS_KEY}}
   TZ: Asia/Seoul
 
 # 워크 플로우가 깃 레포에 대한 권한을 읽기 만 가능하게 설정한다.

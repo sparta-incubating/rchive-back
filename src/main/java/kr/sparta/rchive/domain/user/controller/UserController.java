@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.exception.statement.user.ReissueException;
@@ -43,7 +44,7 @@ public class UserController {
     @DeleteMapping("/logout")
     @Operation(operationId = "USER-004", summary = "로그아웃")
     public ResponseEntity<CommonResponseDto> logout(HttpServletResponse res,
-                                                    @LoginUser User user)
+            @LoginUser User user)
             throws UnsupportedEncodingException {
         userService.logout(res, user);
         return ResponseEntity.status(UserResponseCode.OK_LOGOUT.getHttpStatus())
@@ -54,7 +55,7 @@ public class UserController {
     @Operation(operationId = "USER-005", summary = "토큰 재발급")
     @ApiExceptionCodeExample(ReissueException.class)
     public ResponseEntity<CommonResponseDto> reissue(HttpServletRequest req,
-                                                     HttpServletResponse res)
+            HttpServletResponse res)
             throws UnsupportedEncodingException, ParseException {
         userService.reissue(req, res);
         return ResponseEntity.status(UserResponseCode.OK_REISSUE.getHttpStatus())
@@ -64,7 +65,7 @@ public class UserController {
     @DeleteMapping
     @Operation(operationId = "USER-006", summary = "회원 탈퇴")
     public ResponseEntity<CommonResponseDto> withdraw(HttpServletResponse res,
-                                                      @LoginUser User user)
+            @LoginUser User user)
             throws UnsupportedEncodingException {
         userService.logout(res, user);
         userService.withdraw(user);
@@ -102,7 +103,7 @@ public class UserController {
 
     @GetMapping("/token/expired")
     @Operation(operationId = "USER-009", summary = "유저 토큰 만료 여부 조회")
-    public ResponseEntity<CommonResponseDto> tokenExpired (
+    public ResponseEntity<CommonResponseDto> tokenExpired(
             HttpServletRequest req
     ) throws UnsupportedEncodingException, ParseException {
         Boolean isExpired = userService.tokenExpired(req);
@@ -111,4 +112,14 @@ public class UserController {
                 .body(CommonResponseDto.of(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED, isExpired));
     }
 
+    @PostMapping("/auth/phone")
+    @Operation(operationId = "USER-010", summary = "휴대폰 인증 전송")
+    public ResponseEntity<CommonResponseDto> sendAuthMessage(
+            @Valid @RequestBody AuthPhoneReq req)
+            throws UnsupportedEncodingException, ParseException {
+        userService.sendAuthPhone(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_SEND_AUTH_PHONE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_SEND_AUTH_PHONE, null));
+    }
 }
