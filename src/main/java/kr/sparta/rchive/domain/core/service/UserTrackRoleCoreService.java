@@ -95,7 +95,7 @@ public class UserTrackRoleCoreService {
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
             User user, OrderRoleListEnum sort, TrackNameEnum trackName, Integer period,
             AuthEnum status,
-            Integer searchPeriod, String email, TrackRoleEnum trackRole, Pageable pageable) {
+            Integer searchPeriod, String keyword, TrackRoleEnum trackRole, Pageable pageable) {
 
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         if (period == 0) {
@@ -107,10 +107,10 @@ public class UserTrackRoleCoreService {
         List<Role> roleList;
         if (status == null) {
             roleList = roleService.findRoleListInBackOfficeAuthNoReject(
-                    managerTrack, searchPeriod, email, trackRole, sort);
+                    managerTrack, searchPeriod, keyword, trackRole, sort);
         } else {
             roleList = roleService.findRoleListInBackOffice(
-                    managerTrack, searchPeriod, status, email, trackRole, sort);
+                    managerTrack, searchPeriod, status, keyword, trackRole, sort);
         }
 
         List<RoleGetTrackRoleRequestListRes> responseList = roleList.stream()
