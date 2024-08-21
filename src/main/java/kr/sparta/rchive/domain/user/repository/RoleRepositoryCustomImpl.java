@@ -5,6 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Objects;
 import kr.sparta.rchive.domain.user.entity.QRole;
+import kr.sparta.rchive.domain.user.entity.QTrack;
+import kr.sparta.rchive.domain.user.entity.QUser;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.OrderRoleListEnum;
@@ -50,40 +52,50 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
 
     @Override
     public List<Role> findRoleListInBackOfficeAuthNoRejectByPm(
-            TrackNameEnum trackName, Integer searchPeriod, String email, TrackRoleEnum trackRole,
+            TrackNameEnum trackName, Integer searchPeriod, String keyword, TrackRoleEnum trackRole,
             OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
+        QUser user = QUser.user;
+        QTrack track = QTrack.track;
 
         return queryFactory
                 .select(role)
                 .from(role)
-                .where(role.track.trackName.eq(trackName)
-                        .and(searchPeriod != null ? role.track.period.eq(searchPeriod) : null)
-                        .and(role.track.period.ne(0))
-                        .and(email != null ? role.user.email.eq(email) : null)
-                        .and(trackRole != null ? role.trackRole.eq(trackRole) : null)
-                        .and(role.auth.ne(AuthEnum.REJECT))
+                .join(role.user, user).fetchJoin()
+                .join(role.track, track).fetchJoin()
+                .where(
+                        track.trackName.eq(trackName),
+                        searchPeriod != null ? track.period.eq(searchPeriod) : null,
+                        track.period.ne(0),
+                        (keyword != null) ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        trackRole != null ? role.trackRole.eq(trackRole) : null,
+                        role.auth.ne(AuthEnum.REJECT)
                 )
                 .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
     }
 
     public List<Role> findRoleListInBackOfficeAuthNoRejectByApm(
-            TrackNameEnum trackName, Integer period, String email, TrackRoleEnum trackRole,
+            TrackNameEnum trackName, Integer period, String keyword, TrackRoleEnum trackRole,
             OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
+        QTrack track = QTrack.track;
+        QUser user = QUser.user;
 
         return queryFactory
                 .select(role)
                 .from(role)
-                .where(role.track.trackName.eq(trackName)
-                        .and(role.track.period.eq(period))
-                        .and(email != null ? role.user.email.eq(email) : null)
-                        .and(trackRole != null ? role.trackRole.eq(trackRole) : null)
-                        .and(role.trackRole.ne(TrackRoleEnum.APM))
-                        .and(role.auth.ne(AuthEnum.REJECT))
+                .join(role.user, user).fetchJoin()
+                .join(role.track, track).fetchJoin()
+                .where(
+                        track.trackName.eq(trackName),
+                        track.period.eq(period),
+                        keyword != null ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        trackRole != null ? role.trackRole.eq(trackRole) : null,
+                        role.trackRole.ne(TrackRoleEnum.APM),
+                        role.auth.ne(AuthEnum.REJECT)
                 )
                 .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
@@ -91,19 +103,24 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
 
     public List<Role> findRoleListInBackOfficeByPm(
             TrackNameEnum trackName, Integer searchPeriod,
-            AuthEnum auth, String email, TrackRoleEnum trackRole, OrderRoleListEnum sort) {
+            AuthEnum auth, String keyword, TrackRoleEnum trackRole, OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
+        QTrack track = QTrack.track;
+        QUser user = QUser.user;
 
         return queryFactory
                 .select(role)
                 .from(role)
-                .where(role.track.trackName.eq(trackName)
-                        .and(searchPeriod != null ? role.track.period.eq(searchPeriod) : null)
-                        .and(role.track.period.ne(0))
-                        .and(email != null ? role.user.email.eq(email) : null)
-                        .and(trackRole != null ? role.trackRole.eq(trackRole) : null)
-                        .and(auth != null ? role.auth.eq(auth) : null)
+                .join(role.user, user).fetchJoin()
+                .join(role.track, track).fetchJoin()
+                .where(
+                        track.trackName.eq(trackName),
+                        searchPeriod != null ? track.period.eq(searchPeriod) : null,
+                        track.period.ne(0),
+                        keyword != null ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        trackRole != null ? role.trackRole.eq(trackRole) : null,
+                        auth != null ? role.auth.eq(auth) : null
                 )
                 .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
@@ -111,19 +128,24 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
 
     public List<Role> findRoleListInBackOfficeByApm(
             TrackNameEnum trackName, Integer period,
-            AuthEnum auth, String email, TrackRoleEnum trackRole, OrderRoleListEnum sort) {
+            AuthEnum auth, String keyword, TrackRoleEnum trackRole, OrderRoleListEnum sort) {
 
         QRole role = QRole.role;
+        QTrack track = QTrack.track;
+        QUser user = QUser.user;
 
         return queryFactory
                 .select(role)
                 .from(role)
-                .where(role.track.trackName.eq(trackName)
-                        .and(role.track.period.eq(period))
-                        .and(email != null ? role.user.email.eq(email) : null)
-                        .and(trackRole != null ? role.trackRole.eq(trackRole) : null)
-                        .and(role.trackRole.ne(TrackRoleEnum.APM))
-                        .and(auth != null ? role.auth.eq(auth) : null)
+                .join(role.user, user).fetchJoin()
+                .join(role.track, track).fetchJoin()
+                .where(
+                        track.trackName.eq(trackName),
+                        track.period.eq(period),
+                        keyword != null ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        trackRole != null ? role.trackRole.eq(trackRole) : null,
+                        role.trackRole.ne(TrackRoleEnum.APM),
+                        auth != null ? role.auth.eq(auth) : null
                 )
                 .orderBy(roleListOrderSpecifier(sort, role))
                 .fetch();
