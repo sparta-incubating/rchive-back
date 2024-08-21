@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
+import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.exception.statement.user.ReissueException;
@@ -112,14 +113,23 @@ public class UserController {
                 .body(CommonResponseDto.of(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED, isExpired));
     }
 
-    @PostMapping("/auth/phone")
+    @PostMapping("/auth/phone/send")
     @Operation(operationId = "USER-010", summary = "휴대폰 인증 전송")
-    public ResponseEntity<CommonResponseDto> sendAuthMessage(
-            @Valid @RequestBody AuthPhoneReq req)
-            throws UnsupportedEncodingException, ParseException {
+    public ResponseEntity<CommonResponseDto> sendAuthPhone(
+            @Valid @RequestBody AuthPhoneReq req) {
         userService.sendAuthPhone(req);
 
         return ResponseEntity.status(UserResponseCode.OK_SEND_AUTH_PHONE.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_SEND_AUTH_PHONE, null));
+    }
+
+    @PostMapping("/auth/phone/valid")
+    @Operation(operationId = "USER-011", summary = "휴대폰 인증 확인")
+    public ResponseEntity<CommonResponseDto> validAuthPhone(
+            @Valid @RequestBody AuthPhoneValidReq req) {
+        userService.validAuthPhone(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_VALID_AUTH_PHONE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_VALID_AUTH_PHONE, null));
     }
 }
