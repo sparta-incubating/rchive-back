@@ -472,4 +472,47 @@ public class PostTagCoreService {
 
         redisService.deleteSearchKeyword(user.getId(), track.getId(), request.keyword());
     }
+
+    public PostModifyPreviewRes getPostDetailInBackOffice(User user, TrackNameEnum trackName, Integer period, Long postId) {
+        Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+
+        if (period == 0) {
+            roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
+        } else {
+            roleService.existByUserAndTrackByApmThrowException(user.getId(), track.getId());
+        }
+
+        Post post = postService.findPostDetail(postId);
+
+        if (post.getTrack().getTrackName() != track.getTrackName()) {
+            throw new TrackCustomException(TrackExceptionCode.FORBIDDEN_TRACK);
+        }
+
+        if (track.getPeriod() != 0 && !Objects.equals(post.getTrack().getPeriod(), track.getPeriod())) {
+            throw new TrackCustomException(TrackExceptionCode.FORBIDDEN_TRACK);
+        }
+
+        List<String> tagNameList = post.getPostTagList().stream()
+                .map(
+                        postTag -> postTag.getTag().getTagName()
+                ).toList();
+
+        TutorRes tutorRes = TutorRes.builder()
+                .tutorId(post.getTutor().getId())
+                .tutorName(post.getTutor().getTutorName())
+                .build();
+
+        return PostModifyPreviewRes.builder()
+                .thumbnailUrl(post.getThumbnailUrl())
+                .title(post.getTitle())
+                .contentLink(post.getContentLink())
+                .videoLink(post.getVideoLink())
+                .period(post.getTrack().getPeriod())
+                .postType(post.getPostType())
+                .tutorRes(tutorRes)
+                .tagNameList(tagNameList)
+                .uploadedAt(post.getUploadedAt())
+                .isOpened(post.getIsOpened())
+                .build();
+    }
 }
