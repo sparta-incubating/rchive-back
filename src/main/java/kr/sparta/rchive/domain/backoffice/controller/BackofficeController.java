@@ -6,6 +6,7 @@ import kr.sparta.rchive.domain.backoffice.exception.*;
 import kr.sparta.rchive.domain.backoffice.respoonse.BackofficeResponseCode;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
+import kr.sparta.rchive.domain.post.dto.response.PostModifyPreviewRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
@@ -192,5 +193,19 @@ public class BackofficeController {
 
         return ResponseEntity.status(BackofficeResponseCode.OK_USER_TRACK_REJECTION.getHttpStatus())
             .body(CommonResponseDto.of(BackofficeResponseCode.OK_USER_TRACK_REJECTION, null));
+    }
+
+    @GetMapping("/post/{postId}")
+    @Operation(operationId = "BACKOFFICE-010", summary = "게시물 수정 시 기존 내용 조회")
+    public ResponseEntity<CommonResponseDto> getPostDetailInBackOffice(
+            @LoginUser User user,
+            @RequestParam("trackName") TrackNameEnum trackName,
+            @RequestParam("loginPeriod") Integer period,
+            @PathVariable Long postId
+    ) {
+        PostModifyPreviewRes response = postTagCoreService.getPostDetailInBackOffice(user, trackName, period, postId);
+
+        return ResponseEntity.status(BackofficeResponseCode.OK_GET_POST_DETAIL_IN_BACKOFFICE.getHttpStatus())
+                .body(CommonResponseDto.of(BackofficeResponseCode.OK_GET_POST_DETAIL_IN_BACKOFFICE, response));
     }
 }
