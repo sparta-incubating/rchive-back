@@ -75,3 +75,6 @@ cloud:
       max-file-size: 3MB
       max-request-size: 5MB
       resolve-lazily: true
+
+effic:
+  access-key: ${EFFIC_ACCESS_KEY}

@@ -12,6 +12,7 @@ public class RedisService {
 
     private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
     private static final long SELECT_ROLE_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
+    private static final long AUTH_PHONE_TIME = 10 * 60 * 1000L; // 10분
 
     private final RedisUtil redisUtil;
 
@@ -33,7 +34,7 @@ public class RedisService {
         redisUtil.setListTypeLong(redisKey, postIdList);
     }
 
-    // Refresh Token
+    /* Refresh Token */
     private String keyRefreshToken(User user) {
         return String.format("refresh-user-%d", user.getId());
     }
@@ -53,7 +54,7 @@ public class RedisService {
         redisUtil.delete(key);
     }
 
-    // Select Role
+    /* Select Role */
     private String keySelectRole(User user) {
         return String.format("select-role-user-%d", user.getId());
     }
@@ -78,6 +79,7 @@ public class RedisService {
         redisUtil.delete(key);
     }
 
+    /* RecentSearchKeyword */
     public void saveRecentSearchKeyword(Long userId, Long trackId, String keyword) {
         String key = keySearchKeyword(userId, trackId);
 
@@ -101,4 +103,20 @@ public class RedisService {
 
         redisUtil.removeKeywordSearch(key, keyword);
     }
+
+    /* Auth Phone */
+    private String keyAuthPhone(String username, String phone) {
+        return String.format("auth-phone-%s-%s", username, phone);
+    }
+
+    public String getAuthPhone(String username, String phone) {
+        String key = keyAuthPhone(username, phone);
+        return redisUtil.get(key);
+    }
+
+    public void setAuthPhone(String username, String phone, String authCode) {
+        String key = keyAuthPhone(username, phone);
+        redisUtil.set(key, authCode, AUTH_PHONE_TIME);
+    }
+
 }
