@@ -8,27 +8,31 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
+import java.util.Random;
+import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
-import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
-import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
 import kr.sparta.rchive.domain.user.repository.UserRepository;
-import kr.sparta.rchive.global.execption.GlobalCustomException;
-import kr.sparta.rchive.global.execption.GlobalExceptionCode;
 import kr.sparta.rchive.global.redis.RedisService;
 import kr.sparta.rchive.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +43,10 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
+    private final RestTemplate restTemplate;
+
+    @Value("${effic.access-key}")
+    private String efficAccessKey;
 
     @Transactional
     public void signup(UserSignupReq req) {
@@ -60,8 +68,6 @@ public class UserService {
                 throw new UserCustomException(UserExceptionCode.BAD_REQUEST_MANAGER_NICKNAME);
             }
         }
-
-        // TODO: profileImg null이면 기본값 넣어주기
 
         User user = User.builder()
                 .email(req.email())
@@ -87,12 +93,7 @@ public class UserService {
     public void logout(HttpServletResponse res, User user)
             throws UnsupportedEncodingException {
         redisService.deleteRefreshToken(user);
-
-//        Cookie refresh = jwtUtil.addRefreshTokenToCookie("");
-//        refresh.setMaxAge(0);
-//        res.addCookie(refresh);
         res.addHeader("Set-Cookie", jwtUtil.removeRefreshTokenToCookie().toString());
-
     }
 
     public void reissue(HttpServletRequest req, HttpServletResponse res)
@@ -102,14 +103,11 @@ public class UserService {
         Cookie[] cookies = req.getCookies();
 
         if (cookies != null) {
-            System.out.println("yes cookieeeeeeeee");
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("Refresh")) {
                     refreshToken = cookie.getValue();
                 }
             }
-        } else {
-            System.out.println("no cookieeeeeeeee");
         }
 
         if (refreshToken == null) {
@@ -180,6 +178,38 @@ public class UserService {
     public void updatePhone(User user, ProfileUpdatePhoneReq req) {
         user.updatePhone(req.phone());
         userRepository.save(user);
+    }
+
+    public void sendAuthPhone(AuthPhoneReq req) {
+        String url = "https://api.effic.biz/auto-message-event/template";
+        String authCode = generateAuthCode();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.setBearerAuth(efficAccessKey);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("title", "rchive");
+        requestBody.put("receiverNumber", req.phone());
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("name", req.username());
+        variables.put("brandName", "르탄이의 아카이브");
+        variables.put("verificationCode", authCode);
+
+        requestBody.put("variables", variables);
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, httpHeaders);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        String responseBody = response.getBody();
+
+        redisService.setAuthPhone(req.username(), req.phone(), authCode);
+    }
+
+    public String generateAuthCode() {
+        Random random = new Random();
+        int authCode = random.nextInt(1000000);
+        return String.format("%06d", authCode);
     }
 
     public boolean overlapEmail(String email) {
