@@ -21,7 +21,8 @@ public enum BackofficeResponseCode implements ResponseCode {
     OK_SEARCH_POST_LIST(HttpStatus.OK, "BACKOFFICE-006", "백오피스: 교육자료 검색"),
     OK_GET_LAST_SELECT_ROLE(HttpStatus.OK, "BACKOFFICE-007", "백오피스: 마지막으로 선택한 권한 조회 성공"),
     OK_GET_PROFILE(HttpStatus.OK, "BACKOFFICE-008", "백오피스: 프로필 조회 성공"),
-    OK_USER_TRACK_REJECTION(HttpStatus.OK, "BACKOFFICE-008", "백오피스: 유저 트랙 열람 권한 거절"),
+    OK_USER_TRACK_REJECTION(HttpStatus.OK, "BACKOFFICE-009", "백오피스: 유저 트랙 열람 권한 거절 성공"),
+    OK_GET_POST_DETAIL_IN_BACKOFFICE(HttpStatus.OK, "BACKOFFICE-010", "백오피스: 게시물 수정 시 기존 내용 조회 성공")
     ;
 
     private final HttpStatus httpStatus;

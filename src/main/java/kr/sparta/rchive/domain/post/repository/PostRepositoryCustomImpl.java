@@ -234,4 +234,23 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             .orderBy(post.uploadedAt.desc(), post.id.desc())
             .fetch();
     }
+
+    @Override
+    public Post findPostDetail(Long postId) {
+        QPost post = QPost.post;
+        QTutor tutor = QTutor.tutor;
+        QTag tag = QTag.tag;
+        QPostTag postTag = QPostTag.postTag;
+
+        return queryFactory
+                .select(post).distinct()
+                .from(post)
+                .leftJoin(post.postTagList, postTag).fetchJoin()
+                .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
+                .where(
+                        post.id.eq(postId)
+                )
+                .fetchOne();
+    }
 }

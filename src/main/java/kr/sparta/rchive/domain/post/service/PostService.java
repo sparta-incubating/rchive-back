@@ -120,4 +120,8 @@ public class PostService {
     public List<Post> searchPost(PostTypeEnum postType, String keyword, Long tutorId, Long trackId) {
         return postRepository.findPost(postType, keyword, tutorId, trackId);
     }
+
+    public Post findPostDetail(Long postId) {
+        return postRepository.findPostDetail(postId);
+    }
 }
