@@ -52,7 +52,7 @@ public class BackofficeController {
         @RequestParam(value = "trackName") TrackNameEnum trackName,
         @RequestParam(value = "period") Integer period,
         @RequestParam(value = "searchPeriod", required = false) Integer searchPeriod,
-        @RequestParam(value = "email", required = false) String email,
+        @RequestParam(value = "keyword", required = false) String keyword,
         @RequestParam(value = "trackRole", required = false) TrackRoleEnum trackRole,
         @RequestParam(value = "page", defaultValue = "1") int page,
         @RequestParam(value = "size", defaultValue = "10") int size
@@ -60,7 +60,7 @@ public class BackofficeController {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<RoleGetTrackRoleRequestListRes> responseList =
             userTrackRoleCoreService.getUserTrackRoleRequestList(user, sort, trackName, period,
-                status, searchPeriod, email, trackRole, pageable);
+                status, searchPeriod, keyword, trackRole, pageable);
 
         return ResponseEntity.status(
                 BackofficeResponseCode.OK_GET_USER_TRACK_ROLE_REQUEST_LIST.getHttpStatus())
