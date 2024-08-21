@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
+import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
@@ -212,6 +213,19 @@ public class UserService {
         return String.format("%06d", authCode);
     }
 
+    public void validAuthPhone(AuthPhoneValidReq req) {
+        String AuthCodeInRedis = redisService.getAuthPhone(req.username(), req.phone());
+
+        if (AuthCodeInRedis == null) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_PHONE_AUTH_EXPIRED);
+        }
+
+        if (!req.authCode().equals(AuthCodeInRedis)) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_PHONE_AUTH);
+        }
+
+    }
+
     public boolean overlapEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -242,4 +256,5 @@ public class UserService {
             return true;
         }
     }
+
 }
