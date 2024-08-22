@@ -8,8 +8,9 @@ import jakarta.validation.Valid;
 import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
-import kr.sparta.rchive.domain.user.dto.request.FindEmailReq;
-import kr.sparta.rchive.domain.user.dto.request.FindPasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -140,7 +141,7 @@ public class UserController {
     @PostMapping("/find/email")
     @Operation(operationId = "USER-012", summary = "이메일 찾기")
     public ResponseEntity<CommonResponseDto> findUserEmail(
-            @Valid @RequestBody FindEmailReq req) {
+            @Valid @RequestBody UserFindEmailReq req) {
         List<FindEmailRes> res = userService.findUserEmail(req);
 
         return ResponseEntity.status(UserResponseCode.OK_FIND_EMAIL.getHttpStatus())
@@ -150,10 +151,20 @@ public class UserController {
     @PostMapping("/find/password")
     @Operation(operationId = "USER-013", summary = "비밀번호 찾기")
     public ResponseEntity<CommonResponseDto> findUserPassword(
-            @Valid @RequestBody FindPasswordReq req) {
+            @Valid @RequestBody UserFindPasswordReq req) {
         userService.findUserPassword(req);
 
         return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD, null));
+    }
+
+    @PatchMapping("/find/password")
+    @Operation(operationId = "USER-014", summary = "비밀번호 찾기 후 변경")
+    public ResponseEntity<CommonResponseDto> findUserPasswordUpdate(
+            @Valid @RequestBody UserFindPasswordUpdateReq req) {
+        userService.findUserPasswordUpdate(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD_UPDATE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD_UPDATE, null));
     }
 }
