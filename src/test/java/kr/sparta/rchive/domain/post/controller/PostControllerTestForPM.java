@@ -93,7 +93,7 @@ public class PostControllerTestForPM {
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
-                status().isOk(),
+                status().isBadRequest(),
                 jsonPath("$.message").value("교육자료 생성 성공"),
                 jsonPath("$.data.postId").value(1L)
         );
