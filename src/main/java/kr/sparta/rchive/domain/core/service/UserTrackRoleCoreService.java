@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
@@ -219,6 +220,7 @@ public class UserTrackRoleCoreService {
         Track managaerTrack = roleService.getRoleByManager(manager).getTrack();
         managerTrackRoleInvalid(managaerTrack, reqList);
 
+        roleService.deleteApmRoleList(reqList);
         roleService.approveRoleRequest(reqList);
         roleService.deleteRoleListByAuthNotApprove(reqList);
     }

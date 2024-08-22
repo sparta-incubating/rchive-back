@@ -51,4 +51,9 @@ public interface RoleRepository extends JpaRepository<Role, RoleId>, RoleReposit
             + "and r.trackRole = 'APM'")
     boolean existsByUserIdAndTracIdAndAuthApproveByApm(Long userId, Long trackId);
 
+    @Query("select r from Role r "
+            + "where r.user.email = :email "
+            + "and r.trackRole = :trackRole "
+            + "and r.auth = 'APPROVE'")
+    List<Role> findRoleListByEmailAndTrackRoleAndApprove(String email, TrackRoleEnum trackRole);
 }
