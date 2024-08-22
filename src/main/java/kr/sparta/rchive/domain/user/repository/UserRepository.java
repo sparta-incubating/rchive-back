@@ -24,4 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u where u.username = :username and u.phone = :phone order by u.createdAt asc")
     List<User> findUsersByUsernameAndPhone(String username, String phone);
+
+    boolean existsUserByEmailAndUsernameAndPhone(String email, String username, String phone);
 }

@@ -14,6 +14,7 @@ import java.util.Random;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
 import kr.sparta.rchive.domain.user.dto.request.FindEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.FindPasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
@@ -246,6 +247,14 @@ public class UserService {
         }
 
         return resList;
+    }
+
+    public void findUserPassword(FindPasswordReq req) {
+        boolean isUser = userRepository.existsUserByEmailAndUsernameAndPhone(req.email(),
+                req.username(), req.phone());
+        if (!isUser) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_USER);
+        }
     }
 
     public boolean overlapEmail(String email) {
