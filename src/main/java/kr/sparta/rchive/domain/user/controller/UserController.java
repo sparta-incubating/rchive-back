@@ -9,6 +9,7 @@ import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
 import kr.sparta.rchive.domain.user.dto.request.FindEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.FindPasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -144,5 +145,15 @@ public class UserController {
 
         return ResponseEntity.status(UserResponseCode.OK_FIND_EMAIL.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_FIND_EMAIL, res));
+    }
+
+    @PostMapping("/find/password")
+    @Operation(operationId = "USER-013", summary = "비밀번호 찾기")
+    public ResponseEntity<CommonResponseDto> findUserPassword(
+            @Valid @RequestBody FindPasswordReq req) {
+        userService.findUserPassword(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD, null));
     }
 }
