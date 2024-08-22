@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record FindEmailRes(
-        @Email(message = "올바르지 않은 이메일 형식")
         String email,
         LocalDate createdAt
 ) {
