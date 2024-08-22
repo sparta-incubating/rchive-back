@@ -5,9 +5,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
+import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.exception.statement.user.ReissueException;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
@@ -131,5 +136,35 @@ public class UserController {
 
         return ResponseEntity.status(UserResponseCode.OK_VALID_AUTH_PHONE.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_VALID_AUTH_PHONE, null));
+    }
+
+    @PostMapping("/find/email")
+    @Operation(operationId = "USER-012", summary = "이메일 찾기")
+    public ResponseEntity<CommonResponseDto> findUserEmail(
+            @Valid @RequestBody UserFindEmailReq req) {
+        List<FindEmailRes> res = userService.findUserEmail(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_EMAIL.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_EMAIL, res));
+    }
+
+    @PostMapping("/find/password")
+    @Operation(operationId = "USER-013", summary = "비밀번호 찾기")
+    public ResponseEntity<CommonResponseDto> findUserPassword(
+            @Valid @RequestBody UserFindPasswordReq req) {
+        userService.findUserPassword(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD, null));
+    }
+
+    @PatchMapping("/find/password")
+    @Operation(operationId = "USER-014", summary = "비밀번호 찾기 후 변경")
+    public ResponseEntity<CommonResponseDto> findUserPasswordUpdate(
+            @Valid @RequestBody UserFindPasswordUpdateReq req) {
+        userService.findUserPasswordUpdate(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD_UPDATE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD_UPDATE, null));
     }
 }
