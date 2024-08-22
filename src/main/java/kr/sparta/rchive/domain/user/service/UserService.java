@@ -7,14 +7,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
+import kr.sparta.rchive.domain.user.dto.request.FindEmailReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
+import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
@@ -224,6 +228,24 @@ public class UserService {
             throw new UserCustomException(UserExceptionCode.BAD_REQUEST_PHONE_AUTH);
         }
 
+    }
+
+    public List<FindEmailRes> findUserEmail(FindEmailReq req) {
+        List<User> userList = userRepository.findUsersByUsernameAndPhone(req.username(),
+                req.phone());
+        if (userList.isEmpty()) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_USER);
+        }
+
+        List<FindEmailRes> resList = new ArrayList<>();
+        for (User user : userList) {
+            resList.add(FindEmailRes.builder()
+                    .email(user.getEmail())
+                    .createdAt(user.getCreatedAt().toLocalDate())
+                    .build());
+        }
+
+        return resList;
     }
 
     public boolean overlapEmail(String email) {

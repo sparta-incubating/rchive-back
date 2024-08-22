@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
+import kr.sparta.rchive.domain.user.dto.request.FindEmailReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
+import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.exception.statement.user.ReissueException;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
@@ -131,5 +134,15 @@ public class UserController {
 
         return ResponseEntity.status(UserResponseCode.OK_VALID_AUTH_PHONE.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_VALID_AUTH_PHONE, null));
+    }
+
+    @PostMapping("/find/email")
+    @Operation(operationId = "USER-012", summary = "이메일 찾기")
+    public ResponseEntity<CommonResponseDto> findUserEmail(
+            @Valid @RequestBody FindEmailReq req) {
+        List<FindEmailRes> res = userService.findUserEmail(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_EMAIL.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_EMAIL, res));
     }
 }
