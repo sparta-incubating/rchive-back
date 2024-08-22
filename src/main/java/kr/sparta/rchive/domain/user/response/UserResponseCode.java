@@ -19,7 +19,8 @@ public enum UserResponseCode implements ResponseCode {
     OK_SEND_AUTH_PHONE(HttpStatus.OK, "USER-010", "휴대폰 인증 전송 성공"),
     OK_VALID_AUTH_PHONE(HttpStatus.OK, "USER-011", "휴대폰 인증 확인 성공"),
     OK_FIND_EMAIL(HttpStatus.OK, "USER-012", "이메일 찾기 성공"),
-    OK_FIND_PASSWORD(HttpStatus.OK, "USER-013", "비밀번호 찾기 성공");
+    OK_FIND_PASSWORD(HttpStatus.OK, "USER-013", "비밀번호 찾기 성공"),
+    OK_FIND_PASSWORD_UPDATE(HttpStatus.OK, "USER-014", "비밀번호 찾기 변경 성공");
 
     private final HttpStatus httpStatus;
     private final String ResponseCode;

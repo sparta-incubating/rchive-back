@@ -13,11 +13,12 @@ import java.util.List;
 import java.util.Random;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
-import kr.sparta.rchive.domain.user.dto.request.FindEmailReq;
-import kr.sparta.rchive.domain.user.dto.request.FindPasswordReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -231,9 +232,9 @@ public class UserService {
 
     }
 
-    public List<FindEmailRes> findUserEmail(FindEmailReq req) {
-        List<User> userList = userRepository.findUsersByUsernameAndPhone(req.username(),
-                req.phone());
+    public List<FindEmailRes> findUserEmail(UserFindEmailReq req) {
+        List<User> userList = userRepository.findUsersByUsernameAndPhoneAndAlive(
+                req.username(), req.phone());
         if (userList.isEmpty()) {
             throw new UserCustomException(UserExceptionCode.BAD_REQUEST_USER);
         }
@@ -249,12 +250,25 @@ public class UserService {
         return resList;
     }
 
-    public void findUserPassword(FindPasswordReq req) {
-        boolean isUser = userRepository.existsUserByEmailAndUsernameAndPhone(req.email(),
-                req.username(), req.phone());
+    public void findUserPassword(UserFindPasswordReq req) {
+        boolean isUser = userRepository.existsUserByEmailAndUsernameAndPhoneAndAlive(
+                req.email(), req.username(), req.phone());
         if (!isUser) {
             throw new UserCustomException(UserExceptionCode.BAD_REQUEST_USER);
         }
+    }
+
+    @Transactional
+    public void findUserPasswordUpdate(UserFindPasswordUpdateReq req) {
+        boolean isUser = userRepository.existsUserByEmailAndUsernameAndPhoneAndAlive(
+                req.email(), req.username(), req.phone());
+        if (!isUser) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_USER);
+        }
+
+        User user = findByEmailAlive(req.email());
+        user.updatePassword(bCryptPasswordEncoder.encode(req.newPassword()));
+        userRepository.save(user);
     }
 
     public boolean overlapEmail(String email) {
@@ -273,7 +287,6 @@ public class UserService {
     // 유저의 Email로 트랙 ID 찾아오는 로직
     public Long findUserTrackIdByUserEmail(String userEmail) {
         return userRepository.findTrackIdByUserEmail(userEmail);
-
     }
 
     public Boolean tokenExpired(HttpServletRequest req) {
@@ -287,5 +300,6 @@ public class UserService {
             return true;
         }
     }
+
 
 }
