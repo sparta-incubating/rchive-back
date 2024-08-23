@@ -29,8 +29,7 @@ import java.time.LocalDate;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -135,5 +134,21 @@ public class PostControllerTestForPM {
                 jsonPath("$.message").value("교육자료 수정 성공"),
                 jsonPath("$.data.postId").value(1L)
         );
+    }
+
+    @Test
+    public void 관리자_게시물_삭제() throws Exception {
+        // Given
+        Long postId = 1L;
+
+        // When
+        postTagCoreService.deletePost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any(Long.class));
+
+        // Then
+        mockMvc.perform(delete("/apis/v1/posts/{postId}?trackName=ANDROID&loginPeriod=0", postId))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("교육자료 삭제 성공")
+                );
     }
 }
