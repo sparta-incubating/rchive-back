@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @EnableScheduling
-@EnableJpaAuditing
 @EnableWebSecurity
 @SpringBootApplication
 public class RchiveApplication {
