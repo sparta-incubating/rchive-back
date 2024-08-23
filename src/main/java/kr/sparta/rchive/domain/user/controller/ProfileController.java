@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
+import kr.sparta.rchive.domain.comment.dto.response.CommentProfileRes;
+import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.post.dto.response.PostRes;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
@@ -14,7 +16,6 @@ import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.exception.statement.profile.UpdatePasswordException;
 import kr.sparta.rchive.domain.user.exception.statement.profile.UpdateProfileException;
-import kr.sparta.rchive.domain.user.exception.statement.role.GetLastSelectRoleUserPageException;
 import kr.sparta.rchive.domain.user.response.ProfileResponseCode;
 import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.execption.ApiExceptionCodeExample;
@@ -35,6 +36,18 @@ public class ProfileController {
     private final UserService userService;
     private final UserTrackRoleCoreService userTrackRoleCoreService;
     private final BookmarkService bookmarkService;
+    private final CommentService commentService;
+
+    @GetMapping("/comment")
+    @Operation(operationId = "PROFILE-001", summary = "내가 작성한 댓글 조회")
+    public ResponseEntity<CommonResponseDto> getComment(
+        @LoginUser User user
+    ) {
+        List<CommentProfileRes> responseList = commentService.findCommentList(user);
+
+        return ResponseEntity.status(ProfileResponseCode.OK_GET_COMMENT.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_GET_COMMENT, responseList));
+    }
 
     @GetMapping("/bookmark")
     @Operation(operationId = "PROFILE-002", summary = "북마크 목록 조회")
