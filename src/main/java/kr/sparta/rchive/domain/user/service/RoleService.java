@@ -77,6 +77,19 @@ public class RoleService {
         roleRepository.deleteAll(roleList);
     }
 
+    @Transactional
+    public void deleteApmRoleList(List<RoleRequestListReq> reqList) {
+        List<RoleRequestListReq> apmList = new ArrayList<>();
+        for (RoleRequestListReq req : reqList) {
+            if (req.trackRole() == TrackRoleEnum.APM) {
+                apmList.add(req);
+            }
+        }
+
+        List<Role> roleList = findRoleListByEmailAndTrackRoleAndApprove(reqList);
+        roleRepository.deleteAll(roleList);
+    }
+
     public AuthEnum getResultRoleFirstLogin(User user) {
 
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).orElseThrow(
@@ -132,6 +145,17 @@ public class RoleService {
             roleList.addAll(rejectList);
             List<Role> waitList = roleRepository.findAllByEmailAndAuth(req.email(), AuthEnum.WAIT);
             roleList.addAll(waitList);
+        }
+        return roleList;
+    }
+
+    public List<Role> findRoleListByEmailAndTrackRoleAndApprove(List<RoleRequestListReq> reqList) {
+        List<Role> roleList = new ArrayList<>();
+        for (RoleRequestListReq req : reqList) {
+            List<Role> apmList = roleRepository.findRoleListByEmailAndTrackRoleAndApprove(
+                    req.email(),
+                    TrackRoleEnum.APM);
+            roleList.addAll(apmList);
         }
         return roleList;
     }
