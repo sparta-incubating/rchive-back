@@ -11,6 +11,7 @@ import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
+import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -29,6 +30,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
@@ -183,5 +186,31 @@ public class PostControllerTestForPM {
                 jsonPath("$.message").value("태그 생성 성공"),
                 jsonPath("$.data.tagId").value(1L)
         );
+    }
+
+    @Test
+    @DisplayName("POST-011 태그 검색 테스트")
+    public void 사용할_태그_검색() throws Exception {
+        // Given
+        List<TagSearchRes> responseList = new ArrayList<>();
+
+        for(int i = 1; i <= 5; i++) {
+            TagSearchRes tagSearchRes = TagSearchRes.builder()
+                    .tagId((long) i)
+                    .tagName("test tag")
+                    .build();
+
+            responseList.add(tagSearchRes);
+        }
+
+        given(tagService.searchTag(any(String.class))).willReturn(responseList);
+
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/tags?tagName=test"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("태그 검색 성공"),
+                        jsonPath("$.data[0].tagId").value(1L)
+                );
     }
 }
