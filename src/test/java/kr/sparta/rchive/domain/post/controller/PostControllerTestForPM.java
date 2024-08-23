@@ -242,4 +242,32 @@ public class PostControllerTestForPM {
                         jsonPath("$.message").value("게시물 공개 여부 공개로 변경")
                 );
     }
+    
+    @Test
+    @DisplayName("POST-016 게시물 비공개로 변경")
+    public void 게시물_공개_여부_비공개로_변경()  throws Exception {
+        // Given
+        List<Long> postIdList = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            postIdList.add((long) i);
+        }
+
+        PostOpenCloseReq request = PostOpenCloseReq.builder()
+                .postIdList(postIdList)
+                .build();
+
+        String json = obj.writeValueAsString(request);
+
+        // When
+        postTagCoreService.closePost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any());
+
+        // Then
+        mockMvc.perform(patch("/apis/v1/posts/close?trackName=ANDROID&loginPeriod=0")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("게시물 공개 여부 비공개로 변경")
+                );
+    }
 }
