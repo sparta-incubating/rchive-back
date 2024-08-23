@@ -6,6 +6,7 @@ import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
@@ -40,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = { PostController.class })
+@WebMvcTest(controllers = {PostController.class})
 @ActiveProfiles("test")
 @WithMockCustomPM
 public class PostControllerTestForPM {
@@ -194,7 +195,7 @@ public class PostControllerTestForPM {
         // Given
         List<TagSearchRes> responseList = new ArrayList<>();
 
-        for(int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 5; i++) {
             TagSearchRes tagSearchRes = TagSearchRes.builder()
                     .tagId((long) i)
                     .tagName("test tag")
@@ -211,6 +212,34 @@ public class PostControllerTestForPM {
                         status().isOk(),
                         jsonPath("$.message").value("태그 검색 성공"),
                         jsonPath("$.data[0].tagId").value(1L)
+                );
+    }
+
+    @Test
+    @DisplayName("POST-015 게시물 공개로 변경")
+    public void 게시물_공개_여부_공개로_변경() throws Exception {
+        // Given
+        List<Long> postIdList = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            postIdList.add((long) i);
+        }
+
+        PostOpenCloseReq request = PostOpenCloseReq.builder()
+                .postIdList(postIdList)
+                .build();
+
+        String json = obj.writeValueAsString(request);
+
+        // When
+        postTagCoreService.openPost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any());
+
+        // Then
+        mockMvc.perform(patch("/apis/v1/posts/open?trackName=ANDROID&loginPeriod=0")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("게시물 공개 여부 공개로 변경")
                 );
     }
 }
