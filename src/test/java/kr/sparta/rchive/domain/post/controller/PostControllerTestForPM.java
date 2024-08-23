@@ -7,14 +7,17 @@ import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
+import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.security.WithMockCustomPM;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -65,6 +68,7 @@ public class PostControllerTestForPM {
     }
 
     @Test
+    @DisplayName("POST-001 게시물 생성 테스트")
     public void 관리자_게시물_생성() throws Exception {
         // Given
         PostCreateReq request = PostCreateReq.builder()
@@ -100,6 +104,7 @@ public class PostControllerTestForPM {
     }
 
     @Test
+    @DisplayName("POST-002 게시물 수정 테스트")
     public void 관리자_게시물_수정() throws Exception {
         // Given
         Long postId = 1L;
@@ -137,6 +142,7 @@ public class PostControllerTestForPM {
     }
 
     @Test
+    @DisplayName("POST-003 게시물 삭제 테스트")
     public void 관리자_게시물_삭제() throws Exception {
         // Given
         Long postId = 1L;
@@ -150,5 +156,32 @@ public class PostControllerTestForPM {
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 삭제 성공")
                 );
+    }
+
+    @Test
+    @DisplayName("POST-010 태그 생성 테스트")
+    public void 사용할_태그_생성() throws Exception {
+        // Given
+        TagCreateReq request = TagCreateReq.builder()
+                .tagName("tag test")
+                .build();
+
+        TagCreateRes response = TagCreateRes.builder()
+                .tagId(1L)
+                .build();
+
+        String json = obj.writeValueAsString(request);
+
+        given(tagService.createTag(request.tagName())).willReturn(response);
+
+        // When - Then
+        mockMvc.perform(post("/apis/v1/posts/tags")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isOk(),
+                jsonPath("$.message").value("태그 생성 성공"),
+                jsonPath("$.data.tagId").value(1L)
+        );
     }
 }
