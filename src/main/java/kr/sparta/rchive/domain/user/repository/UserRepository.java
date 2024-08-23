@@ -30,4 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsUserByEmailAndUsernameAndPhoneAndAlive(String email, String username,
             String phone);
 
+    @Query("select COUNT(u.id)>0 from User u "
+            + "where u.email = :email and u.username = :username and u.isDeleted = false ")
+    boolean existsUserByEmailAndUsernameAndAlive(String email, String username);
+
 }
