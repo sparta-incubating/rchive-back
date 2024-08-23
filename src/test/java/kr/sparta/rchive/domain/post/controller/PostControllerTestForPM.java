@@ -9,10 +9,7 @@ import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
-import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
-import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
+import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -34,6 +31,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -268,6 +266,32 @@ public class PostControllerTestForPM {
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("게시물 공개 여부 비공개로 변경")
+                );
+    }
+
+    @Test
+    @DisplayName("POST-017 튜터 목록 검색")
+    public void 게시물_작성_시_튜터_목록_검색() throws Exception {
+        // Given
+        List<TutorRes> responseList = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            TutorRes tutorRes = TutorRes.builder()
+                    .tutorId((long) i)
+                    .tutorName("test tutor")
+                    .build();
+
+            responseList.add(tutorRes);
+        }
+
+        given(postTagCoreService.searchTutor(any(User.class), any(TrackNameEnum.class), any(Integer.class),
+                any(Integer.class), any(String.class))).willReturn(responseList);
+
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/tutors?trackName=ANDROID&loginPeriod=0&inputPeriod=1&tutorName=test"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("튜터 검색 성공"),
+                        jsonPath("$.data[0].tutorId").value(1L)
                 );
     }
 }
