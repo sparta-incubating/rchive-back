@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ProfileResponseCode implements ResponseCode {
     // OK 200
+    OK_GET_COMMENT(HttpStatus.OK, "PROFILE-001", "자신이 작성한 댓글 조회 성공"),
     OK_GET_BOOKMARK(HttpStatus.OK, "PROFILE-002", "북마크 조회 성공"),
     OK_GET_PROFILE(HttpStatus.OK, "PROFILE-005", "프로필 조회 성공"),
     OK_UPDATE_PROFILE(HttpStatus.OK, "PROFILE-006", "프로필 변경 성공"),
