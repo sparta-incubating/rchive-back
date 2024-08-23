@@ -63,6 +63,8 @@ jobs:
         with:
           gradle-version: '8.6'
           arguments: build test
+          gradle-home-cache-includes: '**/*.gradle, **/*.jar, **/*.kts'
+          gradle-home-cache-excludes: '**/test-results/*'
 
 #      - name: Test with Gradle
 #        run: ./gradlew --info test -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2
