@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.comment.service;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
 import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
+import kr.sparta.rchive.domain.comment.dto.response.CommentProfileRes;
 import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.comment.repository.CommentRepository;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -92,6 +93,18 @@ public class CommentService {
                                 .username(comment.getUser().getUsername())
                                 .email(comment.getUser().getEmail())
                                 .nickname(comment.getUser().getNickname())
+                                .createdAt(comment.getCreatedAt())
+                                .build()
+                ).collect(Collectors.toList());
+    }
+
+    public List<CommentProfileRes> findCommentList(User user) {
+        return commentRepository.findCommentByUserId(user.getId()).stream()
+                .map(
+                        comment -> CommentProfileRes.builder()
+                                .commentId(comment.getId())
+                                .postId(comment.getPost().getId())
+                                .content(comment.getContent())
                                 .createdAt(comment.getCreatedAt())
                                 .build()
                 ).collect(Collectors.toList());

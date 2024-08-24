@@ -1,0 +1,107 @@
+
+spring:
+  application:
+    name: rchive
+
+  config:
+    activate:
+      on-profile: test
+
+  # JPA
+  jpa:
+    database: h2
+    generate-ddl: on
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        ddl-auto: create
+        auto_quote_keyword: true # 예약어 사용가능
+        globally_quoted_identifiers: true # 예약어 사용가능
+        show_sql: true # sql 로깅
+        generate_statistics: true # 쿼리수행 통계
+        format_sql: true # SQL문 정렬하여 출력
+        highlight_sql: true # SQL문 색 부여
+
+  # DB
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;NON_KEYWORDS=user # exclude the user keyword from the list of reserved words
+    username: sa
+    password:
+  h2:
+    console: # H2 DB를 웹에서 관리할 수 있는 기능
+      enabled: true           # H2 Console 사용 여부
+      path: /h2-console       # H2 Console 접속 주소
+      settings:
+        web-allow-others: true  # 외부 배포 이후 H2 접속허용여부
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_HOST}
+  #      password: ${REDIS_PASSWORD}
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 5MB
+      resolve-lazily: true
+
+# swagger
+springdoc:
+  show-login-endpoint: true
+  swagger-ui:
+    path: /swagger-ui.html
+    display-operation-id: true
+    tags-sorter: alpha
+  #    operations-sorter: method
+  #    doc-expansion: none
+
+# LOG
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: trace
+      springframework:
+        transaction:
+          interceptor: trace # 트랜잭션 시작과 종료 로깅
+
+swagger:
+  server:
+    url: http://localhost:8080
+
+jwt:
+  secret:
+    key: ${JWT_KEY}
+
+# S3
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET_NAME}
+    stack:
+      auto: false
+    region:
+      static: ${REGION}
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_ACCESS_KEY}
+
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 5MB
+      resolve-lazily: true
+
+effic:
+  access-key: ${EFFIC_ACCESS_KEY}

@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.dto.CommentUserInfo;
+import kr.sparta.rchive.domain.comment.entity.Comment;
 import kr.sparta.rchive.domain.comment.entity.QComment;
 import kr.sparta.rchive.domain.post.entity.QPost;
 import kr.sparta.rchive.domain.user.entity.QUser;
@@ -46,5 +47,24 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
             )
             .orderBy(comment.createdAt.asc())
             .fetch();
+    }
+
+    @Override
+    public List<Comment> findCommentByUserId(Long userId) {
+        QComment comment = QComment.comment;
+        QUser user = QUser.user;
+        QPost post = QPost.post;
+
+        return queryFactory
+                .select(comment)
+                .from(comment)
+                .leftJoin(comment.user, user).fetchJoin()
+                .leftJoin(comment.post, post).fetchJoin()
+                .where(
+                        user.id.eq(userId),
+                        comment.isDeleted.eq(false)
+                )
+                .orderBy(comment.createdAt.desc())
+                .fetch();
     }
 }

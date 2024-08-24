@@ -24,4 +24,6 @@ public interface PostRepositoryCustom {
     List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId);
 
     List<Post> findPost(PostTypeEnum postType, String keyword, Long tutorId, Long trackId);
+
+    Post findPostDetail(Long postId);
 }

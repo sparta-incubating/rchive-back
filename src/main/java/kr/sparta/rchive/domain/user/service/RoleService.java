@@ -77,6 +77,19 @@ public class RoleService {
         roleRepository.deleteAll(roleList);
     }
 
+    @Transactional
+    public void deleteApmRoleList(List<RoleRequestListReq> reqList) {
+        List<RoleRequestListReq> apmList = new ArrayList<>();
+        for (RoleRequestListReq req : reqList) {
+            if (req.trackRole() == TrackRoleEnum.APM) {
+                apmList.add(req);
+            }
+        }
+
+        List<Role> roleList = findRoleListByEmailAndTrackRoleAndApprove(reqList);
+        roleRepository.deleteAll(roleList);
+    }
+
     public AuthEnum getResultRoleFirstLogin(User user) {
 
         Role role = roleRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).orElseThrow(
@@ -136,6 +149,17 @@ public class RoleService {
         return roleList;
     }
 
+    public List<Role> findRoleListByEmailAndTrackRoleAndApprove(List<RoleRequestListReq> reqList) {
+        List<Role> roleList = new ArrayList<>();
+        for (RoleRequestListReq req : reqList) {
+            List<Role> apmList = roleRepository.findRoleListByEmailAndTrackRoleAndApprove(
+                    req.email(),
+                    TrackRoleEnum.APM);
+            roleList.addAll(apmList);
+        }
+        return roleList;
+    }
+
     public int countByRoleRequestByPm(
             TrackNameEnum trackName, Integer searchPeriod, AuthEnum auth) {
         return roleRepository.countByRoleRequestByPm(trackName, searchPeriod, auth);
@@ -163,25 +187,25 @@ public class RoleService {
     }
 
     public List<Role> findRoleListInBackOfficeAuthNoReject(
-            Track managerTrack, Integer searchPeriod, String email, TrackRoleEnum trackRole,
+            Track managerTrack, Integer searchPeriod, String keyword, TrackRoleEnum trackRole,
             OrderRoleListEnum sort) {
         if (managerTrack.getPeriod() == 0) {
             return roleRepository.findRoleListInBackOfficeAuthNoRejectByPm(
-                    managerTrack.getTrackName(), searchPeriod, email, trackRole, sort);
+                    managerTrack.getTrackName(), searchPeriod, keyword, trackRole, sort);
         }
         return roleRepository.findRoleListInBackOfficeAuthNoRejectByApm(
-                managerTrack.getTrackName(), managerTrack.getPeriod(), email, trackRole, sort);
+                managerTrack.getTrackName(), managerTrack.getPeriod(), keyword, trackRole, sort);
     }
 
     public List<Role> findRoleListInBackOffice(
-            Track managerTrack, Integer searchPeriod, AuthEnum auth, String email,
+            Track managerTrack, Integer searchPeriod, AuthEnum auth, String keyword,
             TrackRoleEnum trackRole, OrderRoleListEnum sort) {
         if (managerTrack.getPeriod() == 0) {
             return roleRepository.findRoleListInBackOfficeByPm(
-                    managerTrack.getTrackName(), searchPeriod, auth, email, trackRole, sort);
+                    managerTrack.getTrackName(), searchPeriod, auth, keyword, trackRole, sort);
         }
         return roleRepository.findRoleListInBackOfficeByApm(
-                managerTrack.getTrackName(), managerTrack.getPeriod(), auth, email, trackRole,
+                managerTrack.getTrackName(), managerTrack.getPeriod(), auth, keyword, trackRole,
                 sort);
     }
 

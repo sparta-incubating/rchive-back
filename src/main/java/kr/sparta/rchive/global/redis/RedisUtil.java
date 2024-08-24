@@ -3,7 +3,7 @@ package kr.sparta.rchive.global.redis;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import kr.sparta.rchive.domain.user.entity.Track;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ListOperations;
@@ -75,7 +75,7 @@ public class RedisUtil {
         return hasKey;
     }
 
-    public void removeDuplicateKeywordSearch(String key, String keyword) {
+    public void removeKeywordSearch(String key, String keyword) {
         ListOperations<String, Object> listOps = objectRedisTemplate.opsForList();
 
         listOps.remove(key, 1, keyword);

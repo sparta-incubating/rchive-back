@@ -101,8 +101,7 @@ public class PostService {
         if (userRole.equals(UserRoleEnum.USER)) {
             return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
         } else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType,
-                    track.getId());
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
         }
     }
 
@@ -120,5 +119,9 @@ public class PostService {
 
     public List<Post> searchPost(PostTypeEnum postType, String keyword, Long tutorId, Long trackId) {
         return postRepository.findPost(postType, keyword, tutorId, trackId);
+    }
+
+    public Post findPostDetail(Long postId) {
+        return postRepository.findPostDetail(postId);
     }
 }

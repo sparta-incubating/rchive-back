@@ -21,6 +21,9 @@ public enum UserExceptionCode implements ExceptionCode {
     BAD_REQUEST_REFRESH_TOKEN_NULL(HttpStatus.BAD_REQUEST, "USER-0005", "리프레시 토큰 없음"),
     BAD_REQUEST_REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "USER-0006", "리프레시 토큰이 일치하지 않음"),
     BAD_REQUEST_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "USER-0007", "토큰 시간 만료"),
+    BAD_REQUEST_PHONE_AUTH_EXPIRED(HttpStatus.BAD_REQUEST, "USER-0008", "휴대폰 인증 시간 만료"),
+    BAD_REQUEST_PHONE_AUTH(HttpStatus.BAD_REQUEST, "USER-0009", "휴대폰 인증 번호가 일치하지 않음"),
+    BAD_REQUEST_USER(HttpStatus.BAD_REQUEST, "USER-0010", "존재하지 않는 유저"),
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 

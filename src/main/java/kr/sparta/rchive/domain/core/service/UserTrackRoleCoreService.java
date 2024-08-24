@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
@@ -93,12 +94,12 @@ public class UserTrackRoleCoreService {
     }
 
     public Page<RoleGetTrackRoleRequestListRes> getUserTrackRoleRequestList(
-            User user, OrderRoleListEnum sort, TrackNameEnum trackName, Integer period,
-            AuthEnum status,
-            Integer searchPeriod, String email, TrackRoleEnum trackRole, Pageable pageable) {
+            User user, OrderRoleListEnum sort, TrackNameEnum trackName, Integer loginPeriod,
+            AuthEnum status, Integer searchPeriod, String searchKeyword,
+            TrackRoleEnum searchTrackRole, Pageable pageable) {
 
-        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, period);
-        if (period == 0) {
+        Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, loginPeriod);
+        if (loginPeriod == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
             roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
@@ -107,10 +108,10 @@ public class UserTrackRoleCoreService {
         List<Role> roleList;
         if (status == null) {
             roleList = roleService.findRoleListInBackOfficeAuthNoReject(
-                    managerTrack, searchPeriod, email, trackRole, sort);
+                    managerTrack, searchPeriod, searchKeyword, searchTrackRole, sort);
         } else {
             roleList = roleService.findRoleListInBackOffice(
-                    managerTrack, searchPeriod, status, email, trackRole, sort);
+                    managerTrack, searchPeriod, status, searchKeyword, searchTrackRole, sort);
         }
 
         List<RoleGetTrackRoleRequestListRes> responseList = roleList.stream()
@@ -219,6 +220,7 @@ public class UserTrackRoleCoreService {
         Track managaerTrack = roleService.getRoleByManager(manager).getTrack();
         managerTrackRoleInvalid(managaerTrack, reqList);
 
+        roleService.deleteApmRoleList(reqList);
         roleService.approveRoleRequest(reqList);
         roleService.deleteRoleListByAuthNotApprove(reqList);
     }
@@ -253,16 +255,16 @@ public class UserTrackRoleCoreService {
     }
 
     public RoleGetTrackRoleRequestCountRes getTrackRoleRequestCount(
-            User user, TrackNameEnum trackName, Integer period, Integer searchPeriod) {
+            User user, TrackNameEnum trackName, Integer loginPeriod, Integer searchPeriod) {
 
-        if (period == 0) {
+        if (loginPeriod == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
+            Track track = trackService.findTrackByTrackNameAndPeriod(trackName, loginPeriod);
             roleService.existByUserAndTrackByApmThrowException(user.getId(), track.getId());
         }
 
-        if (period == 0) {
+        if (loginPeriod == 0) {
             return RoleGetTrackRoleRequestCountRes.builder()
                     .statusAll(roleService.countByRoleRequestByPm(trackName, searchPeriod, null))
                     .statusWait(roleService.countByRoleRequestByPm(trackName, searchPeriod,
@@ -273,10 +275,10 @@ public class UserTrackRoleCoreService {
         }
 
         return RoleGetTrackRoleRequestCountRes.builder()
-                .statusAll(roleService.countByRoleRequestByApm(trackName, period, null))
-                .statusWait(roleService.countByRoleRequestByApm(trackName, period,
+                .statusAll(roleService.countByRoleRequestByApm(trackName, loginPeriod, null))
+                .statusWait(roleService.countByRoleRequestByApm(trackName, loginPeriod,
                         AuthEnum.WAIT))
-                .statusApprove(roleService.countByRoleRequestByApm(trackName, period,
+                .statusApprove(roleService.countByRoleRequestByApm(trackName, loginPeriod,
                         AuthEnum.APPROVE))
                 .build();
 

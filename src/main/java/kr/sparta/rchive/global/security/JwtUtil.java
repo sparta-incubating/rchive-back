@@ -21,17 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
+
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String REFRESH_TOKEN_HEADER = "Refresh";
     public static final String AUTHORIZATION_KEY = "auth";
     public static final String BEARER_PREFIX = "Bearer ";
-    private static final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L;  // 1시간
+    private static final long ACCESS_TOKEN_TIME = 10 * 60 * 1000L;  // 10분
     private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
 
     @Value("${jwt.secret.key}")
@@ -43,44 +45,50 @@ public class JwtUtil {
     public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
 
     @PostConstruct
-    public void init(){
-        secretKey = new SecretKeySpec(jwtKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    public void init() {
+        secretKey = new SecretKeySpec(jwtKey.getBytes(StandardCharsets.UTF_8),
+                Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public String getEmail(String token){
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
+    public String getEmail(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("email", String.class);
     }
 
     public String getRole(String token) {
 
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("role", String.class);
     }
 
     public String getOAuthType(String token) {
 
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("oAuthType", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("oAuthType", String.class);
     }
 
-    public Date getIssuedAt(String token){
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getIssuedAt();
+    public Date getIssuedAt(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .getIssuedAt();
     }
 
     public Boolean isExpired(String token) {
 
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .getExpiration().before(new Date());
     }
 
     public String createAccessToken(User user) {
         Date date = new Date();
         return BEARER_PREFIX
                 + Jwts.builder()
-                    .claim("email", user.getEmail())
-                    .claim("role", user.getUserRole().toString())
-                    .claim("oAuthType", user.getOAuthType().toString())
-                    .issuedAt(date)
-                    .expiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
-                    .signWith(secretKey)
-                    .compact();
+                .claim("email", user.getEmail())
+                .claim("role", user.getUserRole().toString())
+                .claim("oAuthType", user.getOAuthType().toString())
+                .issuedAt(date)
+                .expiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
+                .signWith(secretKey)
+                .compact();
     }
 
     public String createRefreshToken(User user) {
@@ -128,16 +136,63 @@ public class JwtUtil {
         return req.getHeader(AUTHORIZATION_HEADER);
     }
 
-    public Cookie addRefreshTokenToCookie(String refreshToken) throws UnsupportedEncodingException {
-        //refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
+    public ResponseCookie addRefreshTokenToCookie(String refreshToken)
+            throws UnsupportedEncodingException {
+//        refreshToken = URLEncoder.encode(refreshToken, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
 
-        Cookie cookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
-        //cookie.setMaxAge(24*60*60);
-        //cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
+//        Cookie cookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
+//        //cookie.setMaxAge(24*60*60);
+//        //cookie.setSecure(true);
+//        cookie.setPath("/");
+//        cookie.setHttpOnly(true);
+
+//        String cookieHeader = createSameSiteCookieHeader(cookie, "None");
+
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_HEADER, refreshToken)
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                //.maxAge(maxAge)
+                .build();
 
         return cookie;
     }
 
+    public ResponseCookie removeRefreshTokenToCookie()
+            throws UnsupportedEncodingException {
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_HEADER, "")
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(0)
+                .build();
+
+        return cookie;
+    }
+
+//    private String createSameSiteCookieHeader(Cookie cookie, String sameSiteValue) {
+//        StringBuilder header = new StringBuilder();
+//        header.append(cookie.getName()).append("=").append(cookie.getValue());
+//
+//        if (cookie.getMaxAge() >= 0) {
+//            header.append("; Max-Age=").append(cookie.getMaxAge());
+//        }
+//        if (cookie.getSecure()) {
+//            header.append("; Secure");
+//        }
+//        if (cookie.isHttpOnly()) {
+//            header.append("; HttpOnly");
+//        }
+//        if (cookie.getPath() != null) {
+//            header.append("; Path=").append(cookie.getPath());
+//        }
+//
+//        if (sameSiteValue != null) {
+//            header.append("; SameSite=").append(sameSiteValue);
+//        }
+//
+//        return header.toString();
+//    }
 }

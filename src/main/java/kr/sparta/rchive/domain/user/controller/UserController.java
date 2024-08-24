@@ -5,7 +5,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
+import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
+import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordCheckEmailReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordCheckPhoneReq;
+import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
+import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.exception.statement.user.ReissueException;
 import kr.sparta.rchive.domain.user.response.UserResponseCode;
@@ -100,4 +108,74 @@ public class UserController {
         }
     }
 
+    @GetMapping("/token/expired")
+    @Operation(operationId = "USER-009", summary = "유저 토큰 만료 여부 조회")
+    public ResponseEntity<CommonResponseDto> tokenExpired(
+            HttpServletRequest req
+    ) throws UnsupportedEncodingException, ParseException {
+        Boolean isExpired = userService.tokenExpired(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED, isExpired));
+    }
+
+    @PostMapping("/auth/phone/send")
+    @Operation(operationId = "USER-010", summary = "휴대폰 인증 전송")
+    public ResponseEntity<CommonResponseDto> sendAuthPhone(
+            @Valid @RequestBody AuthPhoneReq req) {
+        userService.sendAuthPhone(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_SEND_AUTH_PHONE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_SEND_AUTH_PHONE, null));
+    }
+
+    @PostMapping("/auth/phone/valid")
+    @Operation(operationId = "USER-011", summary = "휴대폰 인증 확인")
+    public ResponseEntity<CommonResponseDto> validAuthPhone(
+            @Valid @RequestBody AuthPhoneValidReq req) {
+        userService.validAuthPhone(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_VALID_AUTH_PHONE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_VALID_AUTH_PHONE, null));
+    }
+
+    @PostMapping("/find/email")
+    @Operation(operationId = "USER-012", summary = "이메일 찾기")
+    public ResponseEntity<CommonResponseDto> findUserEmail(
+            @Valid @RequestBody UserFindEmailReq req) {
+        List<FindEmailRes> res = userService.findUserEmail(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_EMAIL.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_EMAIL, res));
+    }
+
+    @PostMapping("/find/password/email")
+    @Operation(operationId = "USER-013", summary = "비밀번호 찾기: 이메일 확인")
+    public ResponseEntity<CommonResponseDto> findUserPasswordCheckEmail(
+            @Valid @RequestBody UserFindPasswordCheckEmailReq req) {
+        userService.findUserPasswordCheckEmail(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD_CHECK_EMAIL.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD_CHECK_EMAIL, null));
+    }
+
+    @PostMapping("/find/password/phone")
+    @Operation(operationId = "USER-014", summary = "비밀번호 찾기: 휴대폰번호 확인")
+    public ResponseEntity<CommonResponseDto> findUserPasswordCheckPhone(
+            @Valid @RequestBody UserFindPasswordCheckPhoneReq req) {
+        userService.findUserPasswordCheckPhone(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD_CHECK_PHONE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD_CHECK_PHONE, null));
+    }
+
+    @PatchMapping("/find/password")
+    @Operation(operationId = "USER-015", summary = "비밀번호 찾기: 비밀번호 변경")
+    public ResponseEntity<CommonResponseDto> findUserPasswordUpdate(
+            @Valid @RequestBody UserFindPasswordUpdateReq req) {
+        userService.findUserPasswordUpdate(req);
+
+        return ResponseEntity.status(UserResponseCode.OK_FIND_PASSWORD_UPDATE.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_FIND_PASSWORD_UPDATE, null));
+    }
 }
