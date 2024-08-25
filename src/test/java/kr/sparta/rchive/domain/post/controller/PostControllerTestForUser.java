@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
@@ -13,6 +14,7 @@ import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.security.WithMockCustomUser;
+import kr.sparta.rchive.test.CommentTest;
 import kr.sparta.rchive.test.PostTest;
 import kr.sparta.rchive.test.TagTest;
 import kr.sparta.rchive.test.TutorTest;
@@ -37,6 +39,7 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,14 +47,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {PostController.class})
 @ActiveProfiles("test")
 @WithMockCustomUser
-public class PostControllerTestForUser implements PostTest, TutorTest, TagTest {
+public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, CommentTest {
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext context;
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper obj;
 
     @MockBean
     private PostTagCoreService postTagCoreService;
@@ -203,6 +206,30 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest {
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 단건 조회 성공"),
                         jsonPath("$.data.title").value(TEST_POST.getTitle())
+                );
+    }
+
+    @Test
+    @DisplayName("POST-007 게시물 댓글 작성 기능 테스트")
+    public void 유저_게시물_댓글_작성() throws Exception {
+        // Given
+        Long postId = 1L;
+
+        CommentCreateReq request = CommentCreateReq.builder()
+                .content(TEST_1L_COMMENT.getContent())
+                .build();
+
+        String json = obj.writeValueAsString(request);
+        // When
+        postCommentCoreService.createComment(any(User.class), any(Long.class), any(), any(CommentCreateReq.class));
+
+        // Then
+        mockMvc.perform(post("/apis/v1/posts/{postId}/comments", postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("댓글 작성 성공")
                 );
     }
 }
