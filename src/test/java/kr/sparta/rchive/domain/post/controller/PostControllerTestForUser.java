@@ -38,8 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -230,6 +229,23 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("댓글 작성 성공")
+                );
+    }
+
+    @Test
+    @DisplayName("POST-008 게시물 댓글 삭제 기능 테스트")
+    public void 유저_게시물_댓굴_삭제() throws Exception {
+        // Given
+        Long commentId = 1L;
+
+        // When
+        commentService.deleteComment(any(User.class), any(Long.class));
+
+        // Then
+        mockMvc.perform(delete("/apis/v1/posts/comment/{commentId}", commentId))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("댓글 삭제 성공")
                 );
     }
 }
