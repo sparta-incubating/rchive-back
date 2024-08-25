@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -84,7 +85,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest {
         tagList.add(tagInfo);
 
         List<PostGetRes> postGetResList = new ArrayList<>();
-        for(int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
                     .thumbnailUrl(TEST_POST.getThumbnailUrl())
@@ -116,6 +117,52 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest {
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 검색 성공"),
                         jsonPath("$.data.content[0].postId").value(0L)
+                );
+    }
+
+    @Test
+    @DisplayName("POST-005 유저 게시판 조회 테스트")
+    public void 유저_게시판_조회() throws Exception {
+        // Given
+        List<TagInfo> tagList = new ArrayList<>();
+
+        TagInfo tagInfo = TagInfo.builder()
+                .tagId(TEST_TAG_1L_ID)
+                .tagName(TEST_1L_TAG.getTagName())
+                .build();
+
+        tagList.add(tagInfo);
+
+        List<PostGetRes> postGetResList = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            PostGetRes postGetRes = PostGetRes.builder()
+                    .postId((long) i)
+                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
+                    .postType(TEST_POST.getPostType())
+                    .tutor(TEST_TUTOR.getTutorName())
+                    .title(TEST_POST.getTitle())
+                    .tagList(tagList)
+                    .build();
+
+            postGetResList.add(postGetRes);
+        }
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<PostGetRes> response = new PageImpl<>(postGetResList, pageable, 2);
+
+        given(postTagCoreService.getPostListByCategory(any(User.class), any(TrackNameEnum.class),
+                any(Integer.class), any(PostTypeEnum.class), any())).willReturn(response);
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/category")
+                        .param("trackName", "ANDROID")
+                        .param("loginPeriod", "1")
+                        .param("category", String.valueOf(PostTypeEnum.Sparta_Lecture))
+                        .param("page", "1")
+                        .param("size", "10"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("교육자료 카테고리 별 조회 성공"),
+                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
                 );
     }
 }
