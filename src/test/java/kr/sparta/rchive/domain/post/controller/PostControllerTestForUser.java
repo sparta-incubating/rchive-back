@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
+import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
@@ -14,10 +15,7 @@ import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.security.WithMockCustomUser;
-import kr.sparta.rchive.test.CommentTest;
-import kr.sparta.rchive.test.PostTest;
-import kr.sparta.rchive.test.TagTest;
-import kr.sparta.rchive.test.TutorTest;
+import kr.sparta.rchive.test.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {PostController.class})
 @ActiveProfiles("test")
 @WithMockCustomUser
-public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, CommentTest {
+public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, CommentTest, UserTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -246,6 +244,36 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("댓글 삭제 성공")
+                );
+    }
+
+    @Test
+    @DisplayName("POST-009 게시물 부모 댓글 리스트 조회 기능 테스트")
+    public void 유저_게시물_부모_댓글_리스트_조회() throws Exception {
+        // Given
+        Long postId = 1L;
+
+        List<CommentGetRes> commentGetResList = new ArrayList<>();
+        for(int i = 1; i <= 2; i++) {
+            CommentGetRes commentGetRes = CommentGetRes.builder()
+                    .id((long) i)
+                    .content(TEST_COMMENT_CONTENT)
+                    .username(TEST_STUDENT_USER.getUsername())
+                    .email(TEST_STUDENT_USER.getEmail())
+                    .nickname(TEST_STUDENT_USER.getNickname())
+                    .build();
+
+            commentGetResList.add(commentGetRes);
+        }
+
+        given(commentService.getParentCommentList(any(Long.class))).willReturn(commentGetResList);
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/{postId}/comments", postId))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("부모 댓글 리스트 조회 성공"),
+                        jsonPath("$.data[0].content").value(TEST_COMMENT_CONTENT),
+                        jsonPath("$.data[0].content").value(TEST_COMMENT_CONTENT)
                 );
     }
 }
