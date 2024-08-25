@@ -168,7 +168,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     }
 
     @Test
-    @DisplayName("POST-006 게시물 단건 조회 기능 테스트")
+    @DisplayName("POST-006 유저 게시물 단건 조회 기능 테스트")
     public void 유저_게시물_단건_조회() throws Exception {
         // Given
         Long postId = TEST_POST_ID;
@@ -207,7 +207,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     }
 
     @Test
-    @DisplayName("POST-007 게시물 댓글 작성 기능 테스트")
+    @DisplayName("POST-007 유저 게시물 댓글 작성 기능 테스트")
     public void 유저_게시물_댓글_작성() throws Exception {
         // Given
         Long postId = 1L;
@@ -231,7 +231,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     }
 
     @Test
-    @DisplayName("POST-008 게시물 댓글 삭제 기능 테스트")
+    @DisplayName("POST-008 유저 게시물 댓글 삭제 기능 테스트")
     public void 유저_게시물_댓굴_삭제() throws Exception {
         // Given
         Long commentId = 1L;
@@ -248,13 +248,13 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     }
 
     @Test
-    @DisplayName("POST-009 게시물 부모 댓글 리스트 조회 기능 테스트")
+    @DisplayName("POST-009 유저 게시물 부모 댓글 리스트 조회 기능 테스트")
     public void 유저_게시물_부모_댓글_리스트_조회() throws Exception {
         // Given
         Long postId = 1L;
 
         List<CommentGetRes> commentGetResList = new ArrayList<>();
-        for(int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= 2; i++) {
             CommentGetRes commentGetRes = CommentGetRes.builder()
                     .id((long) i)
                     .content(TEST_COMMENT_CONTENT)
@@ -274,6 +274,52 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                         jsonPath("$.message").value("부모 댓글 리스트 조회 성공"),
                         jsonPath("$.data[0].content").value(TEST_COMMENT_CONTENT),
                         jsonPath("$.data[0].content").value(TEST_COMMENT_CONTENT)
+                );
+    }
+
+    @Test
+    @DisplayName("POST-012 유저 게시물을 태그를 클릭하여 검색하는 기능 테스트")
+    public void 유저_태그로_게시물을_검색하는_기능() throws Exception {
+        // Given
+        List<TagInfo> tagList = new ArrayList<>();
+
+        TagInfo tagInfo = TagInfo.builder()
+                .tagId(TEST_TAG_1L_ID)
+                .tagName(TEST_1L_TAG.getTagName())
+                .build();
+
+        tagList.add(tagInfo);
+
+        List<PostGetRes> postGetResList = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            PostGetRes postGetRes = PostGetRes.builder()
+                    .postId((long) i)
+                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
+                    .postType(TEST_POST.getPostType())
+                    .tutor(TEST_TUTOR.getTutorName())
+                    .title(TEST_POST.getTitle())
+                    .tagList(tagList)
+                    .build();
+
+            postGetResList.add(postGetRes);
+        }
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<PostGetRes> response = new PageImpl<>(postGetResList, pageable, 2);
+
+        given(postTagCoreService.searchPostByTag(any(TrackNameEnum.class), any(Integer.class), any(Long.class),
+                any(User.class), any(Pageable.class))).willReturn(response);
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/tags/search")
+                        .param("trackName", "ANDROID")
+                        .param("loginPeriod", "1")
+                        .param("tagId", "1")
+                        .param("page", "1")
+                        .param("size", "10"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("태그를 이용한 교육자료 검색 성공"),
+                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
                 );
     }
 }
