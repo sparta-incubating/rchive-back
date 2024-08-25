@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -163,6 +164,45 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest {
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 카테고리 별 조회 성공"),
                         jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
+                );
+    }
+
+    @Test
+    @DisplayName("POST-006 게시물 단건 조회 기능 테스트")
+    public void 유저_게시물_단건_조회() throws Exception {
+        // Given
+        Long postId = TEST_POST_ID;
+
+        List<TagInfo> tagInfoList = new ArrayList<>();
+
+        TagInfo tagInfo = TagInfo.builder()
+                .tagId(TEST_1L_TAG.getId())
+                .tagName(TEST_1L_TAG.getTagName())
+                .build();
+
+        tagInfoList.add(tagInfo);
+
+        PostGetSinglePostRes response = PostGetSinglePostRes.builder()
+                .postId(postId)
+                .title(TEST_POST.getTitle())
+                .tutor(TEST_POST.getTutor().getTutorName())
+                .videoLink(TEST_POST.getVideoLink())
+                .contentLink(TEST_POST.getContentLink())
+                .tagList(tagInfoList)
+                .isBookmarked(false)
+                .build();
+
+        given(postTagCoreService.getPost(any(User.class), any(Long.class), any(TrackNameEnum.class),
+                any(Integer.class))).willReturn(response);
+
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/{postId}", postId)
+                        .param("trackName", "ANDROID")
+                        .param("period", "1"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("교육자료 단건 조회 성공"),
+                        jsonPath("$.data.title").value(TEST_POST.getTitle())
                 );
     }
 }
