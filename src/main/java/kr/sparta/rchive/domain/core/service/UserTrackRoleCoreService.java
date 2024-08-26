@@ -220,10 +220,10 @@ public class UserTrackRoleCoreService {
         Track managaerTrack = roleService.getRoleByManager(manager).getTrack();
         managerTrackRoleInvalid(managaerTrack, reqList);
 
-        roleService.deleteApmRoleList(reqList);
         roleService.approveRoleRequest(reqList);
         userService.approveApmUpdateUserRole(reqList);
         roleService.deleteRoleListByAuthNotApprove(reqList);
+        roleService.deleteApmRoleListExceptLastApprove(reqList);
     }
 
     @Transactional

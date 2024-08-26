@@ -25,7 +25,8 @@ public enum UserExceptionCode implements ExceptionCode {
     BAD_REQUEST_PHONE_AUTH(HttpStatus.BAD_REQUEST, "USER-0009", "휴대폰 인증 번호가 일치하지 않음"),
     BAD_REQUEST_USER(HttpStatus.BAD_REQUEST, "USER-0010", "존재하지 않는 유저"),
     BAD_REQUEST_SAME_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0011", "기존의 닉네임과 같음"),
-    BAD_REQUEST_UPDATE_NICKNAME_EMPTY(HttpStatus.BAD_REQUEST, "USER-0012", "업데이트 닉네임 입력 필수"),
+    BAD_REQUEST_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0012", "닉네임 없음"),
+    BAD_REQUEST_PROFILE_IMG(HttpStatus.BAD_REQUEST, "USER-0012", "프로필이미지 없음"),
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 
