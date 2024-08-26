@@ -112,11 +112,6 @@ public class User extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void updateProfileByUser(String profileImg, String nickname) {
-        this.profileImg = profileImg;
-        this.nickname = nickname;
-    }
-
     public void updatePassword(String password) {
         this.password = password;
     }
@@ -125,7 +120,11 @@ public class User extends BaseTimeEntity {
         this.phone = phone;
     }
 
-    public void updateProfileByManager(String profileImg) {
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
     }
 }
