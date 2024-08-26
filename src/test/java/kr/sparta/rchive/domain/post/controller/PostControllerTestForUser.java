@@ -402,7 +402,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     }
 
     @Test
-    @DisplayName("Post-020 유저의 최근 검색어 조회 기능 테스트")
+    @DisplayName("POST-020 유저의 최근 검색어 조회 기능 테스트")
     public void 유저_최근_검색어_조회() throws Exception {
         // Given
         List<PostGetRecentKeywordRes> responseList = new ArrayList<>();
@@ -423,6 +423,28 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                         status().isOk(),
                         jsonPath("$.message").value("최근 검색어 조회 성공"),
                         jsonPath("$.data[0].keyword").value("TEST 1")
+                );
+    }
+
+    @Test
+    @DisplayName("POST-021 유저의 최근 검색어 삭제 기능 테스트")
+    public void 유저_최근_검색어_삭제() throws Exception {
+        // Given
+        RecentSearchKeywordReq recentSearchKeywordReq = RecentSearchKeywordReq.builder()
+                .keyword("Test")
+                .build();
+
+        String json = obj.writeValueAsString(recentSearchKeywordReq);
+        // When
+        postTagCoreService.deleteRecentSearchKeyword(any(User.class), any(RecentSearchKeywordReq.class));
+
+        // Then
+        mockMvc.perform(delete("/apis/v1/posts/search/recent")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("최근 검색어 삭제 성공")
                 );
     }
 }
