@@ -78,15 +78,17 @@ public class RoleService {
     }
 
     @Transactional
-    public void deleteApmRoleList(List<RoleRequestListReq> reqList) {
-        List<RoleRequestListReq> apmList = new ArrayList<>();
+    public void deleteApmRoleListExceptLastApprove(List<RoleRequestListReq> reqList) {
+        List<String> apmList = new ArrayList<>();
         for (RoleRequestListReq req : reqList) {
             if (req.trackRole() == TrackRoleEnum.APM) {
-                apmList.add(req);
+                if (!apmList.contains(req.email())) {
+                    apmList.add(req.email());
+                }
             }
         }
 
-        List<Role> roleList = findRoleListByEmailAndTrackRoleAndApprove(reqList);
+        List<Role> roleList = findRoleListByEmailAndTrackRoleExceptLastApprove(reqList);
         roleRepository.deleteAll(roleList);
     }
 
@@ -149,12 +151,15 @@ public class RoleService {
         return roleList;
     }
 
-    public List<Role> findRoleListByEmailAndTrackRoleAndApprove(List<RoleRequestListReq> reqList) {
+    public List<Role> findRoleListByEmailAndTrackRoleExceptLastApprove(
+            List<RoleRequestListReq> reqList) {
         List<Role> roleList = new ArrayList<>();
         for (RoleRequestListReq req : reqList) {
             List<Role> apmList = roleRepository.findRoleListByEmailAndTrackRoleAndApprove(
-                    req.email(),
-                    TrackRoleEnum.APM);
+                    req.email(), TrackRoleEnum.APM);
+            if (!apmList.isEmpty()) {
+                apmList.remove(apmList.size() - 1);
+            }
             roleList.addAll(apmList);
         }
         return roleList;
