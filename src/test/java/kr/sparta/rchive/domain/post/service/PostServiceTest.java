@@ -22,6 +22,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -137,5 +139,19 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
         assertThat(exception.getErrorCode()).isEqualTo("POST-4001");
         assertThat(exception.getMessage()).isEqualTo("자료를 찾을 수 없음");
         assertThat(exception.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("교육자료를 열람 상태로 바꾸는 서비스 로직 성공 테스트")
+    void 게시물_열람_상태로_바꾸는_서비스_성공_테스트() {
+        // Given
+        List<Post> postList = new ArrayList<>();
+        postList.add(TEST_POST);
+
+        // When
+        postService.openPost(postList);
+
+        // Then
+        verify(postRepository, times(1)).saveAll(any());
     }
 }
