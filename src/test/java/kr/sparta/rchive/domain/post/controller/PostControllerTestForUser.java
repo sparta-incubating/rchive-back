@@ -9,6 +9,7 @@ import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
+import kr.sparta.rchive.domain.post.dto.response.PostGetRecentKeywordRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -397,6 +398,31 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("최근 검색어 저장 성공")
+                );
+    }
+
+    @Test
+    @DisplayName("Post-020 유저의 최근 검색어 조회 기능 테스트")
+    public void 유저_최근_검색어_조회() throws Exception {
+        // Given
+        List<PostGetRecentKeywordRes> responseList = new ArrayList<>();
+        for(int i = 1; i <= 5; i++) {
+            PostGetRecentKeywordRes postGetRecentKeywordRes = PostGetRecentKeywordRes.builder()
+                    .keyword("TEST " + i)
+                    .build();
+
+            responseList.add(postGetRecentKeywordRes);
+        }
+
+        given(postTagCoreService.getRecentSearchKeyword(any(User.class), any(TrackNameEnum.class), any(Integer.class))).willReturn(responseList);
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/search/recent")
+                .param("trackName", "ANDROID")
+                .param("loginPeriod", "1"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("최근 검색어 조회 성공"),
+                        jsonPath("$.data[0].keyword").value("TEST 1")
                 );
     }
 }
