@@ -14,13 +14,17 @@ import kr.sparta.rchive.test.TutorTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -98,5 +102,20 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
 
         // Then
         verify(postRepository, times(1)).save(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("교육자료를 교육자료의 ID를 이용하여 검색하는 서비스 로직 성공 테스트")
+    void 게시물_아이디로_게시물_찾아오는_서비스_성공_테스트() {
+        // Given
+        given(postRepository.findById(any(Long.class))).willReturn(Optional.of(TEST_POST));
+
+        // When
+        Post post = postService.findPostById(any(Long.class));
+
+        // Then
+        assertThat(post.getTitle()).isEqualTo(TEST_POST.getTitle());
+        assertThat(post.getThumbnailUrl()).isEqualTo(TEST_POST.getThumbnailUrl());
+        assertThat(post.getContent()).isEqualTo(TEST_POST.getContent());
     }
 }
