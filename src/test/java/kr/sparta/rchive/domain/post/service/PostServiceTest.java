@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -186,5 +187,26 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
         assertThat(post.size()).isEqualTo(responseList.size());
         assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
         assertThat(post.get(1).getTitle()).isEqualTo(responseList.get(1).getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 PostType이 전체인 교육자료들 리스트를 찾아오는 서비스 로직 성공 테스트")
+    void 백오피스_APM이_PostType_All인_게시물_리스트_찾아오는_서비스_성공_테스트() {
+        // Given
+        List<Post> responseList = List.of(TEST_POST_1L);
+        String title = "Test";
+        LocalDate testDate = LocalDate.now();
+
+        ReflectionTestUtils.setField(TEST_TRACK_ANDROID_1L, "id", 1L);
+
+        given(postRepository.findPostListInBackOfficePostTypeAllByApm(any(String.class), any(LocalDate.class), any(LocalDate.class),
+                any(Boolean.class), any(Long.class), any(Long.class))).willReturn(responseList);
+
+        // When
+        List<Post> post = postService.findPostListInBackOfficePostTypeAll(TEST_TRACK_ANDROID_1L, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
+
+        // Then
+        assertThat(post.size()).isEqualTo(responseList.size());
+        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
     }
 }
