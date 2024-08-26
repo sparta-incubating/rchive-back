@@ -14,6 +14,7 @@ import java.util.Random;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateProfileImgReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindEmailReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordCheckEmailReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordCheckPhoneReq;
@@ -23,7 +24,9 @@ import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateNicknameReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
+import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
@@ -289,6 +292,18 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void approveApmUpdateUserRole(List<RoleRequestListReq> reqList) {
+        List<User> apmList = new ArrayList<>();
+        for (RoleRequestListReq req : reqList) {
+            if (req.trackRole() == TrackRoleEnum.APM) {
+                User user = findByEmailAlive(req.email());
+                user.updateUserRole(UserRoleEnum.MANAGER);
+                apmList.add(user);
+            }
+        }
+        userRepository.saveAll(apmList);
+    }
+
     public boolean overlapEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -318,6 +333,5 @@ public class UserService {
             return true;
         }
     }
-
 
 }

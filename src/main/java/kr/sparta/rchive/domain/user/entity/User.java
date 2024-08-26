@@ -127,4 +127,8 @@ public class User extends BaseTimeEntity {
     public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
     }
+
+    public void updateUserRole(UserRoleEnum userRole) {
+        this.userRole = userRole;
+    }
 }
