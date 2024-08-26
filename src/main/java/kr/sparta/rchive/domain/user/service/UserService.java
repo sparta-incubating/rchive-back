@@ -24,7 +24,6 @@ import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateNicknameReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
-import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
@@ -166,7 +165,9 @@ public class UserService {
 
     @Transactional
     public void updateNickname(User user, ProfileUpdateNicknameReq req) {
-        if (!req.nickname().isEmpty()) {
+        if (req.nickname().isEmpty()) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_UPDATE_NICKNAME_EMPTY);
+        } else {
             if (user.getNickname().equals(req.nickname())) {
                 throw new UserCustomException(UserExceptionCode.BAD_REQUEST_SAME_NICKNAME);
             } else if (userRepository.existsByNickname(req.nickname())) {
@@ -297,7 +298,7 @@ public class UserService {
         for (RoleRequestListReq req : reqList) {
             if (req.trackRole() == TrackRoleEnum.APM) {
                 User user = findByEmailAlive(req.email());
-                user.updateUserRole(UserRoleEnum.MANAGER);
+                user.updateUserRoleManager();
                 apmList.add(user);
             }
         }

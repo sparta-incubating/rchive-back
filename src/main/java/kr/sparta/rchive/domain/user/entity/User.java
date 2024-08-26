@@ -74,6 +74,7 @@ public class User extends BaseTimeEntity {
     private String profileImg;
 
     @Column(nullable = true, length = 20, unique = true)
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$|^$", message = "닉네임은 특수문자를 제외한 2~10자리 또는 빈 값이어야 합니다.")
     private String nickname;
 
     @Column(nullable = false, length = 20)
@@ -128,7 +129,7 @@ public class User extends BaseTimeEntity {
         this.profileImg = profileImg;
     }
 
-    public void updateUserRole(UserRoleEnum userRole) {
-        this.userRole = userRole;
+    public void updateUserRoleManager() {
+        this.userRole = UserRoleEnum.MANAGER;
     }
 }
