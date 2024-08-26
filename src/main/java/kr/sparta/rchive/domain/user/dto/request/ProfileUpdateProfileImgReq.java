@@ -3,9 +3,8 @@ package kr.sparta.rchive.domain.user.dto.request;
 import lombok.Builder;
 
 @Builder
-public record ProfileUpdateReq(
-        String profileImg,
-        String nickname
+public record ProfileUpdateProfileImgReq(
+        String profileImg
 ) {
 
 }

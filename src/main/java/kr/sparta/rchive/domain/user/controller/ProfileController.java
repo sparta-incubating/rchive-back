@@ -10,7 +10,8 @@ import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.post.dto.response.PostRes;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
-import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateNicknameReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateProfileImgReq;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -41,7 +42,7 @@ public class ProfileController {
     @GetMapping("/comment")
     @Operation(operationId = "PROFILE-001", summary = "내가 작성한 댓글 조회")
     public ResponseEntity<CommonResponseDto> getComment(
-        @LoginUser User user
+            @LoginUser User user
     ) {
         List<CommentProfileRes> responseList = commentService.findCommentList(user);
 
@@ -72,16 +73,16 @@ public class ProfileController {
                 .body(CommonResponseDto.of(ProfileResponseCode.OK_GET_PROFILE, res));
     }
 
-    @PatchMapping
-    @Operation(operationId = "PROFILE-006", summary = "프로필 변경")
+    @PatchMapping("/nickname")
+    @Operation(operationId = "PROFILE-006", summary = "닉네임 변경")
     @ApiExceptionCodeExample(UpdateProfileException.class)
-    public ResponseEntity<CommonResponseDto> updateProfile(
+    public ResponseEntity<CommonResponseDto> updateNickname(
             @LoginUser User user,
-            @RequestBody ProfileUpdateReq req) {
-        userService.updateProfile(user, req);
+            @Valid @RequestBody ProfileUpdateNicknameReq req) {
+        userService.updateNickname(user, req);
 
-        return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PROFILE.getHttpStatus())
-                .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_PROFILE, null));
+        return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_NICKNAME.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_NICKNAME, null));
     }
 
     @PatchMapping("/password")
@@ -89,7 +90,7 @@ public class ProfileController {
     @ApiExceptionCodeExample(UpdatePasswordException.class)
     public ResponseEntity<CommonResponseDto> updatePassword(
             @LoginUser User user,
-            @RequestBody ProfileUpdatePasswordReq req) {
+            @Valid @RequestBody ProfileUpdatePasswordReq req) {
         userService.updatePassword(user, req);
 
         return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PASSWORD.getHttpStatus())
@@ -107,8 +108,20 @@ public class ProfileController {
                 .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_PHONE, null));
     }
 
+    @PatchMapping("/img")
+    @Operation(operationId = "PROFILE-009", summary = "프로필 이미지 변경")
+    @ApiExceptionCodeExample(UpdateProfileException.class)
+    public ResponseEntity<CommonResponseDto> updateProfileImg(
+            @LoginUser User user,
+            @RequestBody ProfileUpdateProfileImgReq req) {
+        userService.updateProfileImg(user, req);
+
+        return ResponseEntity.status(ProfileResponseCode.OK_UPDATE_PROFILE_IMG.getHttpStatus())
+                .body(CommonResponseDto.of(ProfileResponseCode.OK_UPDATE_PROFILE_IMG, null));
+    }
+
     @GetMapping("/bookmark/search")
-    @Operation(operationId = "PROFILE-009", summary = "북마크 목록 검색")
+    @Operation(operationId = "PROFILE-010", summary = "북마크 목록 검색")
     public ResponseEntity<CommonResponseDto> searchBookmark(
             @LoginUser User user,
             @RequestParam("keyword") String keyword
