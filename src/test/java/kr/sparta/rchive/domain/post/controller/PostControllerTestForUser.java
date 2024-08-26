@@ -350,4 +350,28 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                         jsonPath("$.message").value("북마크 삭제 성공")
                 );
     }
+
+    @Test
+    @DisplayName("POST-018 댓글의 대댓글을 조회하는 기능 테스트")
+    public void 댓글_대댓글_조회() throws Exception {
+        // Given
+        CommentGetRes commentGetRes = CommentGetRes.builder()
+                .id(TEST_COMMENT_2L_ID)
+                .content(TEST_2L_COMMENT.getContent())
+                .username(TEST_STUDENT_USER.getUsername())
+                .email(TEST_STUDENT_USER.getEmail())
+                .nickname(TEST_STUDENT_USER.getNickname())
+                .build();
+
+        List<CommentGetRes> commentGetResList = List.of(commentGetRes);
+        
+        given(commentService.getReply(any(Long.class))).willReturn(commentGetResList);
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/comment/{parentCommentId}", TEST_COMMENT_1L_ID))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("대댓글 조회 성공"),
+                        jsonPath("$.data[0].id").value(2L)
+                );
+    }
 }
