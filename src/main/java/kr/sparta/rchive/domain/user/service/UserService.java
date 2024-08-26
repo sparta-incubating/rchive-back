@@ -70,7 +70,13 @@ public class UserService {
             throw new UserCustomException(UserExceptionCode.CONFLICT_EMAIL);
         }
 
-        if (req.nickname().isEmpty()) {
+        if (req.profileImg() == null || req.profileImg().isEmpty()) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_PROFILE_IMG);
+        }
+
+        if (req.nickname() == null) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NICKNAME);
+        } else if (req.nickname().isEmpty()) {
             if (req.userRole() == UserRoleEnum.USER) {
                 throw new UserCustomException(UserExceptionCode.BAD_REQUEST_STUDENT_NICKNAME_NULL);
             }
@@ -165,8 +171,8 @@ public class UserService {
 
     @Transactional
     public void updateNickname(User user, ProfileUpdateNicknameReq req) {
-        if (req.nickname().isEmpty()) {
-            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_UPDATE_NICKNAME_EMPTY);
+        if (req.nickname() == null || req.nickname().isEmpty()) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NICKNAME);
         } else {
             if (user.getNickname().equals(req.nickname())) {
                 throw new UserCustomException(UserExceptionCode.BAD_REQUEST_SAME_NICKNAME);
