@@ -322,4 +322,21 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                         jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
                 );
     }
+
+    @Test
+    @DisplayName("POST-013 유저 북마크를 추가하는 기능 테스트")
+    public void 유저_북마크를_생성하는_기능() throws Exception {
+        // Given
+        Long postId = 1L;
+
+        // When
+        postBookmarkCoreService.createBookmark(any(User.class), any(Long.class));
+
+        // Then
+        mockMvc.perform(post("/apis/v1/posts/{postId}/bookmark", postId))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("북마크 생성 성공")
+                );
+    }
 }
