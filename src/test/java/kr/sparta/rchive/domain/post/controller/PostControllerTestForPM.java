@@ -50,6 +50,7 @@ public class PostControllerTestForPM {
     private WebApplicationContext context;
     @Autowired
     private ObjectMapper obj;
+
     @MockBean
     private PostTagCoreService postTagCoreService;
     @MockBean
