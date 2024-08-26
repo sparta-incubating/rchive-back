@@ -20,7 +20,7 @@ public record PostUpdateReq(
         String content,
         List<String> tagNameList,
         TrackNameEnum trackName,
-        Integer UpdatePeriod,
+        Integer updatePeriod,
         Boolean isOpened
 ) {
 
