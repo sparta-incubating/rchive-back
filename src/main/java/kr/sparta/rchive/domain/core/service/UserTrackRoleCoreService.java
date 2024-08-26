@@ -222,6 +222,7 @@ public class UserTrackRoleCoreService {
 
         roleService.deleteApmRoleList(reqList);
         roleService.approveRoleRequest(reqList);
+        userService.approveApmUpdateUserRole(reqList);
         roleService.deleteRoleListByAuthNotApprove(reqList);
     }
 
