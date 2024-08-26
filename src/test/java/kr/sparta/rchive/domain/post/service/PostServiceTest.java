@@ -86,4 +86,17 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
         // Then
         verify(postRepository, times(1)).save(any(Post.class));
     }
+
+    @Test
+    @DisplayName("게시물 삭제하는 서비스 로직 성공 테스트")
+    void 게시물_삭제_서비스_성공_테스트() {
+        // Given
+        Post post = TEST_POST;
+
+        // When
+        postService.deletePost(post);
+
+        // Then
+        verify(postRepository, times(1)).save(any(Post.class));
+    }
 }
