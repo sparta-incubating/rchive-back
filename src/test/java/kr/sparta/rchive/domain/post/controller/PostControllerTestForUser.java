@@ -8,6 +8,7 @@ import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
+import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -364,7 +365,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .build();
 
         List<CommentGetRes> commentGetResList = List.of(commentGetRes);
-        
+
         given(commentService.getReply(any(Long.class))).willReturn(commentGetResList);
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/comment/{parentCommentId}", TEST_COMMENT_1L_ID))
@@ -372,6 +373,30 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                         status().isOk(),
                         jsonPath("$.message").value("대댓글 조회 성공"),
                         jsonPath("$.data[0].id").value(2L)
+                );
+    }
+
+    @Test
+    @DisplayName("POST-019 유저의 최근 검색어 저장 기능 테스트")
+    public void 유저_최근_검색어_저장() throws Exception {
+        // Given
+        RecentSearchKeywordReq request = RecentSearchKeywordReq.builder()
+                .trackName(TrackNameEnum.ANDROID)
+                .period(1)
+                .keyword("Test")
+                .build();
+
+        String json = obj.writeValueAsString(request);
+        // When
+        postTagCoreService.saveRecentSearchKeyword(any(User.class), any(RecentSearchKeywordReq.class));
+
+        // Then
+        mockMvc.perform(post("/apis/v1/posts/search/recent")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.message").value("최근 검색어 저장 성공")
                 );
     }
 }
