@@ -12,7 +12,7 @@ public interface PostTest extends TrackTest, TutorTest{
     String TEST_POST_VIDEO_LINK = "Test Post Video Link";
     String TEST_POST_CONTENT_LINK = "Test Post Content Link";
 
-    Post TEST_POST = Post.builder()
+    Post TEST_POST_1L = Post.builder()
             .postType(TEST_POST_TYPE)
             .title(TEST_POST_TITLE)
             .thumbnailUrl(TEST_POST_THUMBNAIL)
@@ -20,6 +20,17 @@ public interface PostTest extends TrackTest, TutorTest{
             .contentLink(TEST_POST_CONTENT_LINK)
             .content(TEST_POST_CONTENT)
             .tutor(TEST_TUTOR)
-            .track(TEST_TRACK_ANDROID)
+            .track(TEST_TRACK_ANDROID_1L)
+            .build();
+
+    Post TEST_POST_2L = Post.builder()
+            .postType(TEST_POST_TYPE)
+            .title(TEST_POST_TITLE)
+            .thumbnailUrl(TEST_POST_THUMBNAIL)
+            .videoLink(TEST_POST_VIDEO_LINK)
+            .contentLink(TEST_POST_CONTENT_LINK)
+            .content(TEST_POST_CONTENT)
+            .tutor(TEST_TUTOR)
+            .track(TEST_TRACK_ANDROID_2L)
             .build();
 }

@@ -91,10 +91,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
-                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
-                    .postType(TEST_POST.getPostType())
+                    .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
+                    .postType(TEST_POST_1L.getPostType())
                     .tutor(TEST_TUTOR.getTutorName())
-                    .title(TEST_POST.getTitle())
+                    .title(TEST_POST_1L.getTitle())
                     .tagList(tagList)
                     .build();
 
@@ -140,10 +140,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
-                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
-                    .postType(TEST_POST.getPostType())
+                    .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
+                    .postType(TEST_POST_1L.getPostType())
                     .tutor(TEST_TUTOR.getTutorName())
-                    .title(TEST_POST.getTitle())
+                    .title(TEST_POST_1L.getTitle())
                     .tagList(tagList)
                     .build();
 
@@ -165,7 +165,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 카테고리 별 조회 성공"),
-                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
+                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST_1L.getThumbnailUrl())
                 );
     }
 
@@ -186,10 +186,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
 
         PostGetSinglePostRes response = PostGetSinglePostRes.builder()
                 .postId(postId)
-                .title(TEST_POST.getTitle())
-                .tutor(TEST_POST.getTutor().getTutorName())
-                .videoLink(TEST_POST.getVideoLink())
-                .contentLink(TEST_POST.getContentLink())
+                .title(TEST_POST_1L.getTitle())
+                .tutor(TEST_POST_1L.getTutor().getTutorName())
+                .videoLink(TEST_POST_1L.getVideoLink())
+                .contentLink(TEST_POST_1L.getContentLink())
                 .tagList(tagInfoList)
                 .isBookmarked(false)
                 .build();
@@ -204,7 +204,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 단건 조회 성공"),
-                        jsonPath("$.data.title").value(TEST_POST.getTitle())
+                        jsonPath("$.data.title").value(TEST_POST_1L.getTitle())
                 );
     }
 
@@ -296,10 +296,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
-                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
-                    .postType(TEST_POST.getPostType())
+                    .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
+                    .postType(TEST_POST_1L.getPostType())
                     .tutor(TEST_TUTOR.getTutorName())
-                    .title(TEST_POST.getTitle())
+                    .title(TEST_POST_1L.getTitle())
                     .tagList(tagList)
                     .build();
 
@@ -321,7 +321,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("태그를 이용한 교육자료 검색 성공"),
-                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
+                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST_1L.getThumbnailUrl())
                 );
     }
 
