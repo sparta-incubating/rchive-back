@@ -142,14 +142,28 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
     }
 
     @Test
-    @DisplayName("교육자료를 열람 상태로 바꾸는 서비스 로직 성공 테스트")
-    void 게시물_열람_상태로_바꾸는_서비스_성공_테스트() {
+    @DisplayName("교육자료를 열람 가능 상태로 바꾸는 서비스 로직 성공 테스트")
+    void 게시물_열람_가능_상태로_바꾸는_서비스_성공_테스트() {
         // Given
         List<Post> postList = new ArrayList<>();
         postList.add(TEST_POST);
 
         // When
         postService.openPost(postList);
+
+        // Then
+        verify(postRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    @DisplayName("교육자료를 열람 불가능 상태로 바꾸는 서비스 로직 성공 테스트")
+    void 게시물_열람_불가능_상태로_바꾸는_서비스_성공_테스트() {
+        // Given
+        List<Post> postList = new ArrayList<>();
+        postList.add(TEST_POST);
+
+        // When
+        postService.closePost(postList);
 
         // Then
         verify(postRepository, times(1)).saveAll(any());
