@@ -96,7 +96,7 @@ public class UserService {
                 .phone(req.phone())
                 .gender(req.gender())
                 .profileImg(req.profileImg())
-                .nickname(req.nickname())
+                .nickname(req.nickname().isEmpty() ? null : req.nickname())
                 .userRole(req.userRole())
                 .termUserAge(req.termUserAge())
                 .termUseService(req.termUseService())
