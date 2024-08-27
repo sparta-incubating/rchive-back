@@ -251,5 +251,6 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
         // Then
         assertThat(post.size()).isEqualTo(responseList.size());
         assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(post.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
     }
 }
