@@ -153,11 +153,11 @@ public class UserService {
         issuedAt = sdf.parse(sdf.format(issuedAt));
         date = sdf.parse(sdf.format(date));
 
-        if (!issuedAt.equals(date)) {
-            String newRefresh = jwtUtil.createRefreshToken(user);
-            redisService.setRefreshToken(user, newRefresh);
-            res.addHeader("Set-Cookie", jwtUtil.addRefreshTokenToCookie(newRefresh).toString());
-        }
+//        if (!issuedAt.equals(date)) {
+        String newRefresh = jwtUtil.createRefreshToken(user);
+        redisService.setRefreshToken(user, newRefresh);
+        res.addHeader("Set-Cookie", jwtUtil.addRefreshTokenToCookie(newRefresh).toString());
+//    }
 
         String newAccess = jwtUtil.createAccessToken(user);
         res.setHeader("Authorization", newAccess);
