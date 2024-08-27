@@ -230,4 +230,26 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
         assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
         assertThat(post.get(1).getTitle()).isEqualTo(responseList.get(1).getTitle());
     }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 특정 PostType의 교육자료들 리스트를 찾아오는 서비스 로직 성공 테스트")
+    void 백오피스_APM_특정_PostType_게시물_리스트_찾아오는_서비스_성공_테스트() {
+        // Given
+        List<Post> responseList = List.of(TEST_POST_1L);
+        Track track = TEST_TRACK_ANDROID_1L;
+        String title = "Test";
+        LocalDate testDate = LocalDate.now();
+        PostTypeEnum postType = TEST_POST_TYPE;
+
+        ReflectionTestUtils.setField(TEST_TRACK_ANDROID_1L, "id", 1L);
+
+        given(postRepository.findPostListInBackOfficePostTypeNotNullApm(any(PostTypeEnum.class), any(String.class), any(LocalDate.class),
+            any(LocalDate.class), any(Long.class), any(Boolean.class), any(Long.class))).willReturn(responseList);
+        // When
+        List<Post> post = postService.findPostListInBackOffice(track, postType, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
+
+        // Then
+        assertThat(post.size()).isEqualTo(responseList.size());
+        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+    }
 }
