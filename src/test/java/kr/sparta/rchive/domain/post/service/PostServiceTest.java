@@ -9,9 +9,11 @@ import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.test.PostTest;
 import kr.sparta.rchive.test.TrackTest;
 import kr.sparta.rchive.test.TutorTest;
+import kr.sparta.rchive.test.UserTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +36,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class PostServiceTest implements PostTest, TrackTest, TutorTest {
+public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest {
 
     @InjectMocks
     private PostService postService;
@@ -247,6 +249,28 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest {
             any(LocalDate.class), any(Long.class), any(Boolean.class), any(Long.class))).willReturn(responseList);
         // When
         List<Post> post = postService.findPostListInBackOffice(track, postType, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
+
+        // Then
+        assertThat(post.size()).isEqualTo(responseList.size());
+        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(post.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
+    }
+
+    @Test
+    @DisplayName("User가 PostType과 Track Id를 이용하여 게시물 리스트를 검색해오는 서비스 로직 성공 테스트")
+    void User_권한_PostType_Track_id_게시물_리스트_검색해오는_서비스_성공_테스트() {
+        // Given
+        UserRoleEnum userRole = UserRoleEnum.USER;
+        PostTypeEnum postType = TEST_POST_TYPE;
+        Track track = TEST_TRACK_ANDROID_1L;
+
+        List<Post> responseList = List.of(TEST_POST_1L);
+
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
+        // When
+        List<Post> post = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
 
         // Then
         assertThat(post.size()).isEqualTo(responseList.size());
