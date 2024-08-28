@@ -12,12 +12,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "http://localhost:3000",
-                        "http://rchive.kr", "http://www.rchive.kr", "http://dev.rchive.kr",
-                        "https://rchive.kr", "https://www.rchive.kr", "https://dev.rchive.kr")
+                        "http://rchive.kr", "http://www.rchive.kr",
+                        "http://office.rchive.kr", "http://dev.rchive.kr",
+                        "https://rchive.kr", "https://www.rchive.kr",
+                        "https://office.rchive.kr", "https://dev.rchive.kr")
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
                 .allowCredentials(true)
                 .maxAge(3600);
     }
+
 }
