@@ -299,4 +299,18 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
         assertThat(post.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
     }
+
+    @Test
+    @DisplayName("교육자료의 자세한 내용 교육자료 ID로 찾아오는 서비스 로직 성공 테스트")
+    void 게시물_자세한_내용_게시물_ID_찾아오는_서비스_성공_테스트() {
+        // Given
+        given(postRepository.findPostWithDetailByPostId(any(Long.class))).willReturn(TEST_POST_1L);
+
+        // When
+        Post post = postService.findPostWithDetailByPostId(TEST_POST_ID);
+
+        // Then
+        assertThat(post.getContent()).isEqualTo(TEST_POST_1L.getContent());
+    }
+
 }
