@@ -183,12 +183,12 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
                 any(Boolean.class), any(Integer.class), any(TrackNameEnum.class), any(Long.class))).willReturn(responseList);
 
         // When
-        List<Post> post = postService.findPostListInBackOfficePostTypeAll(track, title, testDate, testDate, 0, TEST_TUTOR_ID, true);
+        List<Post> postList = postService.findPostListInBackOfficePostTypeAll(track, title, testDate, testDate, 0, TEST_TUTOR_ID, true);
 
         // Then
-        assertThat(post.size()).isEqualTo(responseList.size());
-        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
-        assertThat(post.get(1).getTitle()).isEqualTo(responseList.get(1).getTitle());
+        assertThat(postList.size()).isEqualTo(responseList.size());
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(postList.get(1).getTitle()).isEqualTo(responseList.get(1).getTitle());
     }
 
     @Test
@@ -205,11 +205,11 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
                 any(Boolean.class), any(Long.class), any(Long.class))).willReturn(responseList);
 
         // When
-        List<Post> post = postService.findPostListInBackOfficePostTypeAll(TEST_TRACK_ANDROID_1L, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
+        List<Post> postList = postService.findPostListInBackOfficePostTypeAll(TEST_TRACK_ANDROID_1L, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
 
         // Then
-        assertThat(post.size()).isEqualTo(responseList.size());
-        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(postList.size()).isEqualTo(responseList.size());
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
     }
 
     @Test
@@ -225,12 +225,12 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         given(postRepository.findPostListInBackOfficePostTypeNotNullByPM(any(PostTypeEnum.class), any(String.class), any(LocalDate.class),
             any(LocalDate.class), any(Integer.class), any(Boolean.class), any(TrackNameEnum.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> post = postService.findPostListInBackOffice(track, postType, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
+        List<Post> postList = postService.findPostListInBackOffice(track, postType, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
 
         // Then
-        assertThat(post.size()).isEqualTo(responseList.size());
-        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
-        assertThat(post.get(1).getTitle()).isEqualTo(responseList.get(1).getTitle());
+        assertThat(postList.size()).isEqualTo(responseList.size());
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(postList.get(1).getTitle()).isEqualTo(responseList.get(1).getTitle());
     }
 
     @Test
@@ -248,12 +248,12 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         given(postRepository.findPostListInBackOfficePostTypeNotNullApm(any(PostTypeEnum.class), any(String.class), any(LocalDate.class),
             any(LocalDate.class), any(Long.class), any(Boolean.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> post = postService.findPostListInBackOffice(track, postType, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
+        List<Post> postList = postService.findPostListInBackOffice(track, postType, title, testDate, testDate, 1, TEST_TUTOR_ID, true);
 
         // Then
-        assertThat(post.size()).isEqualTo(responseList.size());
-        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
-        assertThat(post.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
+        assertThat(postList.size()).isEqualTo(responseList.size());
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(postList.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
     }
 
     @Test
@@ -270,12 +270,12 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> post = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
 
         // Then
-        assertThat(post.size()).isEqualTo(responseList.size());
-        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
-        assertThat(post.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
+        assertThat(postList.size()).isEqualTo(responseList.size());
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(postList.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
     }
 
     @Test
@@ -292,17 +292,17 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         given(postRepository.findAllByPostTypeAndTrackIdUserRoleManager(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> post = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
 
         // Then
-        assertThat(post.size()).isEqualTo(responseList.size());
-        assertThat(post.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
-        assertThat(post.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
+        assertThat(postList.size()).isEqualTo(responseList.size());
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
+        assertThat(postList.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
     }
 
     @Test
     @DisplayName("교육자료의 자세한 내용 교육자료 ID로 찾아오는 서비스 로직 성공 테스트")
-    void 게시물_자세한_내용_게시물_ID_찾아오는_서비스_성공_테스트() {
+    void 게시물_자세한_내용_게시물_ID로_찾아오는_서비스_성공_테스트() {
         // Given
         given(postRepository.findPostWithDetailByPostId(any(Long.class))).willReturn(TEST_POST_1L);
 
@@ -311,6 +311,20 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         // Then
         assertThat(post.getContent()).isEqualTo(TEST_POST_1L.getContent());
+    }
+
+    @Test
+    @DisplayName("태그 ID와 트랙 ID를 이용하여 해당 태그가 있는 게시물 리스트를 찾아오는 서비스 로직 성공 테스트")
+    void 태그와_트랙으로_게시물_리스트_찾아오는_서비스_성공_테스트 () {
+        // Given
+        List<Post> responseList = List.of(TEST_POST_1L);
+
+        given(postRepository.findPostListByTagIdAndTrackIdWithTagList(any(Long.class), any(Long.class))).willReturn(responseList);
+        // When
+        List<Post> postList = postService.findPostListByTagIdWithTagList(1L, TEST_TRACK_ID);
+
+        // Then
+        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
     }
 
 }
