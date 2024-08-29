@@ -173,7 +173,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     @DisplayName("POST-006 유저 게시물 단건 조회 기능 테스트")
     public void 유저_게시물_단건_조회() throws Exception {
         // Given
-        Long postId = TEST_POST_ID;
+        Long postId = TEST_POST_1L_ID;
 
         List<TagInfo> tagInfoList = new ArrayList<>();
 
@@ -332,7 +332,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         postBookmarkCoreService.createBookmark(any(User.class), any(Long.class));
 
         // Then
-        mockMvc.perform(post("/apis/v1/posts/{postId}/bookmark", TEST_POST_ID))
+        mockMvc.perform(post("/apis/v1/posts/{postId}/bookmark", TEST_POST_1L_ID))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("북마크 생성 성공")
@@ -346,7 +346,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         postBookmarkCoreService.deleteBookmark(any(User.class), any(Long.class));
 
         // Then
-        mockMvc.perform(delete("/apis/v1/posts/{postId}/bookmark", TEST_POST_ID))
+        mockMvc.perform(delete("/apis/v1/posts/{postId}/bookmark", TEST_POST_1L_ID))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("북마크 삭제 성공")

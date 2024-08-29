@@ -3,8 +3,11 @@ package kr.sparta.rchive.test;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 
+import java.time.LocalDate;
+
 public interface PostTest extends TrackTest, TutorTest{
-    Long TEST_POST_ID = 1L;
+    Long TEST_POST_1L_ID = 1L;
+    Long TEST_POST_2L_ID = 2L;
     PostTypeEnum TEST_POST_TYPE = PostTypeEnum.Sparta_Lecture;
     String TEST_POST_TITLE = "Test Post";
     String TEST_POST_THUMBNAIL = "Test Post Thumbnail";
@@ -21,6 +24,7 @@ public interface PostTest extends TrackTest, TutorTest{
             .content(TEST_POST_CONTENT)
             .tutor(TEST_TUTOR)
             .track(TEST_TRACK_ANDROID_1L)
+            .uploadedAt(LocalDate.now())
             .build();
 
     Post TEST_POST_2L = Post.builder()
@@ -32,5 +36,6 @@ public interface PostTest extends TrackTest, TutorTest{
             .content(TEST_POST_CONTENT)
             .tutor(TEST_TUTOR)
             .track(TEST_TRACK_ANDROID_2L)
+            .uploadedAt(LocalDate.now())
             .build();
 }
