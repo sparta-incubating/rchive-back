@@ -13,16 +13,19 @@ import java.util.List;
 import java.util.Random;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateProfileImgReq;
+import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindEmailReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordCheckEmailReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordCheckPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
-import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateReq;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateNicknameReq;
 import kr.sparta.rchive.domain.user.dto.request.UserFindPasswordUpdateReq;
 import kr.sparta.rchive.domain.user.dto.request.UserSignupReq;
 import kr.sparta.rchive.domain.user.dto.response.FindEmailRes;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import kr.sparta.rchive.domain.user.exception.UserCustomException;
 import kr.sparta.rchive.domain.user.exception.UserExceptionCode;
@@ -67,13 +70,19 @@ public class UserService {
             throw new UserCustomException(UserExceptionCode.CONFLICT_EMAIL);
         }
 
-        if (req.userRole() == UserRoleEnum.USER) {
-            if (userRepository.existsByNickname(req.nickname())) {
-                throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
+        if (req.profileImg() == null || req.profileImg().isEmpty()) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_PROFILE_IMG);
+        }
+
+        if (req.nickname() == null) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NICKNAME);
+        } else if (req.nickname().isEmpty()) {
+            if (req.userRole() == UserRoleEnum.USER) {
+                throw new UserCustomException(UserExceptionCode.BAD_REQUEST_STUDENT_NICKNAME_NULL);
             }
         } else {
-            if (req.nickname() != null) {
-                throw new UserCustomException(UserExceptionCode.BAD_REQUEST_MANAGER_NICKNAME);
+            if (userRepository.existsByNickname(req.nickname())) {
+                throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
             }
         }
 
@@ -87,7 +96,7 @@ public class UserService {
                 .phone(req.phone())
                 .gender(req.gender())
                 .profileImg(req.profileImg())
-                .nickname(req.nickname())
+                .nickname(req.nickname().isEmpty() ? null : req.nickname())
                 .userRole(req.userRole())
                 .termUserAge(req.termUserAge())
                 .termUseService(req.termUseService())
@@ -161,15 +170,18 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfile(User user, ProfileUpdateReq req) {
-        if (user.getUserRole() == UserRoleEnum.USER) {
-            if (userRepository.existsByNickname(req.nickname())) {
+    public void updateNickname(User user, ProfileUpdateNicknameReq req) {
+        if (req.nickname() == null || req.nickname().isEmpty()) {
+            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NICKNAME);
+        } else {
+            if (user.getNickname().equals(req.nickname())) {
+                throw new UserCustomException(UserExceptionCode.BAD_REQUEST_SAME_NICKNAME);
+            } else if (userRepository.existsByNickname(req.nickname())) {
                 throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
             }
-            user.updateProfileByUser(req.profileImg(), req.nickname());
-        } else {
-            user.updateProfileByManager(req.profileImg());
+            user.updateNickname(req.nickname());
         }
+
         userRepository.save(user);
     }
 
@@ -185,6 +197,12 @@ public class UserService {
     @Transactional
     public void updatePhone(User user, ProfileUpdatePhoneReq req) {
         user.updatePhone(req.phone());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateProfileImg(User user, ProfileUpdateProfileImgReq req) {
+        user.updateProfileImg(req.profileImg());
         userRepository.save(user);
     }
 
@@ -281,6 +299,18 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void approveApmUpdateUserRole(List<RoleRequestListReq> reqList) {
+        List<User> apmList = new ArrayList<>();
+        for (RoleRequestListReq req : reqList) {
+            if (req.trackRole() == TrackRoleEnum.APM) {
+                User user = findByEmailAlive(req.email());
+                user.updateUserRoleManager();
+                apmList.add(user);
+            }
+        }
+        userRepository.saveAll(apmList);
+    }
+
     public boolean overlapEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -310,6 +340,5 @@ public class UserService {
             return true;
         }
     }
-
 
 }

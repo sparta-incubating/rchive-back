@@ -2,7 +2,6 @@ package kr.sparta.rchive.domain.user.repository;
 
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.RoleId;
-import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
@@ -54,6 +53,7 @@ public interface RoleRepository extends JpaRepository<Role, RoleId>, RoleReposit
     @Query("select r from Role r "
             + "where r.user.email = :email "
             + "and r.trackRole = :trackRole "
-            + "and r.auth = 'APPROVE'")
+            + "and r.auth = 'APPROVE' "
+            + "order by r.modifiedAt asc")
     List<Role> findRoleListByEmailAndTrackRoleAndApprove(String email, TrackRoleEnum trackRole);
 }

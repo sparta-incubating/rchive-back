@@ -15,7 +15,7 @@ public enum UserExceptionCode implements ExceptionCode {
     /*  400 BAD_REQUEST : 잘못된 요청  */
     @ExplainException("이메일이 데이터베이스에 존재하지 않을 때 나는 오류")
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "USER-0001", "존재하지 않는 이메일"),
-    BAD_REQUEST_MANAGER_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0002", "매니저 닉네임 입력 불가"),
+    BAD_REQUEST_STUDENT_NICKNAME_NULL(HttpStatus.BAD_REQUEST, "USER-0002", "학생 닉네임 입력 필수"),
     BAD_REQUEST_DISAGREE_TERMS(HttpStatus.BAD_REQUEST, "USER-0003", "이용약관 미동의"),
     BAD_REQUEST_NO_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "USER-0004", "비밀번호가 일치하지 않음"),
     BAD_REQUEST_REFRESH_TOKEN_NULL(HttpStatus.BAD_REQUEST, "USER-0005", "리프레시 토큰 없음"),
@@ -24,6 +24,9 @@ public enum UserExceptionCode implements ExceptionCode {
     BAD_REQUEST_PHONE_AUTH_EXPIRED(HttpStatus.BAD_REQUEST, "USER-0008", "휴대폰 인증 시간 만료"),
     BAD_REQUEST_PHONE_AUTH(HttpStatus.BAD_REQUEST, "USER-0009", "휴대폰 인증 번호가 일치하지 않음"),
     BAD_REQUEST_USER(HttpStatus.BAD_REQUEST, "USER-0010", "존재하지 않는 유저"),
+    BAD_REQUEST_SAME_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0011", "기존의 닉네임과 같음"),
+    BAD_REQUEST_NICKNAME(HttpStatus.BAD_REQUEST, "USER-0012", "닉네임 없음"),
+    BAD_REQUEST_PROFILE_IMG(HttpStatus.BAD_REQUEST, "USER-0012", "프로필이미지 없음"),
 
     /*  401 UNAUTHORIZED : 인증 안됨  */
 

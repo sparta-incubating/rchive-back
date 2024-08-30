@@ -73,7 +73,8 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String profileImg;
 
-    @Column(nullable = true, length = 20, unique = true)
+    @Column(nullable = false, length = 20)
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$|^\\s*$|^$", message = "닉네임은 특수문자를 제외한 2~10자리 또는 빈 값(공백 포함)이어야 합니다.")
     private String nickname;
 
     @Column(nullable = false, length = 20)
@@ -112,11 +113,6 @@ public class User extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void updateProfileByUser(String profileImg, String nickname) {
-        this.profileImg = profileImg;
-        this.nickname = nickname;
-    }
-
     public void updatePassword(String password) {
         this.password = password;
     }
@@ -125,7 +121,15 @@ public class User extends BaseTimeEntity {
         this.phone = phone;
     }
 
-    public void updateProfileByManager(String profileImg) {
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
+    }
+
+    public void updateUserRoleManager() {
+        this.userRole = UserRoleEnum.MANAGER;
     }
 }
