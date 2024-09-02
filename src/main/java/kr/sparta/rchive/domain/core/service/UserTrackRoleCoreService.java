@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetMyRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleRes;
@@ -40,31 +41,33 @@ public class UserTrackRoleCoreService {
     private final TrackService trackService;
     private final RedisService redisService;
 
-    public List<RoleRes> getMyRoleList(User user) {
+    public RoleGetMyRoleRes getMyRoleList(User user) {
         List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
 
-        TrackNameEnum trackName = null;
         for (Role r : roleList) {
             if (r.getTrackRole() == TrackRoleEnum.PM) {
-                trackName = r.getTrack().getTrackName();
+                TrackNameEnum trackName = r.getTrack().getTrackName();
+                List<Track> trackList = trackService.findTrackListByTrackName(trackName);
+
+                List<RoleRes> roleResList = trackList.stream()
+                        .map(track -> {
+                            return RoleRes.builder()
+                                    .trackId(track.getId())
+                                    .trackRoleEnum(TrackRoleEnum.PM)
+                                    .trackName(track.getTrackName())
+                                    .period(track.getPeriod())
+                                    .build();
+                        }).collect(Collectors.toList());
+
+                return RoleGetMyRoleRes.builder()
+                        .roleResList(roleResList)
+                        .profileImg(user.getProfileImg())
+                        .nickname(user.getNickname())
+                        .build();
             }
         }
 
-        if (trackName != null) {
-            List<Track> trackList = trackService.findTrackListByTrackName(trackName);
-
-            return trackList.stream()
-                    .map(track -> {
-                        return RoleRes.builder()
-                                .trackId(track.getId())
-                                .trackRoleEnum(TrackRoleEnum.PM)
-                                .trackName(track.getTrackName())
-                                .period(track.getPeriod())
-                                .build();
-                    }).collect(Collectors.toList());
-        }
-
-        return roleList.stream()
+        List<RoleRes> roleResList = roleList.stream()
                 .map(role -> {
                     return RoleRes.builder()
                             .trackId(role.getTrack().getId())
@@ -73,6 +76,12 @@ public class UserTrackRoleCoreService {
                             .period(role.getTrack().getPeriod())
                             .build();
                 }).collect(Collectors.toList());
+
+        return RoleGetMyRoleRes.builder()
+                .roleResList(roleResList)
+                .profileImg(user.getProfileImg())
+                .nickname(user.getNickname())
+                .build();
     }
 
     public void selectRole(User user, RoleReq req) {
@@ -150,8 +159,17 @@ public class UserTrackRoleCoreService {
             }
         }
 
-        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
-        Track track = role.getTrack();
+        Role role = null;
+        Track track = null;
+
+        if (user.getEmail().contains("@teamsparta.co")) {
+            track = trackService.findTrackById(trackId);
+            Track pmTrack = trackService.findTrackByTrackNameAndPeriod(track.getTrackName(), 0);
+            role = roleService.findRoleByUserIdAndTrackId(user.getId(), pmTrack.getId());
+        } else {
+            role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
+            track = role.getTrack();
+        }
 
         if (role.getAuth() != AuthEnum.APPROVE) {
             redisService.deleteLastSelectRole(user);

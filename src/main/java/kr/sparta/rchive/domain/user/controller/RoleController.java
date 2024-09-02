@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetMyRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleRes;
@@ -47,10 +48,10 @@ public class RoleController {
     @GetMapping
     @Operation(operationId = "ROLE-001", summary = "내 권한(트랙 및 기수) 조회")
     public ResponseEntity<CommonResponseDto> getMyRoleList(@LoginUser User user) {
-        List<RoleRes> resList = userTrackRoleCoreService.getMyRoleList(user);
+        RoleGetMyRoleRes res = userTrackRoleCoreService.getMyRoleList(user);
 
         return ResponseEntity.status(RoleResponseCode.OK_GET_MY_ROLE_LIST.getHttpStatus())
-                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_MY_ROLE_LIST, resList));
+                .body(CommonResponseDto.of(RoleResponseCode.OK_GET_MY_ROLE_LIST, res));
     }
 
     @PostMapping
