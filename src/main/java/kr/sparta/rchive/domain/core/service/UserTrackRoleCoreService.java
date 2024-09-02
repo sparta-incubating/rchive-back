@@ -7,6 +7,7 @@ import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleReq;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetLastSelectRoleRes;
+import kr.sparta.rchive.domain.user.dto.response.RoleGetMyRoleRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestCountRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackRoleRequestListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleRes;
@@ -40,7 +41,7 @@ public class UserTrackRoleCoreService {
     private final TrackService trackService;
     private final RedisService redisService;
 
-    public List<RoleRes> getMyRoleList(User user) {
+    public RoleGetMyRoleRes getMyRoleList(User user) {
         List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
 
         for (Role r : roleList) {
@@ -48,7 +49,7 @@ public class UserTrackRoleCoreService {
                 TrackNameEnum trackName = r.getTrack().getTrackName();
                 List<Track> trackList = trackService.findTrackListByTrackName(trackName);
 
-                return trackList.stream()
+                List<RoleRes> roleResList = trackList.stream()
                         .map(track -> {
                             return RoleRes.builder()
                                     .trackId(track.getId())
@@ -57,10 +58,16 @@ public class UserTrackRoleCoreService {
                                     .period(track.getPeriod())
                                     .build();
                         }).collect(Collectors.toList());
+
+                return RoleGetMyRoleRes.builder()
+                        .roleResList(roleResList)
+                        .profileImg(user.getProfileImg())
+                        .nickname(user.getNickname())
+                        .build();
             }
         }
 
-        return roleList.stream()
+        List<RoleRes> roleResList = roleList.stream()
                 .map(role -> {
                     return RoleRes.builder()
                             .trackId(role.getTrack().getId())
@@ -69,6 +76,12 @@ public class UserTrackRoleCoreService {
                             .period(role.getTrack().getPeriod())
                             .build();
                 }).collect(Collectors.toList());
+
+        return RoleGetMyRoleRes.builder()
+                .roleResList(roleResList)
+                .profileImg(user.getProfileImg())
+                .nickname(user.getNickname())
+                .build();
     }
 
     public void selectRole(User user, RoleReq req) {
