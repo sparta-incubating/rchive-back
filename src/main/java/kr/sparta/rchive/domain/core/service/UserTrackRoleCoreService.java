@@ -43,25 +43,21 @@ public class UserTrackRoleCoreService {
     public List<RoleRes> getMyRoleList(User user) {
         List<Role> roleList = roleService.findRoleListByUserIdAuthApprove(user.getId());
 
-        TrackNameEnum trackName = null;
         for (Role r : roleList) {
             if (r.getTrackRole() == TrackRoleEnum.PM) {
-                trackName = r.getTrack().getTrackName();
+                TrackNameEnum trackName = r.getTrack().getTrackName();
+                List<Track> trackList = trackService.findTrackListByTrackName(trackName);
+
+                return trackList.stream()
+                        .map(track -> {
+                            return RoleRes.builder()
+                                    .trackId(track.getId())
+                                    .trackRoleEnum(TrackRoleEnum.PM)
+                                    .trackName(track.getTrackName())
+                                    .period(track.getPeriod())
+                                    .build();
+                        }).collect(Collectors.toList());
             }
-        }
-
-        if (trackName != null) {
-            List<Track> trackList = trackService.findTrackListByTrackName(trackName);
-
-            return trackList.stream()
-                    .map(track -> {
-                        return RoleRes.builder()
-                                .trackId(track.getId())
-                                .trackRoleEnum(TrackRoleEnum.PM)
-                                .trackName(track.getTrackName())
-                                .period(track.getPeriod())
-                                .build();
-                    }).collect(Collectors.toList());
         }
 
         return roleList.stream()
