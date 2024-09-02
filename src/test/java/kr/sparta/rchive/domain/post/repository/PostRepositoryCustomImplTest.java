@@ -116,4 +116,38 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
     }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 PostType은 All이고 모든 조건이 null이 아닌 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(3)
+    void 백오피스_APM_전체_게시물_조건_NotNull_리스트_조회_테스트() {
+        // given
+        String title = "test title";
+        LocalDate startDate = LocalDate.of(2023, 1, 1);
+        LocalDate endDate = LocalDate.now();
+        Boolean isOpened = true;
+        Long trackId = track.getId();
+        Long tutorId = tutor.getId();
+
+        Post post = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(title)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        Post savePost = postRepository.save(post);
+
+        // when
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(title, startDate, endDate, isOpened, trackId, tutorId);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
 }
