@@ -226,7 +226,7 @@ public class PostTagCoreService {
     }
 
     public Page<PostGetRes> getPostListByCategory(
-            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, Pageable pageable) {
+            User user, TrackNameEnum trackName, Integer period, PostTypeEnum postType, Long tutorId, Pageable pageable) {
 
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
 
@@ -234,7 +234,7 @@ public class PostTagCoreService {
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
         List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(),
-                postType, track);
+                postType, track, tutorId);
 
         List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
 

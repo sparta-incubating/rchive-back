@@ -268,9 +268,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         ReflectionTestUtils.setField(track, "id", 1L);
 
-        given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
+        given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track, TEST_TUTOR_ID);
 
         // Then
         assertThat(postList.size()).isEqualTo(responseList.size());
@@ -290,9 +290,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         ReflectionTestUtils.setField(track, "id", 1L);
 
-        given(postRepository.findAllByPostTypeAndTrackIdUserRoleManager(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
+        given(postRepository.findAllByPostTypeAndTrackIdUserRoleManager(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track, TEST_TUTOR_ID);
 
         // Then
         assertThat(postList.size()).isEqualTo(responseList.size());
