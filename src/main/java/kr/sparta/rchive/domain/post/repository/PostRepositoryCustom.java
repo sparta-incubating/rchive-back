@@ -17,9 +17,9 @@ public interface PostRepositoryCustom {
 
     List<Post> findPostListInBackOfficePostTypeNotNullApm(PostTypeEnum postType, String title, LocalDate startDate, LocalDate endDate, Long trackId, Boolean isOpened, Long tutorId);
 
-    List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId);
+    List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId, Long tutorId);
 
-    List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId);
+    List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId, Long tutorId);
 
     List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId);
 
