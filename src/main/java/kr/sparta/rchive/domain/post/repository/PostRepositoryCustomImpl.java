@@ -6,13 +6,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 
 @RequiredArgsConstructor
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
@@ -124,19 +121,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId) {
+    public List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
 
         BooleanBuilder builder = new BooleanBuilder();
 
         if (postType == PostTypeEnum.Level_All) {
             builder.and(post.postType.stringValue().contains("Level"));
-        } else {
+        } else if (postType != null) {
             builder.and(post.postType.eq(postType));
         }
+
+        if(tutorId != null) {
+            builder.and(post.tutor.id.eq(tutorId));
+        }
+
         builder.and(post.track.id.eq(trackId));
         builder.and(post.isOpened.eq(true));
 
@@ -151,19 +154,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId) {
+    public List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId, Long tutorId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
+        QTutor tutor = QTutor.tutor;
 
         BooleanBuilder builder = new BooleanBuilder();
 
         if (postType == PostTypeEnum.Level_All) {
             builder.and(post.postType.stringValue().contains("Level"));
-        } else {
+        } else if (postType != null) {
             builder.and(post.postType.eq(postType));
         }
+
+        if(tutorId != null) {
+            builder.and(post.tutor.id.eq(tutorId));
+        }
+
         builder.and(post.track.id.eq(trackId));
 
         return queryFactory

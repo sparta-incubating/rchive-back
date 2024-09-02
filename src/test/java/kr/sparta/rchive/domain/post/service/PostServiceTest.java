@@ -268,9 +268,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         ReflectionTestUtils.setField(track, "id", 1L);
 
-        given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
+        given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track, TEST_TUTOR_ID);
 
         // Then
         assertThat(postList.size()).isEqualTo(responseList.size());
@@ -290,9 +290,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         ReflectionTestUtils.setField(track, "id", 1L);
 
-        given(postRepository.findAllByPostTypeAndTrackIdUserRoleManager(any(PostTypeEnum.class), any(Long.class))).willReturn(responseList);
+        given(postRepository.findAllByPostTypeAndTrackIdUserRoleManager(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track, TEST_TUTOR_ID);
 
         // Then
         assertThat(postList.size()).isEqualTo(responseList.size());
@@ -307,7 +307,7 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         given(postRepository.findPostWithDetailByPostId(any(Long.class))).willReturn(TEST_POST_1L);
 
         // When
-        Post post = postService.findPostWithDetailByPostId(TEST_POST_ID);
+        Post post = postService.findPostWithDetailByPostId(TEST_POST_1L_ID);
 
         // Then
         assertThat(post.getContent()).isEqualTo(TEST_POST_1L.getContent());
@@ -331,7 +331,7 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
     @DisplayName("교육자료 ID 리스트로 교육자료 리스트 찾아오는 서비스 로직 성공 테스트")
     void 게시물_ID_리스트로_게시물_리스트_찾아오는_서비스_성공_테스트() {
         // Given
-        List<Long> postIdList = List.of(TEST_POST_ID);
+        List<Long> postIdList = List.of(TEST_POST_1L_ID);
         List<Post> responseList = List.of(TEST_POST_1L);
 
         given(postRepository.findPostByIdIn(any())).willReturn(responseList);
@@ -366,7 +366,7 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         // Given
         given(postRepository.findPostDetail(any(Long.class))).willReturn(TEST_POST_1L);
         // When
-        Post post = postService.findPostDetail(TEST_POST_ID);
+        Post post = postService.findPostDetail(TEST_POST_1L_ID);
 
         // Then
         assertThat(post.getTitle()).isEqualTo(TEST_POST_1L.getTitle());
