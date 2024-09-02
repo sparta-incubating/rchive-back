@@ -160,6 +160,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                         .param("trackName", "ANDROID")
                         .param("loginPeriod", "1")
                         .param("category", String.valueOf(PostTypeEnum.Sparta_Lecture))
+                        .param("tutorId", "1")
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpectAll(
