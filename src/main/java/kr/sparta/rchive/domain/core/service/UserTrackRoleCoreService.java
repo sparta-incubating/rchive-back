@@ -159,8 +159,17 @@ public class UserTrackRoleCoreService {
             }
         }
 
-        Role role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
-        Track track = role.getTrack();
+        Role role = null;
+        Track track = null;
+
+        if (user.getEmail().contains("@teamsparta.co")) {
+            track = trackService.findTrackById(trackId);
+            Track pmTrack = trackService.findTrackByTrackNameAndPeriod(track.getTrackName(), 0);
+            role = roleService.findRoleByUserIdAndTrackId(user.getId(), pmTrack.getId());
+        } else {
+            role = roleService.findRoleByUserIdAndTrackId(user.getId(), trackId);
+            track = role.getTrack();
+        }
 
         if (role.getAuth() != AuthEnum.APPROVE) {
             redisService.deleteLastSelectRole(user);
