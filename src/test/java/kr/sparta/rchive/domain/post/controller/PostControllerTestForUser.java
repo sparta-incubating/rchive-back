@@ -154,7 +154,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         Page<PostGetRes> response = new PageImpl<>(postGetResList, pageable, 2);
 
         given(postTagCoreService.getPostListByCategory(any(User.class), any(TrackNameEnum.class),
-                any(Integer.class), any(PostTypeEnum.class), any())).willReturn(response);
+                any(Integer.class), any(PostTypeEnum.class), any(Long.class), any())).willReturn(response);
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/category")
                         .param("trackName", "ANDROID")
