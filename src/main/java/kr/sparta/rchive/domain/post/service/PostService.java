@@ -97,11 +97,11 @@ public class PostService {
     }
 
     public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,
-                                                       Track track) {
+                                                       Track track, Long tutorId) {
         if (userRole.equals(UserRoleEnum.USER)) {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId(), tutorId);
         } else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId(), tutorId);
         }
     }
 
