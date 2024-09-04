@@ -82,11 +82,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
                         title != null ? post.title.contains(title) : null,
-                        postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                        post.postType.eq(postType),
                         post.track.trackName.eq(trackName),
                         post.isDeleted.eq(false)
                 )
