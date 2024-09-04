@@ -220,6 +220,7 @@ public class PostTagCoreService {
                 .tutor(post.getTutor().getTutorName())
                 .videoLink(post.getVideoLink())
                 .contentLink(post.getContentLink())
+                .uploadedAt(post.getUploadedAt())
                 .tagList(tagList)
                 .isBookmarked(isBookmarked)
                 .build();
