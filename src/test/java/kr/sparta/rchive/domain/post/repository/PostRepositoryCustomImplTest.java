@@ -214,4 +214,37 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
     }
+
+    @Test
+    @DisplayName("백오피스에서 PM이 특정 PostType에 조건은 null의 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(6)
+    void 백오피스_PM_특정_PostType_게시물_조건_null_리스트_조회_테스트() {
+        // Given
+        String title = "test";
+        PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.now();
+
+        Post post = Post.builder()
+                .postType(postType)
+                .title(title)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(post);
+
+        // When
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullByPM(postType, null, null,
+                null, null, null, track.getTrackName(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
 }
