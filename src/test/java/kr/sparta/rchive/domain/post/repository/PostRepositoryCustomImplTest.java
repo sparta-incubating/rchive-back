@@ -1,13 +1,16 @@
 package kr.sparta.rchive.domain.post.repository;
 
-import jakarta.persistence.EntityManager;
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.entity.Tutor;
+import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
-import kr.sparta.rchive.global.config.AuditingConfig;
+import kr.sparta.rchive.domain.user.repository.TrackRepository;
 import kr.sparta.rchive.global.config.QueryDslConfig;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import kr.sparta.rchive.test.PostTest;
+import kr.sparta.rchive.test.TagTest;
+import kr.sparta.rchive.test.TrackTest;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -20,20 +23,54 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import({QueryDslConfig.class})  // PostRepositoryCustomImpl을 직접 로드
-public class PostRepositoryCustomImplTest {
+public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTest {
 
     @Autowired
     private PostRepositoryCustomImpl postRepositoryCustom;
+    @Autowired
+    private TrackRepository trackRepository;
+    @Autowired
+    private TutorRepository tutorRepository;
+    @Autowired
+    private TagRepository tagRepository;
+    @Autowired
+    private PostTagRepository postTagRepository;
+    @Autowired
+    private PostRepository postRepository;
+
+    Track track;
+    Tutor tutor;
+    Tag tag;
+
 
     @BeforeEach
-    void setUp() {
-        // 테스트에 사용할 데이터 준비
-        // Post, Tag, Track, Tutor 등의 엔티티를 생성하고 저장
+    void setup() {
+        track = trackRepository.save(TEST_TRACK_ANDROID_1L);
+
+        Tutor buildTutor = Tutor.builder()
+                .tutorName("test")
+                .track(track)
+                .build();
+
+        tutor = tutorRepository.save(buildTutor);
+
+        tag = tagRepository.save(TEST_1L_TAG);
+    }
+
+    @AfterEach
+    void afterEach() {
+        postTagRepository.deleteAllInBatch();
+        tagRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        tutorRepository.deleteAllInBatch();
+        trackRepository.deleteAllInBatch();
     }
 
     @Test
     @DisplayName("백오피스에서 PM이 PostType은 All이고 모든 조건이 null이 아닌 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(1)
     void 백오피스_PM_전체_게시물_조건_NotNull_리스트_조회_테스트() {
         // given
         String title = "test title";
@@ -51,5 +88,97 @@ public class PostRepositoryCustomImplTest {
         assertThat(result).isEmpty();
     }
 
-    // 추가적인 테스트 메소드 작성
+    @Test
+    @DisplayName("백오피스에서 PM이 PostType은 All이고 모든 조건이 null인 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(2)
+    void 백오피스_PM_전체_게시물_조건_Null_리스트_조회_테스트() {
+        // given
+        TrackNameEnum trackName = TrackNameEnum.ANDROID;
+
+        Post post = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(post);
+
+        // when
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByPm(null, null, null, null, null, trackName, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 PostType은 All이고 모든 조건이 null이 아닌 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(3)
+    void 백오피스_APM_전체_게시물_조건_NotNull_리스트_조회_테스트() {
+        // given
+        String title = "test title";
+        LocalDate startDate = LocalDate.of(2023, 1, 1);
+        LocalDate endDate = LocalDate.now();
+        Boolean isOpened = true;
+        Long trackId = track.getId();
+        Long tutorId = tutor.getId();
+
+        Post post = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(title)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        Post savePost = postRepository.save(post);
+
+        // when
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(title, startDate, endDate, isOpened, trackId, tutorId);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 PostType은 All이고 모든 조건이 null인 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(4)
+    void 백오피스_APM_전체_게시물_조건_Null_리스트_조회_테스트() {
+        // given
+        String title = "test title";
+        Boolean isOpened = true;
+        Long trackId = track.getId();
+
+        Post post = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(title)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        Post savePost = postRepository.save(post);
+
+        // when
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(null, null, null, isOpened, trackId, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
 }

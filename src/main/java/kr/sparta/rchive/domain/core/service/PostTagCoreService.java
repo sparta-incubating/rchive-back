@@ -281,7 +281,9 @@ public class PostTagCoreService {
         if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+            if(!roleService.checkIsPm(user.getId(), trackName)) {
+                roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+            }
         }
 
         return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
