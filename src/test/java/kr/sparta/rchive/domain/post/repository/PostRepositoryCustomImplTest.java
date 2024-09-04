@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.post.repository;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
+import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
@@ -157,7 +158,6 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     void 백오피스_APM_전체_게시물_조건_Null_리스트_조회_테스트() {
         // given
         String title = "test title";
-        Boolean isOpened = true;
         Long trackId = track.getId();
 
         Post post = Post.builder()
@@ -175,9 +175,42 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         Post savePost = postRepository.save(post);
 
         // when
-        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(null, null, null, isOpened, trackId, null);
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(null, null, null, null, trackId, null);
 
         // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 PM이 특정 PostType에 특정 조건의 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(5)
+    void 백오피스_PM_특정_PostType_게시물_특정_조건_리스트_조회_테스트() {
+        // Given
+        String title = "test";
+        PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.now();
+
+        Post post = Post.builder()
+                .postType(postType)
+                .title(title)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(post);
+
+        // When
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullByPM(postType, title, startDate,
+                endDate, track.getPeriod(), true, track.getTrackName(), tutor.getId());
+
+        // Then
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
     }
