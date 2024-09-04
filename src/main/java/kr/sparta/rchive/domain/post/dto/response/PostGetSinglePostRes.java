@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Builder
@@ -14,6 +15,7 @@ public record PostGetSinglePostRes(
         String tutor,
         String videoLink,
         String contentLink,
+        LocalDate uploadedAt,
         List<TagInfo> tagList,
         Boolean isBookmarked
 ) {
