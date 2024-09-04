@@ -222,8 +222,6 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         // Given
         String title = "test";
         PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = LocalDate.now();
 
         Post post = Post.builder()
                 .postType(postType)
