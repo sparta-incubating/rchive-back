@@ -179,7 +179,11 @@ public class PostTagCoreService {
             managerTrack = findPost.getTrack();
         }
 
-        Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
+        Tutor tutor = null;
+
+        if(request.tutorId() != null) {
+            tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
+        }
 
         Post updatePost = postService.updatePost(findPost, request, managerTrack, tutor);
 
@@ -218,6 +222,7 @@ public class PostTagCoreService {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
+                .postType(post.getPostType())
                 .videoLink(post.getVideoLink())
                 .contentLink(post.getContentLink())
                 .uploadedAt(post.getUploadedAt())
