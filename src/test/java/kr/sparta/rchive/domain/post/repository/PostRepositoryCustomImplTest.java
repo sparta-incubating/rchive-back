@@ -47,6 +47,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     Tag tag;
     Post post;
     PostTag postTag;
+    Post savePost;
 
 
     @BeforeEach
@@ -74,7 +75,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
                 .uploadedAt(LocalDate.now())
                 .build();
 
-        Post savePost = postRepository.save(post);
+        savePost = postRepository.save(post);
 
         postTag = PostTag.builder()
                 .post(savePost)
@@ -343,5 +344,16 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         // Then
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("postId로 게시물의 디테일을 가져오는 로직 테스트")
+    @Order(15)
+    void 게시물_id_게시물_디테일_가져오는_조회_테스트() {
+        // Given - When
+        Post result = postRepositoryCustom.findPostDetail(savePost.getId());
+
+        // Then
+        assertThat(result.getTitle()).isEqualTo(post.getTitle());
     }
 }
