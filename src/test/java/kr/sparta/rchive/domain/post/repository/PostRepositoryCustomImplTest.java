@@ -192,7 +192,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     @Test
     @DisplayName("백오피스에서 APM이 특정 PostType에 특정 조건의 게시물 리스트를 찾아오는 로직 테스트")
     @Order(7)
-    void 백오피스_APM_특정_PostType_특정_게시물_조건_리스트_조회_테스트() {
+    void 백오피스_APM_특정_PostType_게시물_조건_null_리스트_조회_테스트() {
         // Given
         String title = TEST_POST_TITLE;
         PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
@@ -202,6 +202,22 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         // When
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullApm(postType, title, startDate,
                 endDate, track.getId(), true, tutor.getId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 특정 PostType에 조건은 null의 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(8)
+    void 백오피스_APM_특정_PostType_특정_게시물_조건_리스트_조회_테스트() {
+        // Given
+        PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
+
+        // When
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullApm(postType, null, null,
+                null, track.getId(), true, null);
 
         // Then
         assertThat(result).isNotEmpty();
