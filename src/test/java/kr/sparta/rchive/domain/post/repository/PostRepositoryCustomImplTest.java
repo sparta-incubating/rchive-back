@@ -44,6 +44,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     Track track;
     Tutor tutor;
     Tag tag;
+    Post post;
 
 
     @BeforeEach
@@ -58,6 +59,20 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         tutor = tutorRepository.save(buildTutor);
 
         tag = tagRepository.save(TEST_1L_TAG);
+
+        post = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(post);
     }
 
     @AfterEach
@@ -96,20 +111,6 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         // given
         TrackNameEnum trackName = TrackNameEnum.ANDROID;
 
-        Post post = Post.builder()
-                .postType(TEST_POST_TYPE)
-                .title(TEST_POST_TITLE)
-                .thumbnailUrl(TEST_POST_THUMBNAIL)
-                .videoLink(TEST_POST_VIDEO_LINK)
-                .contentLink(TEST_POST_CONTENT_LINK)
-                .content(TEST_POST_CONTENT)
-                .tutor(tutor)
-                .track(track)
-                .uploadedAt(LocalDate.now())
-                .build();
-
-        postRepository.save(post);
-
         // when
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByPm(null, null, null, null, null, trackName, null);
 
@@ -123,26 +124,12 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     @Order(3)
     void 백오피스_APM_전체_게시물_조건_NotNull_리스트_조회_테스트() {
         // given
-        String title = "test title";
+        String title = TEST_POST_TITLE;
         LocalDate startDate = LocalDate.of(2023, 1, 1);
         LocalDate endDate = LocalDate.now();
         Boolean isOpened = true;
         Long trackId = track.getId();
         Long tutorId = tutor.getId();
-
-        Post post = Post.builder()
-                .postType(TEST_POST_TYPE)
-                .title(title)
-                .thumbnailUrl(TEST_POST_THUMBNAIL)
-                .videoLink(TEST_POST_VIDEO_LINK)
-                .contentLink(TEST_POST_CONTENT_LINK)
-                .content(TEST_POST_CONTENT)
-                .tutor(tutor)
-                .track(track)
-                .uploadedAt(LocalDate.now())
-                .build();
-
-        Post savePost = postRepository.save(post);
 
         // when
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(title, startDate, endDate, isOpened, trackId, tutorId);
@@ -157,22 +144,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     @Order(4)
     void 백오피스_APM_전체_게시물_조건_Null_리스트_조회_테스트() {
         // given
-        String title = "test title";
         Long trackId = track.getId();
-
-        Post post = Post.builder()
-                .postType(TEST_POST_TYPE)
-                .title(title)
-                .thumbnailUrl(TEST_POST_THUMBNAIL)
-                .videoLink(TEST_POST_VIDEO_LINK)
-                .contentLink(TEST_POST_CONTENT_LINK)
-                .content(TEST_POST_CONTENT)
-                .tutor(tutor)
-                .track(track)
-                .uploadedAt(LocalDate.now())
-                .build();
-
-        Post savePost = postRepository.save(post);
 
         // when
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeAllByApm(null, null, null, null, trackId, null);
@@ -187,24 +159,10 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     @Order(5)
     void 백오피스_PM_특정_PostType_게시물_특정_조건_리스트_조회_테스트() {
         // Given
-        String title = "test";
+        String title = TEST_POST_TITLE;
         PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now();
-
-        Post post = Post.builder()
-                .postType(postType)
-                .title(title)
-                .thumbnailUrl(TEST_POST_THUMBNAIL)
-                .videoLink(TEST_POST_VIDEO_LINK)
-                .contentLink(TEST_POST_CONTENT_LINK)
-                .content(TEST_POST_CONTENT)
-                .tutor(tutor)
-                .track(track)
-                .uploadedAt(LocalDate.now())
-                .build();
-
-        postRepository.save(post);
 
         // When
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullByPM(postType, title, startDate,
@@ -220,26 +178,46 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     @Order(6)
     void 백오피스_PM_특정_PostType_게시물_조건_null_리스트_조회_테스트() {
         // Given
-        String title = "test";
         PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
-
-        Post post = Post.builder()
-                .postType(postType)
-                .title(title)
-                .thumbnailUrl(TEST_POST_THUMBNAIL)
-                .videoLink(TEST_POST_VIDEO_LINK)
-                .contentLink(TEST_POST_CONTENT_LINK)
-                .content(TEST_POST_CONTENT)
-                .tutor(tutor)
-                .track(track)
-                .uploadedAt(LocalDate.now())
-                .build();
-
-        postRepository.save(post);
 
         // When
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullByPM(postType, null, null,
                 null, null, null, track.getTrackName(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 특정 PostType에 특정 조건의 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(7)
+    void 백오피스_APM_특정_PostType_게시물_조건_null_리스트_조회_테스트() {
+        // Given
+        String title = TEST_POST_TITLE;
+        PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.now();
+
+        // When
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullApm(postType, title, startDate,
+                endDate, track.getId(), true, tutor.getId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 특정 PostType에 조건은 null의 게시물 리스트를 찾아오는 로직 테스트")
+    @Order(8)
+    void 백오피스_APM_특정_PostType_특정_게시물_조건_리스트_조회_테스트() {
+        // Given
+        PostTypeEnum postType = PostTypeEnum.Sparta_Lecture;
+
+        // When
+        List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullApm(postType, null, null,
+                null, track.getId(), null, null);
 
         // Then
         assertThat(result).isNotEmpty();
