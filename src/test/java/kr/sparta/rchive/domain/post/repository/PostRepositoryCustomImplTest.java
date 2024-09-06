@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.entity.PostTag;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -45,6 +46,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     Tutor tutor;
     Tag tag;
     Post post;
+    PostTag postTag;
 
 
     @BeforeEach
@@ -72,7 +74,14 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
                 .uploadedAt(LocalDate.now())
                 .build();
 
-        postRepository.save(post);
+        Post savePost = postRepository.save(post);
+
+        postTag = PostTag.builder()
+                .post(savePost)
+                .tag(tag)
+                .build();
+
+        postTagRepository.save(postTag);
     }
 
     @AfterEach
@@ -306,6 +315,18 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     void 매니저_PostType_null_자신의_Track_튜터로_필터링하지_않은_게시물_리스트_조회_테스트() {
         // Given - When
         List<Post> result = postRepository.findAllByPostTypeAndTrackIdUserRoleManager(null, track.getId(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("특정 PostType에서 태그 id와 트랙 id로 게시물 리스트와 해당 게시물의 tagList를 가져오는 로직 테스트")
+    @Order(13)
+    void 특정_PostType_태그_트랙_게시물_리스트와_해당_게시물들의_tagList_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepositoryCustom.findPostListByTagIdAndTrackIdWithTagList(tag.getId(), track.getId(), TEST_POST_TYPE);
 
         // Then
         assertThat(result).isNotEmpty();
