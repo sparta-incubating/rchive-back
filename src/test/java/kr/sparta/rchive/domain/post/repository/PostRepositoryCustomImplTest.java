@@ -300,4 +300,15 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         assertThat(postListPostTypeNotNull.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
     }
 
+    @Test
+    @DisplayName("매니저가 PostType은 null이고 Track에 맞고 튜터 id로 필터링하지 않은 게시물 리스트 조회해오는 로직 테스트")
+    @Order(12)
+    void 매니저_PostType_null_자신의_Track_튜터로_필터링하지_않은_게시물_리스트_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepository.findAllByPostTypeAndTrackIdUserRoleManager(null, track.getId(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
 }
