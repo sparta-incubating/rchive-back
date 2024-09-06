@@ -360,7 +360,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     @Test
     @DisplayName("특정 PostType으로 특정 keyword로 게시물 리스트를 검색해오고 튜터 id로 필터링 하는 로직 테스트")
     @Order(16)
-    void 특정_PostType_특정_keyword_게시물_리스트_특정_튜터로_필터링_로직_테스트() {
+    void 특정_PostType_특정_keyword로_검색하고_특정_튜터로_필터링한_게시물_리스트_가져오는_로직_테스트() {
         // Given
         Post testPost = Post.builder()
                 .postType(PostTypeEnum.Level_Basic)
@@ -385,5 +385,17 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         assertThat(postListPostTypeLevelAll.get(0).getTitle()).isEqualTo(testPost.getTitle());
         assertThat(postListPostTypeNotLevel).isNotEmpty();
         assertThat(postListPostTypeLevelAll.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("전체 PostType으로 특정 keyword로 검색한 게시물 리스트를 검색하는 로직 테스트")
+    @Order(16)
+    void PostType_전체_특정_keyword로_검색한_게시물_리스트_가져오는_로직_테스트() {
+        // Given - When
+        List<Post> result = postRepositoryCustom.findPost(null, "test", null, track.getId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
     }
 }
