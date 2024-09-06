@@ -332,4 +332,16 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
     }
+
+    @Test
+    @DisplayName("PostType은 null이고 태그 id와 트랙 id로 게시물 리스트와 해당 게시물의 tagList를 가져오는 로직 테스트")
+    @Order(14)
+    void PostType_Null_태그_트랙_게시물_리스트와_해당_게시물들의_tagList_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepositoryCustom.findPostListByTagIdAndTrackIdWithTagList(tag.getId(), track.getId(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
 }
