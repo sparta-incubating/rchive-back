@@ -311,13 +311,12 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         Page<PostGetRes> response = new PageImpl<>(postGetResList, pageable, 2);
 
         given(postTagCoreService.searchPostByTag(any(TrackNameEnum.class), any(Integer.class), any(Long.class),
-                any(User.class), any(String.class), any(PostTypeEnum.class), any(Pageable.class))).willReturn(response);
+                any(User.class), any(PostTypeEnum.class), any(Pageable.class))).willReturn(response);
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/tags/search")
                         .param("trackName", "ANDROID")
                         .param("loginPeriod", "1")
                         .param("tagId", "1")
-                        .param("tagName", "test")
                         .param("postType", PostTypeEnum.Sparta_Lecture.name())
                         .param("page", "1")
                         .param("size", "10"))
