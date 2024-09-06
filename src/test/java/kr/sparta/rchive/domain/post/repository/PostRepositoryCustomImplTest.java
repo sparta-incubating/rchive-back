@@ -217,7 +217,7 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
 
         // When
         List<Post> result = postRepositoryCustom.findPostListInBackOfficePostTypeNotNullApm(postType, null, null,
-                null, track.getId(), true, null);
+                null, track.getId(), null, null);
 
         // Then
         assertThat(result).isNotEmpty();
