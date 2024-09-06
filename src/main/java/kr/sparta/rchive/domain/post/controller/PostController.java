@@ -212,12 +212,13 @@ public class PostController {
             @RequestParam("loginPeriod") Integer period,
             @RequestParam("tagId") Long tagId,
             @RequestParam("tagName") String tagName,
+            @RequestParam("postType") PostTypeEnum postType,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
         Page<PostGetRes> responseList = postTagCoreService
-                .searchPostByTag(trackName, period, tagId, user, tagName, pageable);
+                .searchPostByTag(trackName, period, tagId, user, tagName, postType, pageable);
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
     }

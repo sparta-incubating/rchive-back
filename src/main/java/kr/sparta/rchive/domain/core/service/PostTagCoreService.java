@@ -109,12 +109,13 @@ public class PostTagCoreService {
 
     // TODO : Redis 만들기
     public Page<PostGetRes> searchPostByTag(TrackNameEnum trackName, Integer period,
-                                                    Long tagId, User user, String tagName, Pageable pageable) {
+                                            Long tagId, User user, String tagName,
+                                            PostTypeEnum postType, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId());
+        List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId(), postType);
 
         List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
 
@@ -182,7 +183,7 @@ public class PostTagCoreService {
 
         Tutor tutor = null;
 
-        if(request.tutorId() != null) {
+        if (request.tutorId() != null) {
             tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
         }
 
@@ -288,7 +289,7 @@ public class PostTagCoreService {
         if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            if(!roleService.checkIsPm(user.getId(), trackName)) {
+            if (!roleService.checkIsPm(user.getId(), trackName)) {
                 roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
             }
         }
@@ -297,7 +298,7 @@ public class PostTagCoreService {
     }
 
     public Page<PostGetRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period,
-                                           String keyword, Long tutorId, Pageable pageable) {
+                                        String keyword, Long tutorId, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
@@ -464,16 +465,16 @@ public class PostTagCoreService {
 
         List<String> keywordList = redisService.getRecentSearchKeyword(user.getId(), track.getId());
 
-        if(keywordList.isEmpty()) {
+        if (keywordList.isEmpty()) {
             return null;
         }
 
         return keywordList.stream()
-            .map(
-                keyword -> PostGetRecentKeywordRes.builder()
-                    .keyword(keyword)
-                    .build()
-            ).collect(Collectors.toList());
+                .map(
+                        keyword -> PostGetRecentKeywordRes.builder()
+                                .keyword(keyword)
+                                .build()
+                ).collect(Collectors.toList());
     }
 
     public void deleteRecentSearchKeyword(User user, RecentSearchKeywordReq request) {
