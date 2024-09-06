@@ -16,6 +16,7 @@ public record PostGetRes(
         String title,
         LocalDate uploadedAt,
         List<TagInfo> tagList,
-        Boolean isBookmarked
+        Boolean isBookmarked,
+        String tagName
 ) {
 }

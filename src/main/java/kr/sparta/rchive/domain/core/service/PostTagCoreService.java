@@ -109,7 +109,7 @@ public class PostTagCoreService {
 
     // TODO : Redis 만들기
     public Page<PostGetRes> searchPostByTag(TrackNameEnum trackName, Integer period,
-                                                    Long tagId, User user, Pageable pageable) {
+                                                    Long tagId, User user, String tagName, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
@@ -134,6 +134,7 @@ public class PostTagCoreService {
                             .uploadedAt(post.getUploadedAt())
                             .tagList(tagInfoList)
                             .isBookmarked(bookmarkedPostIdList.contains(post.getId()))
+                            .tagName(tagName)
                             .build();
                 }).collect(Collectors.toList());
 
