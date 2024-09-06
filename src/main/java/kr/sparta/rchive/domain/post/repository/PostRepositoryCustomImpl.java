@@ -181,6 +181,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .from(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
                 .where(builder)
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
