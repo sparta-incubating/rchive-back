@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.entity.PostTag;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -45,6 +46,8 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
     Tutor tutor;
     Tag tag;
     Post post;
+    PostTag postTag;
+    Post savePost;
 
 
     @BeforeEach
@@ -72,7 +75,14 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
                 .uploadedAt(LocalDate.now())
                 .build();
 
-        postRepository.save(post);
+        savePost = postRepository.save(post);
+
+        postTag = PostTag.builder()
+                .post(savePost)
+                .tag(tag)
+                .build();
+
+        postTagRepository.save(postTag);
     }
 
     @AfterEach
@@ -222,5 +232,170 @@ public class PostRepositoryCustomImplTest implements PostTest, TrackTest, TagTes
         // Then
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("유저가 특정 PostType과 Track에 맞고 튜터 id로 필터링 한 게시물 리스트 조회해오는 로직 테스트")
+    @Order(9)
+    void 유저_특정_PostType_자신의_Track_튜터로_필터링한_게시물_리스트_조회_테스트() {
+        // Given
+        Post testPost = Post.builder()
+                .postType(PostTypeEnum.Level_Basic)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(testPost);
+
+        // When
+        List<Post> postListPostTypeLevelAll = postRepository.findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum.Level_All,
+                track.getId(), tutor.getId());
+        List<Post> postListPostTypeNotNull = postRepository.findAllByPostTypeAndTrackIdUserRoleUser(TEST_POST_TYPE,
+                track.getId(), tutor.getId());
+
+        // Then
+        assertThat(postListPostTypeLevelAll).isNotEmpty();
+        assertThat(postListPostTypeNotNull).isNotEmpty();
+        assertThat(postListPostTypeLevelAll.get(0).getTitle()).isEqualTo(testPost.getTitle());
+        assertThat(postListPostTypeNotNull.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("유저가 PostType은 null이고 Track에 맞고 튜터 id로 필터링하지 않은 게시물 리스트 조회해오는 로직 테스트")
+    @Order(10)
+    void 유저_PostType_null_자신의_Track_튜터로_필터링하지_않은_게시물_리스트_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepository.findAllByPostTypeAndTrackIdUserRoleUser(null, track.getId(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("매니저가 특정 PostType과 Track에 맞고 튜터 id로 필터링 한 게시물 리스트 조회해오는 로직 테스트")
+    @Order(11)
+    void 매니저_특정_PostType_자신의_Track_튜터로_필터링한_게시물_리스트_조회_테스트() {
+        // Given
+        Post testPost = Post.builder()
+                .postType(PostTypeEnum.Level_Basic)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(testPost);
+
+        // When
+        List<Post> postListPostTypeLevelAll = postRepository.findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum.Level_All,
+                track.getId(), tutor.getId());
+        List<Post> postListPostTypeNotNull = postRepository.findAllByPostTypeAndTrackIdUserRoleManager(TEST_POST_TYPE,
+                track.getId(), tutor.getId());
+
+        // Then
+        assertThat(postListPostTypeLevelAll).isNotEmpty();
+        assertThat(postListPostTypeNotNull).isNotEmpty();
+        assertThat(postListPostTypeLevelAll.get(0).getTitle()).isEqualTo(testPost.getTitle());
+        assertThat(postListPostTypeNotNull.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("매니저가 PostType은 null이고 Track에 맞고 튜터 id로 필터링하지 않은 게시물 리스트 조회해오는 로직 테스트")
+    @Order(12)
+    void 매니저_PostType_null_자신의_Track_튜터로_필터링하지_않은_게시물_리스트_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepository.findAllByPostTypeAndTrackIdUserRoleManager(null, track.getId(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("특정 PostType에서 태그 id와 트랙 id로 게시물 리스트와 해당 게시물의 tagList를 가져오는 로직 테스트")
+    @Order(13)
+    void 특정_PostType_태그_트랙_게시물_리스트와_해당_게시물들의_tagList_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepositoryCustom.findPostListByTagIdAndTrackIdWithTagList(tag.getId(), track.getId(), TEST_POST_TYPE);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("PostType은 null이고 태그 id와 트랙 id로 게시물 리스트와 해당 게시물의 tagList를 가져오는 로직 테스트")
+    @Order(14)
+    void PostType_Null_태그_트랙_게시물_리스트와_해당_게시물들의_tagList_조회_테스트() {
+        // Given - When
+        List<Post> result = postRepositoryCustom.findPostListByTagIdAndTrackIdWithTagList(tag.getId(), track.getId(), null);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("postId로 게시물의 디테일을 가져오는 로직 테스트")
+    @Order(15)
+    void 게시물_id_게시물_디테일_가져오는_조회_테스트() {
+        // Given - When
+        Post result = postRepositoryCustom.findPostDetail(savePost.getId());
+
+        // Then
+        assertThat(result.getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    @DisplayName("특정 PostType으로 특정 keyword로 게시물 리스트를 검색해오고 튜터 id로 필터링 하는 로직 테스트")
+    @Order(16)
+    void 특정_PostType_특정_keyword로_검색하고_특정_튜터로_필터링한_게시물_리스트_가져오는_로직_테스트() {
+        // Given
+        Post testPost = Post.builder()
+                .postType(PostTypeEnum.Level_Basic)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(tutor)
+                .track(track)
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        postRepository.save(testPost);
+
+        // When
+        List<Post> postListPostTypeLevelAll = postRepository.findPost(PostTypeEnum.Level_All, "test", tutor.getId(), track.getId());
+        List<Post> postListPostTypeNotLevel = postRepository.findPost(TEST_POST_TYPE, "test", tutor.getId(), track.getId());
+
+        // Then
+        assertThat(postListPostTypeLevelAll).isNotEmpty();
+        assertThat(postListPostTypeLevelAll.get(0).getTitle()).isEqualTo(testPost.getTitle());
+        assertThat(postListPostTypeNotLevel).isNotEmpty();
+        assertThat(postListPostTypeLevelAll.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
+    }
+
+    @Test
+    @DisplayName("전체 PostType으로 특정 keyword로 검색한 게시물 리스트를 검색하는 로직 테스트")
+    @Order(16)
+    void PostType_전체_특정_keyword로_검색한_게시물_리스트_가져오는_로직_테스트() {
+        // Given - When
+        List<Post> result = postRepositoryCustom.findPost(null, "test", null, track.getId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getTitle()).isEqualTo(TEST_POST_TITLE);
     }
 }
