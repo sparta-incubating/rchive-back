@@ -186,7 +186,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId) {
+    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId, PostTypeEnum postType) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -204,6 +204,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                                         .join(post.postTagList, postTag)
                                         .where(postTag.tag.id.eq(tagId))
                         ),
+                        postType != null ? post.postType.eq(postType) : null,
                         post.track.id.eq(trackId))
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
