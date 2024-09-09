@@ -186,4 +186,29 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(result.getContent().size()).isEqualTo(postList.size());
         assertThat(result.getContent().get(0).title()).isEqualTo(postList.get(0).getTitle());
     }
+
+
+    @Test
+    @DisplayName("유저가 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 권한이 존재하지 않는 실패 테스트")
+    void 유저_태그_게시물_검색_기능_권한_없음으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_STUDENT_USER;
+        Track track = TEST_TRACK_ANDROID_1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        List<Role> roleList = new ArrayList<>();
+
+        given(trackService.findTrackByTrackNameAndPeriod(track.getTrackName(), track.getPeriod())).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        // When
+        RoleCustomException exception = assertThrows(
+                RoleCustomException.class, () -> postTagCoreService.searchPostByTag(track.getTrackName(), track.getPeriod(), TEST_TAG_1L_ID,
+                        user, null, pageable)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("ROLE-0001");
+        assertThat(exception.getMessage()).isEqualTo("유저가 속한 트랙 없음");
+    }
 }
