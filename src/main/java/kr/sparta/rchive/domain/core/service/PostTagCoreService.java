@@ -1,7 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
-import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -28,7 +27,6 @@ import kr.sparta.rchive.domain.user.exception.TrackCustomException;
 import kr.sparta.rchive.domain.user.exception.TrackExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
-import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,10 +48,8 @@ public class PostTagCoreService {
     private final PostTagService postTagService;
     private final TrackService trackService;
     private final TagService tagService;
-    private final UserService userService;
     private final RoleService roleService;
     private final BookmarkService bookmarkService;
-    private final CommentService commentService;
     private final RedisService redisService;
     private final TutorService tutorService;
 
