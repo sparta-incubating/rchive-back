@@ -13,7 +13,9 @@ import kr.sparta.rchive.domain.post.service.TutorService;
 import kr.sparta.rchive.domain.user.entity.Role;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
+import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
@@ -187,6 +189,49 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(result.getContent().get(0).title()).isEqualTo(postList.get(0).getTitle());
     }
 
+    @Test
+    @DisplayName("PM이 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 성공 테스트")
+    void PM_태그로_게시물_리스트_검색_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Role role = TEST_PM_ROLE;
+        List<Role> roleList = List.of(role);
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        List<Long> bookmarkedPostIdList = List.of(1L, 2L);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        List<Post> postList = List.of(testPost);
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.findPostListByTagIdWithTagList(any(Long.class), any(Long.class), any(PostTypeEnum.class))).willReturn(postList);
+        given(bookmarkService.findPostIdListByUserId(any(Long.class))).willReturn(bookmarkedPostIdList);
+        // When
+        Page<PostGetRes> result = postTagCoreService.searchPostByTag(TEST_TRACK_NAME, TEST_TRACK_PM_PERIOD, TEST_TAG_1L_ID,
+                user, TEST_POST_TYPE, pageable);
+
+        // Then
+        assertThat(result.getContent().size()).isEqualTo(postList.size());
+        assertThat(result.getContent().get(0).title()).isEqualTo(postList.get(0).getTitle());
+    }
+
 
     @Test
     @DisplayName("유저가 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 권한이 존재하지 않는 실패 테스트")
@@ -210,5 +255,35 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(exception.getErrorCode()).isEqualTo("ROLE-0001");
         assertThat(exception.getMessage()).isEqualTo("유저가 속한 트랙 없음");
+    }
+
+    @Test
+    @DisplayName("유저가 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 권한이 올바르지 않음으로 인한 실패 테스트")
+    void 유저_태그_게시물_검색_기능_권한_올바르지_않음으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_STUDENT_USER;
+        Track track = TEST_TRACK_AI_1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Role role = Role.builder()
+                .user(user)
+                .track(track)
+                .trackRole(TrackRoleEnum.STUDENT)
+                .auth(AuthEnum.APPROVE)
+                .build();
+        ReflectionTestUtils.setField(user, "id", 1L);
+        List<Role> roleList = List.of(role);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        // When
+        RoleCustomException exception = assertThrows(
+                RoleCustomException.class, () -> postTagCoreService.searchPostByTag(TEST_TRACK_NAME, TEST_TRACK_1L_PERIOD, TEST_TAG_1L_ID,
+                        user, null, pageable)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("ROLE-3001");
+        assertThat(exception.getMessage()).isEqualTo("해당 권한 접근 불가");
     }
 }

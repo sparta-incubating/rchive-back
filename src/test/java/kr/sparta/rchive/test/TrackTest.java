@@ -32,4 +32,11 @@ public interface TrackTest {
             .isPermission(true)
             .isDeleted(false)
             .build();
+
+    Track TEST_TRACK_AI_1L = Track.builder()
+            .trackName(TrackNameEnum.AI)
+            .period(TEST_TRACK_1L_PERIOD)
+            .isPermission(true)
+            .isDeleted(false)
+            .build();
 }
