@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.core.service;
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.entity.PostTag;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -14,10 +15,7 @@ import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.global.redis.RedisService;
-import kr.sparta.rchive.test.PostTest;
-import kr.sparta.rchive.test.TrackTest;
-import kr.sparta.rchive.test.TutorTest;
-import kr.sparta.rchive.test.UserTest;
+import kr.sparta.rchive.test.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, TutorTest {
+public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, TutorTest, TagTest, PostTagTest {
 
     @InjectMocks
     private PostTagCoreService postTagCoreService;
@@ -99,6 +97,43 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 any(LocalDate.class), any(Integer.class), any(Long.class), any(Boolean.class))).willReturn(postList);
         // When
         Page<PostSearchBackOfficeRes> result = postTagCoreService.getPostListInBackOffice(user, TEST_TRACK_NAME, TEST_TRACK_PM_PERIOD,
+                TEST_POST_TITLE, TEST_POST_TYPE, LocalDate.now(), LocalDate.now(), TEST_TRACK_1L_PERIOD, true, TEST_TUTOR_ID, pageable);
+        // Then
+        assertThat(result.getContent().size()).isEqualTo(postList.size());
+        assertThat(result.getContent().get(0).title()).isEqualTo(postList.get(0).getTitle());
+    }
+
+    @Test
+    @DisplayName("백오피스에서 APM이 특정 PostType의 게시물 리스트를 조회해오는 코어 서비스 로직 성공 테스트")
+    void 백오피스_APM_특정_PostType_게시물_리스트_조회_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track managerTrack = TEST_TRACK_ANDROID_PM;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        List<Post> postList = List.of(testPost);
+        ReflectionTestUtils.setField(user, "id", 1L);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(managerTrack);
+        given(postService.findPostListInBackOffice(any(Track.class), any(PostTypeEnum.class), any(String.class), any(LocalDate.class),
+                any(LocalDate.class), any(Integer.class), any(Long.class), any(Boolean.class))).willReturn(postList);
+        // When
+
+        Page<PostSearchBackOfficeRes> result = postTagCoreService.getPostListInBackOffice(user, TEST_TRACK_NAME, TEST_TRACK_1L_PERIOD,
                 TEST_POST_TITLE, TEST_POST_TYPE, LocalDate.now(), LocalDate.now(), TEST_TRACK_1L_PERIOD, true, TEST_TUTOR_ID, pageable);
         // Then
         assertThat(result.getContent().size()).isEqualTo(postList.size());
