@@ -24,7 +24,7 @@ public record UserSignupReq(
         String phone,
         GenderEnum gender,
         String profileImg,
-        @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10자리여야 합니다.")
+        @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$|^\\s*$|^$", message = "닉네임은 특수문자를 제외한 2~10자리 또는 빈 값(공백 포함)이어야 합니다.")
         String nickname,
         UserRoleEnum userRole,
         Boolean termUserAge,
