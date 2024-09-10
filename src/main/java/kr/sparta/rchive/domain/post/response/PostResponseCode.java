@@ -30,7 +30,8 @@ public enum PostResponseCode implements ResponseCode {
     OK_GET_REPLY(HttpStatus.OK, "POST-018", "대댓글 조회 성공"),
     OK_SAVE_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-019", "최근 검색어 저장 성공"),
     OK_GET_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-020", "최근 검색어 조회 성공"),
-    OK_DELETE_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-021", "최근 검색어 삭제 성공");
+    OK_DELETE_RECENT_SEARCH_KEYWORD(HttpStatus.OK, "POST-021", "최근 검색어 삭제 성공"),
+    OK_DELETE_THUMBNAIL(HttpStatus.OK, "POST-022", "썸네일 DB에서 삭제 성공");
 
     private final HttpStatus httpStatus;
     private final String responseCode;

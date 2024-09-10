@@ -124,4 +124,10 @@ public class PostService {
     public Post findPostDetail(Long postId) {
         return postRepository.findPostDetail(postId);
     }
+
+    public void deleteThumbnail(Post post) {
+        post.deleteThumbnail();
+
+        postRepository.save(post);
+    }
 }

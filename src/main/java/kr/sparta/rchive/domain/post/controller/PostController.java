@@ -343,4 +343,17 @@ public class PostController {
         return ResponseEntity.status(PostResponseCode.OK_DELETE_RECENT_SEARCH_KEYWORD.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_RECENT_SEARCH_KEYWORD, null));
     }
+
+    @DeleteMapping("/{postId}/thumbnail")
+    @Operation(operationId = "POST-022", summary = "썸네일 삭제")
+    public ResponseEntity<CommonResponseDto> deleteThumbnail(
+        @LoginUser User user,
+        @PathVariable Long postId,
+        @RequestBody DeleteThumbnailReq request
+    ) {
+        postTagCoreService.deleteThumbnail(user, postId, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_DELETE_THUMBNAIL.getHttpStatus())
+            .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_THUMBNAIL, null));
+    }
 }
