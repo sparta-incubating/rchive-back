@@ -109,8 +109,8 @@ public class PostService {
         return postRepository.findPostWithDetailByPostId(postId);
     }
 
-    public List<Post> findPostListByTagIdWithTagList(Long tagId, Long trackId) {
-        return postRepository.findPostListByTagIdAndTrackIdWithTagList(tagId, trackId);
+    public List<Post> findPostListByTagIdWithTagList(Long tagId, Long trackId, PostTypeEnum postType) {
+        return postRepository.findPostListByTagIdAndTrackIdWithTagList(tagId, trackId, postType);
     }
 
     public List<Post> findPostListByPostIdList(List<Long> postIdList) {

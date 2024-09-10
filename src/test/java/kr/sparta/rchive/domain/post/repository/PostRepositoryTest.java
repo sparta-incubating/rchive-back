@@ -1,13 +1,11 @@
 package kr.sparta.rchive.domain.post.repository;
 
-import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.repository.TrackRepository;
-import kr.sparta.rchive.domain.user.repository.UserRepository;
 import kr.sparta.rchive.global.config.AuditingConfig;
 import kr.sparta.rchive.global.config.QueryDslConfig;
 import kr.sparta.rchive.test.PostTest;
@@ -93,7 +91,7 @@ public class PostRepositoryTest implements PostTest, TrackTest, TagTest {
 
         List<Long> postIdList = List.of(1L, 2L);
 
-        List<Post> resultpostList = postRepository.saveAll(responseList);
+        postRepository.saveAll(responseList);
         // When
         List<Post> postList = postRepository.findPostByIdIn(postIdList);
 

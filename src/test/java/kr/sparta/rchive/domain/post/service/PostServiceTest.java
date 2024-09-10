@@ -319,9 +319,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         // Given
         List<Post> responseList = List.of(TEST_POST_1L);
 
-        given(postRepository.findPostListByTagIdAndTrackIdWithTagList(any(Long.class), any(Long.class))).willReturn(responseList);
+        given(postRepository.findPostListByTagIdAndTrackIdWithTagList(any(Long.class), any(Long.class), any(PostTypeEnum.class))).willReturn(responseList);
         // When
-        List<Post> postList = postService.findPostListByTagIdWithTagList(1L, TEST_TRACK_ID);
+        List<Post> postList = postService.findPostListByTagIdWithTagList(1L, TEST_TRACK_ID, PostTypeEnum.Sparta_Lecture);
 
         // Then
         assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());

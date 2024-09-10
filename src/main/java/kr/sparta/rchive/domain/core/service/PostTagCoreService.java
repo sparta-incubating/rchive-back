@@ -1,7 +1,6 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
-import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.DeleteThumbnailReq;
@@ -29,7 +28,6 @@ import kr.sparta.rchive.domain.user.exception.TrackCustomException;
 import kr.sparta.rchive.domain.user.exception.TrackExceptionCode;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
-import kr.sparta.rchive.domain.user.service.UserService;
 import kr.sparta.rchive.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,10 +49,8 @@ public class PostTagCoreService {
     private final PostTagService postTagService;
     private final TrackService trackService;
     private final TagService tagService;
-    private final UserService userService;
     private final RoleService roleService;
     private final BookmarkService bookmarkService;
-    private final CommentService commentService;
     private final RedisService redisService;
     private final TutorService tutorService;
 
@@ -109,13 +105,13 @@ public class PostTagCoreService {
     }
 
     // TODO : Redis 만들기
-    public Page<PostGetRes> searchPostByTag(TrackNameEnum trackName, Integer period,
-                                                    Long tagId, User user, Pageable pageable) {
+    public Page<PostGetRes> searchPostByTag(TrackNameEnum trackName, Integer period, Long tagId, User user,
+                                            PostTypeEnum postType, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId());
+        List<Post> postList = postService.findPostListByTagIdWithTagList(tagId, track.getId(), postType);
 
         List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
 
@@ -180,7 +176,11 @@ public class PostTagCoreService {
             managerTrack = findPost.getTrack();
         }
 
-        Tutor tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
+        Tutor tutor = null;
+
+        if (request.tutorId() != null) {
+            tutor = tutorService.checkTutor(request.tutorId(), managerTrack);
+        }
 
         Post updatePost = postService.updatePost(findPost, request, managerTrack, tutor);
 
@@ -219,8 +219,10 @@ public class PostTagCoreService {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
+                .postType(post.getPostType())
                 .videoLink(post.getVideoLink())
                 .contentLink(post.getContentLink())
+                .uploadedAt(post.getUploadedAt())
                 .tagList(tagList)
                 .isBookmarked(isBookmarked)
                 .build();
@@ -282,14 +284,16 @@ public class PostTagCoreService {
         if (period == 0) {
             roleService.existByUserAndTrackByPmThrowException(user.getId(), trackName);
         } else {
-            roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+            if (!roleService.checkIsPm(user.getId(), trackName)) {
+                roleService.existByUserAndTrackByApmThrowException(user.getId(), managerTrack.getId());
+            }
         }
 
         return tutorService.findTutorListByTutorNameAndTrackId(tutorName, managerTrack.getId());
     }
 
     public Page<PostGetRes> searchPosts(User user, PostTypeEnum postType, TrackNameEnum trackName, Integer period,
-                                           String keyword, Long tutorId, Pageable pageable) {
+                                        String keyword, Long tutorId, Pageable pageable) {
         Track track = trackService.findTrackByTrackNameAndPeriod(trackName, period);
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
@@ -456,16 +460,16 @@ public class PostTagCoreService {
 
         List<String> keywordList = redisService.getRecentSearchKeyword(user.getId(), track.getId());
 
-        if(keywordList.isEmpty()) {
+        if (keywordList.isEmpty()) {
             return null;
         }
 
         return keywordList.stream()
-            .map(
-                keyword -> PostGetRecentKeywordRes.builder()
-                    .keyword(keyword)
-                    .build()
-            ).collect(Collectors.toList());
+                .map(
+                        keyword -> PostGetRecentKeywordRes.builder()
+                                .keyword(keyword)
+                                .build()
+                ).collect(Collectors.toList());
     }
 
     public void deleteRecentSearchKeyword(User user, RecentSearchKeywordReq request) {

@@ -1,13 +1,15 @@
 package kr.sparta.rchive.domain.post.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import java.util.List;
+
 import kr.sparta.rchive.domain.post.entity.QTutor;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TutorRepositoryCustomImpl implements TutorRepositoryCustom{
+public class TutorRepositoryCustomImpl implements TutorRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -16,12 +18,13 @@ public class TutorRepositoryCustomImpl implements TutorRepositoryCustom{
         QTutor tutor = QTutor.tutor;
 
         return queryFactory
-            .select(tutor)
-            .from(tutor)
-            .where(
-                tutorName != null ? tutor.tutorName.contains(tutorName) : null,
-                tutor.track.id.eq(trackId)
-            )
-            .fetch();
+                .select(tutor)
+                .from(tutor)
+                .where(
+                        tutorName != null ? tutor.tutorName.contains(tutorName) : null,
+                        tutor.track.id.eq(trackId)
+                )
+                .orderBy(tutor.tutorName.asc())
+                .fetch();
     }
 }

@@ -82,11 +82,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
                         title != null ? post.title.contains(title) : null,
-                        postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                        post.postType.eq(postType),
                         post.track.trackName.eq(trackName),
                         post.isDeleted.eq(false)
                 )
@@ -109,10 +109,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
                         title != null ? post.title.contains(title) : null,
-                        postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
+                        post.postType.eq(postType),
                         post.track.id.eq(trackId),
                         post.isDeleted.eq(false)
                 )
@@ -148,6 +148,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .from(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
                 .where(builder)
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
@@ -180,13 +181,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .from(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
+                .leftJoin(post.tutor, tutor).fetchJoin()
                 .where(builder)
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
     @Override
-    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId) {
+    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId, PostTypeEnum postType) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -204,6 +206,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                                         .join(post.postTagList, postTag)
                                         .where(postTag.tag.id.eq(tagId))
                         ),
+                        postType != null ? post.postType.eq(postType) : null,
                         post.track.id.eq(trackId))
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
