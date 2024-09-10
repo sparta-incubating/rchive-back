@@ -114,6 +114,6 @@ public class Post extends BaseTimeEntity {
     }
 
     public void deleteThumbnail() {
-        this.thumbnailUrl = null;
+        this.thumbnailUrl = "";
     }
 }
