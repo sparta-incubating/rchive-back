@@ -89,12 +89,12 @@ jobs:
           script: |
             # Docker login
             sudo echo "${{secrets.DOCKER_HUB_TOKEN}}" | docker login -u ${{secrets.DOCKER_USERNAME}} --password-stdin
-            
+
             # Check if network exists, create if it does not
             if [ -z "$(docker network ls | grep rchive-network)" ]; then
               docker network create rchive-network
             fi
-            
+
             # Stop and remove existing containers
             if [ "$(docker ps -q --filter "name=rchive-api-")" ]; then
               docker stop $(docker ps -q --filter "name=rchive-api-")
@@ -102,10 +102,10 @@ jobs:
             if [ "$(docker ps -a -q -f status=exited)" ]; then
               docker rm $(docker ps -a -q -f status=exited)
             fi
-            
+
             # Pull the latest image
             docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev
-            
+
             # Docker run
             docker run -d \
               --name rchive-api-${VERSION} \
@@ -125,6 +125,6 @@ jobs:
               -e EFFIC_ACCESS_KEY=${{secrets.EFFIC_ACCESS_KEY}} \
               -e TZ=Asia/Seoul \
               ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:dev
-            
+
             # Remove unused images to free up space
             docker image prune -f

@@ -8,6 +8,6 @@ public interface TutorTest extends TrackTest {
 
     Tutor TEST_TUTOR = Tutor.builder()
             .tutorName(TEST_TUTOR_NAME)
-            .track(TEST_TRACK_ANDROID)
+            .track(TEST_TRACK_ANDROID_1L)
             .build();
 }

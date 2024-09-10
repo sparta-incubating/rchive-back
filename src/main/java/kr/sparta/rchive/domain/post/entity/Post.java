@@ -112,4 +112,8 @@ public class Post extends BaseTimeEntity {
     public void closePost() {
         this.isOpened = false;
     }
+
+    public void deleteThumbnail() {
+        this.thumbnailUrl = "";
+    }
 }

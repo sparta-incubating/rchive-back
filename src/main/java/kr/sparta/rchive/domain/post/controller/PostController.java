@@ -114,13 +114,13 @@ public class PostController {
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("loginPeriod") Integer period,
-            @RequestParam("category") PostTypeEnum postType,
+            @RequestParam(value = "category", required = false) PostTypeEnum postType,
+            @RequestParam(value = "tutorId", required = false) Long tutorId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostGetRes> responseList =
-                postTagCoreService.getPostListByCategory(user, trackName, period, postType, pageable);
+        Page<PostGetRes> responseList = postTagCoreService.getPostListByCategory(user, trackName, period, postType, tutorId, pageable);
         return ResponseEntity.status(PostResponseCode.OK_GET_CATEGORY_POST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_CATEGORY_POST, responseList));
     }
@@ -211,12 +211,12 @@ public class PostController {
             @RequestParam("trackName") TrackNameEnum trackName,
             @RequestParam("loginPeriod") Integer period,
             @RequestParam("tagId") Long tagId,
+            @RequestParam(value = "postType", required = false) PostTypeEnum postType,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = new CustomPageable(page, size, Sort.unsorted());
-        Page<PostGetRes> responseList = postTagCoreService
-                .searchPostByTag(trackName, period, tagId, user, pageable);
+        Page<PostGetRes> responseList = postTagCoreService.searchPostByTag(trackName, period, tagId, user, postType, pageable);
         return ResponseEntity.status(PostResponseCode.OK_SEARCH_POST_BY_TAG.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_SEARCH_POST_BY_TAG, responseList));
     }
@@ -342,5 +342,18 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_DELETE_RECENT_SEARCH_KEYWORD.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_RECENT_SEARCH_KEYWORD, null));
+    }
+
+    @DeleteMapping("/{postId}/thumbnail")
+    @Operation(operationId = "POST-022", summary = "썸네일 삭제")
+    public ResponseEntity<CommonResponseDto> deleteThumbnail(
+        @LoginUser User user,
+        @PathVariable Long postId,
+        @RequestBody DeleteThumbnailReq request
+    ) {
+        postTagCoreService.deleteThumbnail(user, postId, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_DELETE_THUMBNAIL.getHttpStatus())
+            .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_THUMBNAIL, null));
     }
 }
