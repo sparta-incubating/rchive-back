@@ -4,6 +4,7 @@ import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
+import kr.sparta.rchive.domain.post.dto.request.DeleteThumbnailReq;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
@@ -514,5 +515,12 @@ public class PostTagCoreService {
                 .uploadedAt(post.getUploadedAt())
                 .isOpened(post.getIsOpened())
                 .build();
+    }
+
+    @Transactional
+    public void deleteThumbnail(User user, Long postId, DeleteThumbnailReq request) {
+        PostTrackInfo postTrackInfo = checkPostAndTrack(user, request.trackName(), request.period(), postId);
+
+        postService.deleteThumbnail(postTrackInfo.post());
     }
 }
