@@ -373,4 +373,17 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         assertThat(post.getContent()).isEqualTo(TEST_POST_1L.getContent());
     }
 
+    @Test
+    @DisplayName("썸네일 삭제하는 서비스 로직 성공 테스트")
+    void 썸네일_삭제_서비스_성공_테스트() {
+        // Given
+        Post post = TEST_POST_1L;
+
+        // When
+        postService.deleteThumbnail(post);
+
+        // Then
+        verify(postRepository, times(1)).save(any(Post.class));
+    }
+
 }
