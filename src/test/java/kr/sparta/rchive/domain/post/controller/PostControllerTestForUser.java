@@ -476,7 +476,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         jsonPath("$.message").value("카테고리 리스트 조회 성공"),
                         jsonPath("$.data[0].key").value("Sparta_Lecture"),
-                        jsonPath("$.data[1].key").value("Special_Lecture")
+                        jsonPath("$.data[1].key").value("Level_All")
                 );
     }
 }
