@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PostTypeEnum {
     Sparta_Lecture("강의자료"),
-    Special_Lecture("특강/실시간 세션"),
+    Level_All("수준별강의"),
     Level_Challenge("챌린지"),
     Level_Standard("스탠다드"),
     Level_Basic("베이직"),
-    Level_All("수준별강의"),
+    Special_Lecture("특강/실시간 세션"),
     Project_Description("과제해설");
 
      private final String name;

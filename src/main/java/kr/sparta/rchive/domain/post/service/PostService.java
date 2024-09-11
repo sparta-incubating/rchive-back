@@ -50,7 +50,6 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    @Transactional
     public void deletePost(Post post) {
 
         post.delete();
@@ -65,7 +64,6 @@ public class PostService {
         );
     }
 
-    @Transactional
     public void openPost(List<Post> postList) {
         postList.forEach(Post::openPost);
         postRepository.saveAll(postList);
@@ -138,8 +136,8 @@ public class PostService {
 
         for(PostTypeEnum postType : PostTypeEnum.values()) {
             PostGetPostTypeRes postGetPostType = PostGetPostTypeRes.builder()
-                    .postTypeEnum(postType)
-                    .postType(postType.getName())
+                    .key(postType)
+                    .value(postType.getName())
                     .build();
 
             postGetPostTypeList.add(postGetPostType);

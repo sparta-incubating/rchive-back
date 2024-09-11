@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record PostGetPostTypeRes(
-        PostTypeEnum postTypeEnum,
-        String postType
+        PostTypeEnum key,
+        String value
 ) {
 }

@@ -10,6 +10,7 @@ import kr.sparta.rchive.domain.core.service.PostTagCoreService;
 import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
+import kr.sparta.rchive.domain.post.dto.response.PostGetPostTypeRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRecentKeywordRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
@@ -451,6 +452,31 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("최근 검색어 삭제 성공")
+                );
+    }
+
+    @Test
+    @DisplayName("POST-023 카테고리 목록 조회 기능 테스트")
+    public void 카테고리_목록_조회() throws Exception {
+        // Given
+        List<PostGetPostTypeRes> responseList = new ArrayList<>();
+
+        for(PostTypeEnum postType : PostTypeEnum.values()) {
+            PostGetPostTypeRes response = PostGetPostTypeRes.builder()
+                    .key(postType)
+                    .value(postType.getName())
+                    .build();
+
+            responseList.add(response);
+        }
+
+        given(postService.getCategory()).willReturn(responseList);
+        // When - Then
+        mockMvc.perform(get("/apis/v1/posts/postType"))
+                .andExpectAll(
+                        jsonPath("$.message").value("카테고리 리스트 조회 성공"),
+                        jsonPath("$.data[0].key").value("Sparta_Lecture"),
+                        jsonPath("$.data[1].key").value("Level_All")
                 );
     }
 }

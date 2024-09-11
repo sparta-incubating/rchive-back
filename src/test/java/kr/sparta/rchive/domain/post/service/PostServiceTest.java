@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.post.service;
 
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.response.PostGetPostTypeRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -371,6 +372,44 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
         // Then
         assertThat(post.getTitle()).isEqualTo(TEST_POST_1L.getTitle());
         assertThat(post.getContent()).isEqualTo(TEST_POST_1L.getContent());
+    }
+
+    @Test
+    @DisplayName("썸네일 삭제하는 서비스 로직 성공 테스트")
+    void 썸네일_삭제_서비스_성공_테스트() {
+        // Given
+        Post post = TEST_POST_1L;
+
+        // When
+        postService.deleteThumbnail(post);
+
+        // Then
+        verify(postRepository, times(1)).save(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("카테고리 리스트를 조회하는 서비스 로직 성공 테스트")
+    void 카테고리_리스트_조회하는_서비스_성공_테스트() {
+        // Given
+        List<PostGetPostTypeRes> postGetPostTypeList = new ArrayList<>();
+
+        for(PostTypeEnum postType : PostTypeEnum.values()) {
+            PostGetPostTypeRes postGetPostType = PostGetPostTypeRes.builder()
+                    .key(postType)
+                    .value(postType.getName())
+                    .build();
+
+            postGetPostTypeList.add(postGetPostType);
+        }
+
+        // When
+        List<PostGetPostTypeRes> result = postService.getCategory();
+
+        // Then
+        assertThat(result.size()).isEqualTo(postGetPostTypeList.size());
+        assertThat(result.get(0).key()).isEqualTo(postGetPostTypeList.get(0).key());
+        assertThat(result.get(1).key()).isEqualTo(postGetPostTypeList.get(1).key());
+        assertThat(result.get(2).key()).isEqualTo(postGetPostTypeList.get(2).key());
     }
 
 }
