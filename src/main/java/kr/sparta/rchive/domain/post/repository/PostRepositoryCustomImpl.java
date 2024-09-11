@@ -136,7 +136,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             builder.and(post.postType.eq(postType));
         }
 
-        if(tutorId != null) {
+        if (tutorId != null) {
             builder.and(post.tutor.id.eq(tutorId));
         }
 
@@ -170,7 +170,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             builder.and(post.postType.eq(postType));
         }
 
-        if(tutorId != null) {
+        if (tutorId != null) {
             builder.and(post.tutor.id.eq(tutorId));
         }
 
@@ -221,33 +221,32 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (postType != null) {
-            if (postType == PostTypeEnum.Level_All) {
-                builder.and(post.postType.stringValue().contains("Level"));
-            } else {
-                builder.and(post.postType.eq(postType));
-            }
+        // 키워드가 있을 때만 필터링
+        if (keyword != null && !keyword.isEmpty()) {
+            builder.and(
+                    Expressions.stringTemplate("function('replace', {0}, {1}, {2})", post.title, " ", "")
+                            .toLowerCase().contains(keyword.toLowerCase())
+                            .or(post.content.toLowerCase().contains(keyword.toLowerCase()))
+                            .or(postTag.tag.tagName.toLowerCase().contains(keyword.toLowerCase())) // 태그명 검색
+            );
         }
-
-        if (tutorId != null) {
-            builder.and(post.tutor.id.eq(tutorId));
-        }
-
-        builder.and(post.track.id.eq(trackId));
-
-        builder.and(
-                Expressions.stringTemplate("function('replace', {0}, {1}, {2})", post.title, " ", "")
-                        .toLowerCase().contains(keyword.toLowerCase())
-                        .or(post.content.toLowerCase().contains(keyword.toLowerCase()))
-        );
 
         return queryFactory
                 .select(post).distinct()
                 .from(post)
-                .leftJoin(post.postTagList, postTag).fetchJoin()
-                .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
-                .where(builder)
+                .leftJoin(post.postTagList, postTag).fetchJoin() // post와 연관된 모든 태그를 fetchJoin
+                .leftJoin(postTag.tag, tag).fetchJoin() // tag와 연결된 태그 정보 가져오기
+                .leftJoin(post.tutor, tutor).fetchJoin() // tutor 정보 가져오기
+                .where(post.id.in(
+                        queryFactory.select(post.id).distinct()
+                                .from(post)
+                                .leftJoin(post.postTagList, postTag)
+                                .leftJoin(postTag.tag, tag)
+                                .where(builder)),
+                        postType == null ? null : postType == PostTypeEnum.Level_All ? post.postType.stringValue().contains("Level") : post.postType.eq(postType),
+                        tutorId == null? null : post.tutor.id.eq(tutorId),
+                        post.track.id.eq(trackId)
+                )
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
