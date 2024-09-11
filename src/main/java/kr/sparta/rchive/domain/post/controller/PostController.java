@@ -13,6 +13,7 @@ import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.exception.statement.*;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
+import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -38,6 +39,7 @@ public class PostController {
     private final PostTagCoreService postTagCoreService;
     private final PostBookmarkCoreService postBookmarkCoreService;
     private final PostCommentCoreService postCommentCoreService;
+    private final PostService postService;
     private final TagService tagService;
     private final CommentService commentService;
 
@@ -355,5 +357,14 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_DELETE_THUMBNAIL.getHttpStatus())
             .body(CommonResponseDto.of(PostResponseCode.OK_DELETE_THUMBNAIL, null));
+    }
+
+    @GetMapping("/postType")
+    @Operation(operationId = "POST-023", summary = "카테고리 목록 조회")
+    public ResponseEntity<CommonResponseDto> getCategory() {
+        List<PostGetPostTypeRes> responseList = postService.getCategory();
+
+        return ResponseEntity.status(PostResponseCode.OK_GET_POST_TYPE_LIST.getHttpStatus())
+                .body(CommonResponseDto.of(PostResponseCode.OK_GET_POST_TYPE_LIST, responseList));
     }
 }
