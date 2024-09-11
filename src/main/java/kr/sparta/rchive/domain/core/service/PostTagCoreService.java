@@ -195,6 +195,7 @@ public class PostTagCoreService {
                 .build();
     }
 
+    @Transactional
     public void deletePost(User user, TrackNameEnum trackName, Integer period, Long postId) {
 
         PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
@@ -269,6 +270,7 @@ public class PostTagCoreService {
         return new PageImpl<>(responseList.subList(start, end), pageable, responseList.size());
     }
 
+    @Transactional
     public void openPost(User user, TrackNameEnum trackName, Integer period, List<Long> postIdList) {
         List<Post> postList = checkPostListAndTrack(user, trackName, period, postIdList);
         postService.openPost(postList);
