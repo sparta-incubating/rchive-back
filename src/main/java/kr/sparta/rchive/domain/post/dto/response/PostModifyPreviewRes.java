@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.post.dto.response;
 
+import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import lombok.Builder;
@@ -14,7 +15,7 @@ public record PostModifyPreviewRes(
         String contentLink,
         String videoLink,
         Integer period,
-        PostTypeEnum postType,
+        PostTypeInfo postType,
         TutorRes tutorRes,
         List<String> tagNameList,
         LocalDate uploadedAt,

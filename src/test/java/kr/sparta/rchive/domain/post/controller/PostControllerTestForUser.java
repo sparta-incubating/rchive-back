@@ -7,12 +7,14 @@ import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
+import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRecentKeywordRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -65,6 +67,8 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     private TagService tagService;
     @MockBean
     private CommentService commentService;
+    @MockBean
+    private PostService postService;
 
     @BeforeEach
     void setUp() {
@@ -92,7 +96,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
                     .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
-                    .postType(TEST_POST_1L.getPostType())
+                    .postType(PostTypeInfo.of(TEST_POST_1L.getPostType()))
                     .tutor(TEST_TUTOR.getTutorName())
                     .title(TEST_POST_1L.getTitle())
                     .tagList(tagList)
@@ -141,7 +145,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
                     .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
-                    .postType(TEST_POST_1L.getPostType())
+                    .postType(PostTypeInfo.of(TEST_POST_1L.getPostType()))
                     .tutor(TEST_TUTOR.getTutorName())
                     .title(TEST_POST_1L.getTitle())
                     .tagList(tagList)
@@ -298,7 +302,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
                     .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
-                    .postType(TEST_POST_1L.getPostType())
+                    .postType(PostTypeInfo.of(TEST_POST_1L.getPostType()))
                     .tutor(TEST_TUTOR.getTutorName())
                     .title(TEST_POST_1L.getTitle())
                     .tagList(tagList)
