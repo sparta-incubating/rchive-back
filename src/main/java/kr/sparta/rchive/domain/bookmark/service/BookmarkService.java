@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.bookmark.service;
 
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
 import kr.sparta.rchive.domain.bookmark.repository.BookmarkRepository;
+import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.response.PostRes;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -85,7 +86,7 @@ public class BookmarkService {
                             .postId(bookmark.getPost().getId())
                             .title(bookmark.getPost().getTitle())
                             .thumbnailUrl(bookmark.getPost().getThumbnailUrl())
-                            .postType(bookmark.getPost().getPostType())
+                            .postType(PostTypeInfo.of(bookmark.getPost().getPostType()))
                             .tutor(bookmark.getPost().getTutor().getTutorName())
                             .uploadedAt(bookmark.getPost().getUploadedAt())
                             .tagList(tagInfoList).build();

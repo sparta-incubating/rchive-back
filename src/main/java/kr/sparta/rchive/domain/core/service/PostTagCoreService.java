@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.post.dto.PostTrackInfo;
+import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
 import kr.sparta.rchive.domain.post.dto.request.DeleteThumbnailReq;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
@@ -88,7 +89,7 @@ public class PostTagCoreService {
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
                             .title(post.getTitle())
-                            .postType(post.getPostType())
+                            .postType(PostTypeInfo.of(post.getPostType()))
                             .tutor(post.getTutor().getTutorName())
                             .contentLink(post.getContentLink())
                             .period(post.getTrack().getPeriod())
@@ -126,6 +127,7 @@ public class PostTagCoreService {
                     return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
+                            .postType(PostTypeInfo.of(post.getPostType()))
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
@@ -219,7 +221,7 @@ public class PostTagCoreService {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .tutor(post.getTutor().getTutorName())
-                .postType(post.getPostType())
+                .postType(PostTypeInfo.of(post.getPostType()))
                 .videoLink(post.getVideoLink())
                 .contentLink(post.getContentLink())
                 .uploadedAt(post.getUploadedAt())
@@ -252,7 +254,7 @@ public class PostTagCoreService {
                     return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
-                            .postType(post.getPostType())
+                            .postType(PostTypeInfo.of(post.getPostType()))
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
@@ -315,7 +317,7 @@ public class PostTagCoreService {
                     return PostGetRes.builder()
                             .postId(post.getId())
                             .thumbnailUrl(post.getThumbnailUrl())
-                            .postType(post.getPostType())
+                            .postType(PostTypeInfo.of(post.getPostType()))
                             .title(post.getTitle())
                             .tutor(post.getTutor().getTutorName())
                             .uploadedAt(post.getUploadedAt())
@@ -513,7 +515,7 @@ public class PostTagCoreService {
                 .contentLink(post.getContentLink())
                 .videoLink(post.getVideoLink())
                 .period(post.getTrack().getPeriod())
-                .postType(post.getPostType())
+                .postType(PostTypeInfo.of(post.getPostType()))
                 .tutorRes(tutorRes)
                 .tagNameList(tagNameList)
                 .uploadedAt(post.getUploadedAt())

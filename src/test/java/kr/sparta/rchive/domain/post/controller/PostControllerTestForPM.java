@@ -1,16 +1,15 @@
 package kr.sparta.rchive.domain.post.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
 import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
-import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
-import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
-import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
-import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.*;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
@@ -24,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -61,6 +61,10 @@ public class PostControllerTestForPM {
     private TagService tagService;
     @MockBean
     private CommentService commentService;
+    @MockBean
+    private PostService postService;
+    @Autowired
+    private PostController postController;
 
     @BeforeEach
     void setUp() {
@@ -294,5 +298,30 @@ public class PostControllerTestForPM {
                         jsonPath("$.message").value("튜터 검색 성공"),
                         jsonPath("$.data[0].tutorId").value(1L)
                 );
+    }
+
+    @Test
+    @DisplayName("POST-022 썸네일 삭제")
+    public void 게시물_썸네일_삭제() throws Exception {
+        // Given
+        Long postId = 1L;
+        DeleteThumbnailReq request = DeleteThumbnailReq.builder()
+                .trackName(TrackNameEnum.ANDROID)
+                .period(0)
+                .build();
+
+        String json = obj.writeValueAsString(request);
+
+        // When
+        postController.deleteThumbnail(any(User.class), any(Long.class), any(DeleteThumbnailReq.class));
+
+        // Then
+        mockMvc.perform(delete("/apis/v1/posts/{postId}/thumbnail", postId)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isOk(),
+                jsonPath("$.message").value("썸네일 DB에서 삭제 성공")
+        );
     }
 }
