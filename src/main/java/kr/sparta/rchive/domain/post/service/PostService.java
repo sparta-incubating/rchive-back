@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.post.service;
 
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.response.PostGetPostTypeRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -129,5 +131,20 @@ public class PostService {
         post.deleteThumbnail();
 
         postRepository.save(post);
+    }
+
+    public List<PostGetPostTypeRes> getCategory() {
+        List<PostGetPostTypeRes> postGetPostTypeList = new ArrayList<>();
+
+        for(PostTypeEnum postType : PostTypeEnum.values()) {
+            PostGetPostTypeRes postGetPostType = PostGetPostTypeRes.builder()
+                    .postTypeEnum(postType)
+                    .postType(postType.getName())
+                    .build();
+
+            postGetPostTypeList.add(postGetPostType);
+        }
+
+        return postGetPostTypeList;
     }
 }
