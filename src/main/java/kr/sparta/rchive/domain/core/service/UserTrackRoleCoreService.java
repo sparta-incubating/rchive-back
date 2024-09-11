@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.core.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.user.dto.TrackNameInfo;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestListReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleRequestReq;
 import kr.sparta.rchive.domain.user.dto.request.RoleReq;
@@ -54,7 +55,7 @@ public class UserTrackRoleCoreService {
                             return RoleRes.builder()
                                     .trackId(track.getId())
                                     .trackRoleEnum(TrackRoleEnum.PM)
-                                    .trackName(track.getTrackName())
+                                    .trackName(TrackNameInfo.of(track.getTrackName()))
                                     .period(track.getPeriod())
                                     .build();
                         }).collect(Collectors.toList());
@@ -72,7 +73,7 @@ public class UserTrackRoleCoreService {
                     return RoleRes.builder()
                             .trackId(role.getTrack().getId())
                             .trackRoleEnum(role.getTrackRole())
-                            .trackName(role.getTrack().getTrackName())
+                            .trackName(TrackNameInfo.of(role.getTrack().getTrackName()))
                             .period(role.getTrack().getPeriod())
                             .build();
                 }).collect(Collectors.toList());
@@ -179,7 +180,7 @@ public class UserTrackRoleCoreService {
         return RoleGetLastSelectRoleRes.builder()
                 .trackId(track.getId())
                 .trackRole(role.getTrackRole())
-                .trackName(track.getTrackName())
+                .trackName(TrackNameInfo.of(track.getTrackName()))
                 .period(track.getPeriod())
                 .build();
     }
@@ -192,7 +193,7 @@ public class UserTrackRoleCoreService {
         return RoleGetLastSelectRoleRes.builder()
                 .trackId(track.getId())
                 .trackRole(role.getTrackRole())
-                .trackName(track.getTrackName())
+                .trackName(TrackNameInfo.of(track.getTrackName()))
                 .period(track.getPeriod())
                 .build();
     }
@@ -210,7 +211,7 @@ public class UserTrackRoleCoreService {
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .trackRole(role.getTrackRole())
-                .trackName(track.getTrackName())
+                .trackName(TrackNameInfo.of(track.getTrackName()))
                 .period(track.getPeriod())
                 .build();
     }
@@ -228,7 +229,7 @@ public class UserTrackRoleCoreService {
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .trackRole(role.getTrackRole())
-                .trackName(track.getTrackName())
+                .trackName(TrackNameInfo.of(track.getTrackName()))
                 .period(track.getPeriod())
                 .build();
     }
