@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.user.dto.TrackNameInfo;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackNameListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleGetTrackPeriodListRes;
 import kr.sparta.rchive.domain.user.dto.response.RoleRes;
@@ -24,10 +25,10 @@ public class TrackService {
     private final TrackRepository trackRepository;
 
     public RoleGetTrackNameListRes getTrackNameList() {
-        List<String> trackNameList = new ArrayList<>();
+        List<TrackNameInfo> trackNameList = new ArrayList<>();
 
         for (TrackNameEnum trackName : TrackNameEnum.values()) {
-            trackNameList.add(trackName.name());
+            trackNameList.add(TrackNameInfo.of(trackName));
         }
 
         return new RoleGetTrackNameListRes(trackNameList);
