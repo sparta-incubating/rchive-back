@@ -395,8 +395,8 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         for(PostTypeEnum postType : PostTypeEnum.values()) {
             PostGetPostTypeRes postGetPostType = PostGetPostTypeRes.builder()
-                    .postTypeEnum(postType)
-                    .postType(postType.getName())
+                    .key(postType)
+                    .value(postType.getName())
                     .build();
 
             postGetPostTypeList.add(postGetPostType);
@@ -407,9 +407,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         // Then
         assertThat(result.size()).isEqualTo(postGetPostTypeList.size());
-        assertThat(result.get(0).postType()).isEqualTo(postGetPostTypeList.get(0).postType());
-        assertThat(result.get(1).postType()).isEqualTo(postGetPostTypeList.get(1).postType());
-        assertThat(result.get(2).postType()).isEqualTo(postGetPostTypeList.get(2).postType());
+        assertThat(result.get(0).key()).isEqualTo(postGetPostTypeList.get(0).key());
+        assertThat(result.get(1).key()).isEqualTo(postGetPostTypeList.get(1).key());
+        assertThat(result.get(2).key()).isEqualTo(postGetPostTypeList.get(2).key());
     }
 
 }

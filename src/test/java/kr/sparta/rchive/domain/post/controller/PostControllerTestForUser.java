@@ -463,8 +463,8 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
 
         for(PostTypeEnum postType : PostTypeEnum.values()) {
             PostGetPostTypeRes response = PostGetPostTypeRes.builder()
-                    .postTypeEnum(postType)
-                    .postType(postType.getName())
+                    .key(postType)
+                    .value(postType.getName())
                     .build();
 
             responseList.add(response);
@@ -475,8 +475,8 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         mockMvc.perform(get("/apis/v1/posts/postType"))
                 .andExpectAll(
                         jsonPath("$.message").value("카테고리 리스트 조회 성공"),
-                        jsonPath("$.data[0].postTypeEnum").value("Sparta_Lecture"),
-                        jsonPath("$.data[1].postTypeEnum").value("Special_Lecture")
+                        jsonPath("$.data[0].key").value("Sparta_Lecture"),
+                        jsonPath("$.data[1].key").value("Special_Lecture")
                 );
     }
 }

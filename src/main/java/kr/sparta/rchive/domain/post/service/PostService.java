@@ -136,8 +136,8 @@ public class PostService {
 
         for(PostTypeEnum postType : PostTypeEnum.values()) {
             PostGetPostTypeRes postGetPostType = PostGetPostTypeRes.builder()
-                    .postTypeEnum(postType)
-                    .postType(postType.getName())
+                    .key(postType)
+                    .value(postType.getName())
                     .build();
 
             postGetPostTypeList.add(postGetPostType);
