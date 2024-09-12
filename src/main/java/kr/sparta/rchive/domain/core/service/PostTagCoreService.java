@@ -239,8 +239,7 @@ public class PostTagCoreService {
         Role role = userRoleAndTrackCheck(user, track);
         userCheckPermission(user.getUserRole(), track, role.getTrackRole());
 
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(user.getUserRole(),
-                postType, track, tutorId);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(postType, track, tutorId);
 
         List<Long> bookmarkedPostIdList = bookmarkService.findPostIdListByUserId(user.getId());
 
