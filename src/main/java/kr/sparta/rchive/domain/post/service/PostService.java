@@ -10,7 +10,6 @@ import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.Track;
-import kr.sparta.rchive.domain.user.enums.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,13 +95,8 @@ public class PostService {
                 endDate, track.getId(), isOpened, tutorId);
     }
 
-    public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,
-                                                       Track track, Long tutorId) {
-        if (userRole.equals(UserRoleEnum.USER)) {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId(), tutorId);
-        } else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId(), tutorId);
-        }
+    public List<Post> findPostListByPostTypeAndTrackId(PostTypeEnum postType, Track track, Long tutorId) {
+        return postRepository.findAllByPostTypeAndTrackId(postType, track.getId(), tutorId);
     }
 
     public Post findPostWithDetailByPostId(Long postId) {
