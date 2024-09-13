@@ -72,22 +72,22 @@ public class RoleService {
         roleRepository.saveAll(roleList);
     }
 
-    public void deleteRoleListByAuthNotApprove(List<RoleRequestListReq> reqList) {
-        List<Role> roleList = findRoleListByEmailAndAuthNotApprove(reqList);
+    public void deleteRoleListByAuthReject(List<RoleRequestListReq> reqList) {
+        List<Role> roleList = findRoleListByEmailAndAuthReject(reqList);
         roleRepository.deleteAll(roleList);
     }
-    
+
     public void deleteApmRoleListExceptLastApprove(List<RoleRequestListReq> reqList) {
-        List<String> apmList = new ArrayList<>();
+        List<String> apmEmailList = new ArrayList<>();
         for (RoleRequestListReq req : reqList) {
             if (req.trackRole() == TrackRoleEnum.APM) {
-                if (!apmList.contains(req.email())) {
-                    apmList.add(req.email());
+                if (!apmEmailList.contains(req.email())) {
+                    apmEmailList.add(req.email());
                 }
             }
         }
 
-        List<Role> roleList = findRoleListByEmailAndTrackRoleExceptLastApprove(reqList);
+        List<Role> roleList = findRoleListByEmailAndTrackRoleExceptLastApprove(apmEmailList);
         roleRepository.deleteAll(roleList);
     }
 
@@ -138,24 +138,21 @@ public class RoleService {
         );
     }
 
-    public List<Role> findRoleListByEmailAndAuthNotApprove(List<RoleRequestListReq> reqList) {
+    public List<Role> findRoleListByEmailAndAuthReject(List<RoleRequestListReq> reqList) {
         List<Role> roleList = new ArrayList<>();
         for (RoleRequestListReq req : reqList) {
             List<Role> rejectList = roleRepository.findAllByEmailAndAuth(req.email(),
                     AuthEnum.REJECT);
             roleList.addAll(rejectList);
-            List<Role> waitList = roleRepository.findAllByEmailAndAuth(req.email(), AuthEnum.WAIT);
-            roleList.addAll(waitList);
         }
         return roleList;
     }
 
-    public List<Role> findRoleListByEmailAndTrackRoleExceptLastApprove(
-            List<RoleRequestListReq> reqList) {
+    public List<Role> findRoleListByEmailAndTrackRoleExceptLastApprove(List<String> emailList) {
         List<Role> roleList = new ArrayList<>();
-        for (RoleRequestListReq req : reqList) {
+        for (String email : emailList) {
             List<Role> apmList = roleRepository.findRoleListByEmailAndTrackRoleAndApprove(
-                    req.email(), TrackRoleEnum.APM);
+                    email, TrackRoleEnum.APM);
             if (!apmList.isEmpty()) {
                 apmList.remove(apmList.size() - 1);
             }
