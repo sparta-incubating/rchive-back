@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneReq;
 import kr.sparta.rchive.domain.user.dto.request.AuthPhoneValidReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateProfileImgReq;
@@ -74,17 +75,10 @@ public class UserService {
             throw new UserCustomException(UserExceptionCode.BAD_REQUEST_PROFILE_IMG);
         }
 
-        if (req.nickname() == null) {
-            throw new UserCustomException(UserExceptionCode.BAD_REQUEST_NICKNAME);
-        } else if (req.nickname().isEmpty()) {
-            if (req.userRole() == UserRoleEnum.USER) {
-                throw new UserCustomException(UserExceptionCode.BAD_REQUEST_STUDENT_NICKNAME_NULL);
-            }
-        } else {
-            if (userRepository.existsByNickname(req.nickname())) {
-                throw new UserCustomException(UserExceptionCode.CONFLICT_NICKNAME);
-            }
-        }
+        String randomNickname = "";
+        do {
+            randomNickname = generateNickname();
+        } while (userRepository.existsByNickname(randomNickname));
 
         User user = User.builder()
                 .email(req.email())
@@ -96,7 +90,7 @@ public class UserService {
                 .phone(req.phone())
                 .gender(req.gender())
                 .profileImg(req.profileImg())
-                .nickname(req.nickname().isEmpty() ? null : req.nickname())
+                .nickname(randomNickname)
                 .userRole(req.userRole())
                 .termUserAge(req.termUserAge())
                 .termUseService(req.termUseService())
@@ -105,6 +99,11 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    public String generateNickname() {
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        return "르탄이" + uuid.substring(uuid.length() - 12);
     }
 
     public void logout(HttpServletResponse res, User user)
