@@ -1,10 +1,13 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
+import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
+import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -345,5 +348,48 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(exception.getErrorCode()).isEqualTo("TRACK-3001");
         assertThat(exception.getMessage()).isEqualTo("트랙 열람권한 없음");
+    }
+
+    @Test
+    @DisplayName("PM이 게시물 생성 기능 코어 서비스 성공 테스트")
+    void PM_게시물_생성_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Tutor tutor = TEST_TUTOR;
+        Post post = TEST_POST_1L;
+
+        List<String> tagNameList = List.of(TEST_TAG_1L_NAME, TEST_TAG_2L_NAME);
+
+        PostCreateReq request = PostCreateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tagNameList(tagNameList)
+                .postPeriod(1)
+                .isOpened(true)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(tutor);
+        given(postService.createPost(any(PostCreateReq.class), any(Track.class), any(Tutor.class))).willReturn(post);
+
+        PostCreateRes response = PostCreateRes.builder()
+                .postId(TEST_POST_1L_ID)
+                .build();
+
+        // When
+        PostCreateRes result = postTagCoreService.createPost(user, track.getTrackName(), track.getPeriod(), request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
     }
 }
