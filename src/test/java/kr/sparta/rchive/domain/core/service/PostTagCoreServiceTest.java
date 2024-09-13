@@ -286,4 +286,34 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(exception.getErrorCode()).isEqualTo("ROLE-3001");
         assertThat(exception.getMessage()).isEqualTo("해당 권한 접근 불가");
     }
+
+    @Test
+    @DisplayName("PM이 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 다른 트랙 게시물 조회로 인한 실패 테스트")
+    void PM_태그_게시물_검색_기능_다른_트랙_게시물_조회로_인한_실패_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_AI_1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Role role = Role.builder()
+                .user(user)
+                .track(TEST_TRACK_ANDROID_PM)
+                .trackRole(TrackRoleEnum.PM)
+                .auth(AuthEnum.APPROVE)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(List.of(role));
+
+        // When
+        RoleCustomException exception = assertThrows(
+                RoleCustomException.class, () -> postTagCoreService.searchPostByTag(track.getTrackName(), track.getPeriod(), TEST_TAG_1L_ID,
+                        user, null, pageable)
+        );
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("ROLE-3001");
+        assertThat(exception.getMessage()).isEqualTo("해당 권한 접근 불가");
+    }
 }
