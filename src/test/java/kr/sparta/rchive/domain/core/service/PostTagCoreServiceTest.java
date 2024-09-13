@@ -392,4 +392,44 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(result.postId()).isEqualTo(response.postId());
     }
+
+    @Test
+    @DisplayName("APM이 게시물 생성 기능 코어 서비스 성공 테스트")
+    void APM_게시물_생성_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Track track = TEST_TRACK_ANDROID_1L;
+        Tutor tutor = TEST_TUTOR;
+        Post post = TEST_POST_1L;
+
+        PostCreateReq request = PostCreateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .postPeriod(1)
+                .isOpened(true)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(tutor);
+        given(postService.createPost(any(PostCreateReq.class), any(Track.class), any(Tutor.class))).willReturn(post);
+
+        PostCreateRes response = PostCreateRes.builder()
+                .postId(TEST_POST_1L_ID)
+                .build();
+
+        // When
+        PostCreateRes result = postTagCoreService.createPost(user, track.getTrackName(), track.getPeriod(), request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
 }
