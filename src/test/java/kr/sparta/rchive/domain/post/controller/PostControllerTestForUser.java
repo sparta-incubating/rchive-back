@@ -115,7 +115,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/search")
                         .param("trackName", "ANDROID") // 트랙 이름 예시
-                        .param("loginPeriod", "1") // 로그인 기간 예시
+                        .param("selectPeriod", "1") // 로그인 기간 예시
                         .param("keyword", "Test") // 키워드 예시
                         .param("page", "1")
                         .param("size", "10")
@@ -163,7 +163,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/category")
                         .param("trackName", "ANDROID")
-                        .param("loginPeriod", "1")
+                        .param("selectPeriod", "1")
                         .param("category", String.valueOf(PostTypeEnum.Sparta_Lecture))
                         .param("tutorId", "1")
                         .param("page", "1")
@@ -320,7 +320,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/tags/search")
                         .param("trackName", "ANDROID")
-                        .param("loginPeriod", "1")
+                        .param("selectPeriod", "1")
                         .param("tagId", "1")
                         .param("postType", PostTypeEnum.Sparta_Lecture.name())
                         .param("page", "1")
@@ -425,7 +425,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/search/recent")
                 .param("trackName", "ANDROID")
-                .param("loginPeriod", "1"))
+                .param("selectPeriod", "1"))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("최근 검색어 조회 성공"),
