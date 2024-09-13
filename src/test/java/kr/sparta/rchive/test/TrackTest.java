@@ -26,6 +26,13 @@ public interface TrackTest {
             .isDeleted(false)
             .build();
 
+    Track TEST_TRACK_ANDROID_1L_NOT_PERMISSION = Track.builder()
+            .trackName(TEST_TRACK_NAME)
+            .period(TEST_TRACK_1L_PERIOD)
+            .isPermission(false)
+            .isDeleted(false)
+            .build();
+
     Track TEST_TRACK_ANDROID_2L = Track.builder()
             .trackName(TEST_TRACK_NAME)
             .period(TEST_TRACK_2L_PERIOD)

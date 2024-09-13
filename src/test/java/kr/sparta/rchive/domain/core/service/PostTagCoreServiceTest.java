@@ -17,6 +17,7 @@ import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
+import kr.sparta.rchive.domain.user.exception.TrackCustomException;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.global.redis.RedisService;
@@ -315,5 +316,34 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(exception.getErrorCode()).isEqualTo("ROLE-3001");
         assertThat(exception.getMessage()).isEqualTo("해당 권한 접근 불가");
+    }
+
+    @Test
+    @DisplayName("APM이 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 트랙이 허용되지 않음으로 인한 실패 테스트")
+    void APM_태그_게시물_검색_기능_트랙_허용되지_않음으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Track track = TEST_TRACK_ANDROID_1L_NOT_PERMISSION;
+        Role role = Role.builder()
+                .user(user)
+                .track(track)
+                .trackRole(TrackRoleEnum.APM)
+                .auth(AuthEnum.APPROVE)
+                .build();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(List.of(role));
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.searchPostByTag(track.getTrackName(), track.getPeriod(), TEST_TAG_1L_ID,
+                        user, null, pageable)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("TRACK-3001");
+        assertThat(exception.getMessage()).isEqualTo("트랙 열람권한 없음");
     }
 }
