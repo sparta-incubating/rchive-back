@@ -76,8 +76,7 @@ public class RoleService {
         List<Role> roleList = findRoleListByEmailAndAuthNotApprove(reqList);
         roleRepository.deleteAll(roleList);
     }
-
-    @Transactional
+    
     public void deleteApmRoleListExceptLastApprove(List<RoleRequestListReq> reqList) {
         List<String> apmList = new ArrayList<>();
         for (RoleRequestListReq req : reqList) {
