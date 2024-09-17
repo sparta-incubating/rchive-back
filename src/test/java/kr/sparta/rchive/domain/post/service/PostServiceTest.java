@@ -269,31 +269,9 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
 
         ReflectionTestUtils.setField(track, "id", 1L);
 
-        given(postRepository.findAllByPostTypeAndTrackIdUserRoleUser(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
+        given(postRepository.findAllByPostTypeAndTrackId(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
         // When
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track, TEST_TUTOR_ID);
-
-        // Then
-        assertThat(postList.size()).isEqualTo(responseList.size());
-        assertThat(postList.get(0).getTitle()).isEqualTo(responseList.get(0).getTitle());
-        assertThat(postList.get(0).getContent()).isEqualTo(responseList.get(0).getContent());
-    }
-
-    @Test
-    @DisplayName("Manager가 PostType과 Track Id를 이용하여 게시물 리스트를 검색해오는 서비스 로직 성공 테스트")
-    void Manager_권한_PostType_Track_id_게시물_리스트_검색해오는_서비스_성공_테스트() {
-        // Given
-        UserRoleEnum userRole = UserRoleEnum.MANAGER;
-        PostTypeEnum postType = TEST_POST_TYPE;
-        Track track = TEST_TRACK_ANDROID_1L;
-
-        List<Post> responseList = List.of(TEST_POST_1L);
-
-        ReflectionTestUtils.setField(track, "id", 1L);
-
-        given(postRepository.findAllByPostTypeAndTrackIdUserRoleManager(any(PostTypeEnum.class), any(Long.class), any(Long.class))).willReturn(responseList);
-        // When
-        List<Post> postList = postService.findPostListByPostTypeAndTrackId(userRole, postType, track, TEST_TUTOR_ID);
+        List<Post> postList = postService.findPostListByPostTypeAndTrackId(postType, track, TEST_TUTOR_ID);
 
         // Then
         assertThat(postList.size()).isEqualTo(responseList.size());

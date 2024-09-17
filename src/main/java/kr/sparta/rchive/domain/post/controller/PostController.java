@@ -95,7 +95,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> searchPosts(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("loginPeriod") Integer period,
+            @RequestParam("selectPeriod") Integer period,
             @RequestParam(value = "category", required = false) PostTypeEnum postType,
             @RequestParam("keyword") String keyword,
             @RequestParam(value = "tutorId", required = false) Long tutorId,
@@ -115,7 +115,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> getPostCategory(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("loginPeriod") Integer period,
+            @RequestParam("selectPeriod") Integer period,
             @RequestParam(value = "category", required = false) PostTypeEnum postType,
             @RequestParam(value = "tutorId", required = false) Long tutorId,
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -211,7 +211,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> searchPostByTag(
             @LoginUser User user,
             @RequestParam("trackName") TrackNameEnum trackName,
-            @RequestParam("loginPeriod") Integer period,
+            @RequestParam("selectPeriod") Integer period,
             @RequestParam("tagId") Long tagId,
             @RequestParam(value = "postType", required = false) PostTypeEnum postType,
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -325,7 +325,7 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> getRecentSearchKeyword(
         @LoginUser User user,
         @RequestParam("trackName") TrackNameEnum trackName,
-        @RequestParam("loginPeriod") Integer period
+        @RequestParam("selectPeriod") Integer period
     ) {
         List<PostGetRecentKeywordRes> responseList = postTagCoreService.getRecentSearchKeyword(user, trackName, period);
 
