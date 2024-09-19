@@ -30,12 +30,10 @@ import kr.sparta.rchive.test.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -467,6 +465,44 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         ReflectionTestUtils.setField(user, "id", 1L);
         ReflectionTestUtils.setField(TEST_TRACK_ANDROID_1L, "id", 1L);
         ReflectionTestUtils.setField(TEST_POST_1L, "id", 1L);
+
+        PostModifyRes response = PostModifyRes.builder()
+                .postId(1L)
+                .build();
+        // When
+        PostModifyRes result = postTagCoreService.updatePost(user, trackName, period, postId, request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("PM이 게시물을 업데이트하는 기능 코어 서비스 성공 테스트")
+    void PM_게시물_업데이트_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .isOpened(true)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(TEST_POST_1L, "id", 1L);
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_PM);
+        given(postService.updatePost(any(Post.class), any(PostUpdateReq.class), any(Track.class), isNull())).willReturn(TEST_POST_1L);
 
         PostModifyRes response = PostModifyRes.builder()
                 .postId(1L)
