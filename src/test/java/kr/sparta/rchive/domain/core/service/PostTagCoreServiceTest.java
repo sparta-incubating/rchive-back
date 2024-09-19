@@ -554,4 +554,38 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(result.postId()).isEqualTo(response.postId());
     }
+
+    @Test
+    @DisplayName("게시물 업데이트하는 기능 코어 서비스 다른 트랙으로 인한 실패 테스트")
+    void 게시물_업데이트_기능_다른_트랙으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_3L_ID;
+
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .isOpened(true)
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_3L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.updatePost(user, trackName, period, postId, request)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("TRACK-3002");
+        assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
+    }
 }
