@@ -622,4 +622,23 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(exception.getErrorCode()).isEqualTo("TRACK-3002");
         assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
     }
+
+    @Test
+    @DisplayName("게시물 삭제하는 기능 코어 서비스 성공 테스트")
+    void 게시물_삭제_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_PM);
+
+        // When
+        postTagCoreService.deletePost(user, trackName, period, postId);
+
+        // Then
+        verify(postService, times(1)).deletePost(any(Post.class));
+    }
 }
