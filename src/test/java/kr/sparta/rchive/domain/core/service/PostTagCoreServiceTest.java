@@ -2,8 +2,10 @@ package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
+import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
 import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
@@ -428,6 +430,49 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
 
         // When
         PostCreateRes result = postTagCoreService.createPost(user, track.getTrackName(), track.getPeriod(), request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물을 업데이트하는 기능 코어 서비스 성공 테스트")
+    void APM_게시물_업데이트_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_1L_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+        List<String> tagName = List.of(TEST_TAG_1L_NAME, TEST_TAG_2L_NAME);
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .updatePeriod(period)
+                .isOpened(true)
+                .tagNameList(tagName)
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+        given(postService.updatePost(any(Post.class), any(PostUpdateReq.class), any(Track.class), any(Tutor.class))).willReturn(TEST_POST_1L);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(TEST_TUTOR);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(TEST_TRACK_ANDROID_1L, "id", 1L);
+        ReflectionTestUtils.setField(TEST_POST_1L, "id", 1L);
+
+        PostModifyRes response = PostModifyRes.builder()
+                .postId(1L)
+                .build();
+        // When
+        PostModifyRes result = postTagCoreService.updatePost(user, trackName, period, postId, request);
 
         // Then
         assertThat(result.postId()).isEqualTo(response.postId());
