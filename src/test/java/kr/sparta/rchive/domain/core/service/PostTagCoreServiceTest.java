@@ -751,4 +751,28 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         verify(postService, times(1)).openPost(anyList());
     }
+
+    @Test
+    @DisplayName("APM이 게시물 열람할 수 있도록 변경하는 기능 코어 서비스 성공 테스트")
+    void APM_게시물_상태_열람으로_변경하는_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Post post = TEST_POST_1L;
+        Track track = TEST_TRACK_ANDROID_1L;
+        Integer period = 1;
+        List<Long> postIdList = List.of(1L);
+        List<Post> postList = List.of(post);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(postService.findPostListByPostIdList(anyList())).willReturn(postList);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.openPost(user, track.getTrackName(), period, postIdList);
+
+        // Then
+        verify(postService, times(1)).openPost(anyList());
+    }
 }
