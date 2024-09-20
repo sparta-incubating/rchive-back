@@ -851,4 +851,31 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(result.get(0).tutorId()).isEqualTo(TEST_TUTOR_ID);
         assertThat(result.get(0).tutorName()).isEqualTo(TEST_TUTOR.getTutorName());
     }
+
+    @Test
+    @DisplayName("APM이 튜터를 검색하는 기능 코어 서비스 성공 테스트")
+    void APM_튜터_검색_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Track track = TEST_TRACK_ANDROID_1L;
+
+        TutorRes tutorRes = TutorRes.builder()
+                .tutorId(TEST_TUTOR_ID)
+                .tutorName(TEST_TUTOR.getTutorName())
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.checkIsPm(any(Long.class), any(TrackNameEnum.class))).willReturn(false);
+        given(tutorService.findTutorListByTutorNameAndTrackId(any(String.class), any(Long.class))).willReturn(List.of(tutorRes));
+
+        // When
+        List<TutorRes> result = postTagCoreService.searchTutor(user, track.getTrackName(), track.getPeriod(), 1, "test");
+
+        // Then
+        assertThat(result.get(0).tutorId()).isEqualTo(TEST_TUTOR_ID);
+        assertThat(result.get(0).tutorName()).isEqualTo(TEST_TUTOR.getTutorName());
+    }
 }
