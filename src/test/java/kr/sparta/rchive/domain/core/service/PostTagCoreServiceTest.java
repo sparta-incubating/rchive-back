@@ -1106,4 +1106,38 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(result.title()).isEqualTo(testPost.getTitle());
         assertThat(result.thumbnailUrl()).isEqualTo(testPost.getThumbnailUrl());
     }
+
+    @Test
+    @DisplayName("APM이 게시물 수정하기 전에 이전 게시물의 내용 미리보는 기능 코어 서비스 다른 트랙 조회로 인한 실패 테스트")
+    void APM_게시물_이전_내용_미리보는_기능_다른_트랙_조회로_인한_실패_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_APM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_AI_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(postService.findPostDetail(any(Long.class))).willReturn(testPost);
+
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.getPostDetailInBackOffice(user, track.getTrackName(), track.getPeriod(), 1L));
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
+    }
 }
