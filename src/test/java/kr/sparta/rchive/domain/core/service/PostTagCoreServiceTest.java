@@ -989,4 +989,28 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(result).isEqualTo(null);
     }
+
+    @Test
+    @DisplayName("최근 검색한 기록 삭제하는 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_삭제_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+        RecentSearchKeywordReq request = RecentSearchKeywordReq.builder()
+                .keyword("test")
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.deleteRecentSearchKeyword(user, request);
+
+        // Then
+        verify(redisService, times(1)).deleteSearchKeyword(any(Long.class), any(Long.class), any(String.class));
+    }
 }
