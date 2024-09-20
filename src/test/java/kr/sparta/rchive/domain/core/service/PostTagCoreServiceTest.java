@@ -15,6 +15,7 @@ import kr.sparta.rchive.domain.post.service.PostTagService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.post.service.TutorService;
 import kr.sparta.rchive.domain.user.entity.Role;
+import kr.sparta.rchive.domain.user.entity.RoleId;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
@@ -901,5 +902,47 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
 
         // Then
         verify(redisService, times(1)).saveRecentSearchKeyword(any(Long.class), any(Long.class), any(String.class));
+    }
+
+    @Test
+    @DisplayName("게시물 검색하는 기능 코어 서비스 성공 테스트")
+    void 게시물_검색_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        Role role = TEST_STUDENT_ROLE;
+        User user = TEST_STUDENT_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+        List<Role> roleList = List.of(role);
+        List<Post> postList = List.of(testPost);
+        List<Long> bookmarkedPostIdList = List.of(1L);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.searchPost(any(PostTypeEnum.class), any(String.class), any(Long.class), any(Long.class))).willReturn(postList);
+        given(bookmarkService.findPostIdListByUserId(any(Long.class))).willReturn(bookmarkedPostIdList);
+
+        // When
+        Page<PostGetRes> result = postTagCoreService.searchPosts(user, TEST_POST_1L.getPostType(), track.getTrackName(), track.getPeriod(), "test", 1L, pageable);
+
+        // Then
+        assertThat(result.getContent().get(0).title()).isEqualTo(testPost.getTitle());
+        assertThat(result.getContent().size()).isEqualTo(postList.size());
     }
 }
