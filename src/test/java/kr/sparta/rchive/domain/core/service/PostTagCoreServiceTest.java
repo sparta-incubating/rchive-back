@@ -967,4 +967,26 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(result.get(0).keyword()).isEqualTo(keywordList.get(0));
     }
+
+    @Test
+    @DisplayName("최근 검색한 검색어 목록이 비었을 때 조회 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_목록_비어있을_때_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        List<String> keywordList = new ArrayList<>();
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(redisService.getRecentSearchKeyword(any(Long.class), any(Long.class))).willReturn(keywordList);
+
+        // When
+        List<PostGetRecentKeywordRes> result = postTagCoreService.getRecentSearchKeyword(user, track.getTrackName(), track.getPeriod());
+
+        // Then
+        assertThat(result).isEqualTo(null);
+    }
 }
