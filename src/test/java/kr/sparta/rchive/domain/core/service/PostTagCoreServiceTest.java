@@ -2,6 +2,7 @@ package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
+import kr.sparta.rchive.domain.post.dto.request.DeleteThumbnailReq;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
@@ -15,7 +16,6 @@ import kr.sparta.rchive.domain.post.service.PostTagService;
 import kr.sparta.rchive.domain.post.service.TagService;
 import kr.sparta.rchive.domain.post.service.TutorService;
 import kr.sparta.rchive.domain.user.entity.Role;
-import kr.sparta.rchive.domain.user.entity.RoleId;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.domain.user.enums.AuthEnum;
@@ -1012,5 +1012,29 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
 
         // Then
         verify(redisService, times(1)).deleteSearchKeyword(any(Long.class), any(Long.class), any(String.class));
+    }
+
+    @Test
+    @DisplayName("썸네일 삭제하는 기능 코어 서비스 성공 테스트")
+    void 썸네일_삭제_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Post post = TEST_POST_1L;
+        DeleteThumbnailReq request = DeleteThumbnailReq.builder()
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(postService.findPostById(any(Long.class))).willReturn(post);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.deleteThumbnail(user, 1L, request);
+
+        // Then
+        verify(postService, times(1)).deleteThumbnail(any(Post.class));
     }
 }
