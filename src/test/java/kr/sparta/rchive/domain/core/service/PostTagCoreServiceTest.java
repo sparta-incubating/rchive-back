@@ -3,10 +3,7 @@ package kr.sparta.rchive.domain.core.service;
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
-import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
-import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
-import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
-import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
+import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
@@ -640,5 +637,53 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
 
         // Then
         verify(postService, times(1)).deletePost(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("게시물 단건 조회해오는 기능 코어 서비스 성공 테스트")
+    void 게시물_단건_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        Role role = TEST_PM_ROLE;
+        User user = TEST_PM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+        Boolean isBookmarked = true;
+
+        List<Role> roleList = List.of(role);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.findPostWithDetailByPostId(any(Long.class))).willReturn(testPost);
+        given(bookmarkService.existsBookmarkByUserIdAndPostId(any(Long.class), any(Long.class))).willReturn(isBookmarked);
+
+        PostGetSinglePostRes response = PostGetSinglePostRes.builder()
+                .postId(1L)
+                .title(testPost.getTitle())
+                .tutor(testPost.getTutor().getTutorName())
+                .videoLink(testPost.getVideoLink())
+                .build();
+        // When
+        PostGetSinglePostRes result = postTagCoreService.getPost(user, 1L, track.getTrackName(), 1);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+        assertThat(result.title()).isEqualTo(response.title());
+        assertThat(result.tutor()).isEqualTo(response.tutor());
+        assertThat(result.videoLink()).isEqualTo(response.videoLink());
     }
 }
