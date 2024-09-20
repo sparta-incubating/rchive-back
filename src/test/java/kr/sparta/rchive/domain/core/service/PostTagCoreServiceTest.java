@@ -4,6 +4,7 @@ import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
@@ -877,5 +878,28 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(result.get(0).tutorId()).isEqualTo(TEST_TUTOR_ID);
         assertThat(result.get(0).tutorName()).isEqualTo(TEST_TUTOR.getTutorName());
+    }
+
+    @Test
+    @DisplayName("최근에 검색한 검색어 저장하는 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_저장_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+        RecentSearchKeywordReq request = RecentSearchKeywordReq.builder()
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .keyword("test")
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        // When
+        postTagCoreService.saveRecentSearchKeyword(user, request);
+
+        // Then
+        verify(redisService, times(1)).saveRecentSearchKeyword(any(Long.class), any(Long.class), any(String.class));
     }
 }
