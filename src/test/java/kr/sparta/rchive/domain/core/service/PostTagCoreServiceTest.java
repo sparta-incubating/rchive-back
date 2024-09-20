@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
+import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.response.*;
@@ -685,5 +686,46 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         assertThat(result.title()).isEqualTo(response.title());
         assertThat(result.tutor()).isEqualTo(response.tutor());
         assertThat(result.videoLink()).isEqualTo(response.videoLink());
+    }
+
+    @Test
+    @DisplayName("카테고리 별 게시물의 리스트를 조회하는 기능 코어 서비스 성공 테스트")
+    void 카테고리_게시물_리스트_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        Role role = TEST_PM_ROLE;
+        User user = TEST_PM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+        List<Role> roleList = List.of(role);
+        List<Post> postList = List.of(testPost);
+        List<Long> bookmarkedPostIdList = List.of(1L);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.findPostListByPostTypeAndTrackId(any(PostTypeEnum.class), any(Track.class), any(Long.class))).willReturn(postList);
+        given(bookmarkService.findPostIdListByUserId(any(Long.class))).willReturn(bookmarkedPostIdList);
+        // When
+        Page<PostGetRes> result = postTagCoreService.getPostListByCategory(user, track.getTrackName(), track.getPeriod(), testPost.getPostType(), TEST_TUTOR_ID, pageable);
+
+        // Then
+        assertThat(result.getContent().get(0).title()).isEqualTo(testPost.getTitle());
+        assertThat(result.getContent().get(0).postType()).isEqualTo(PostTypeInfo.of(testPost.getPostType()));
     }
 }
