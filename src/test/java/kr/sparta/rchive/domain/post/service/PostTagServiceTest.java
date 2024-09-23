@@ -1,6 +1,11 @@
 package kr.sparta.rchive.domain.post.service;
 
+import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.entity.PostTag;
+import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.repository.PostTagRepository;
+import kr.sparta.rchive.test.PostTagTest;
+import kr.sparta.rchive.test.PostTest;
 import kr.sparta.rchive.test.TagTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PostTagServiceTest implements TagTest {
+public class PostTagServiceTest implements TagTest, PostTest, PostTagTest {
 
     @InjectMocks
     private PostTagService postTagService;
@@ -38,5 +43,20 @@ public class PostTagServiceTest implements TagTest {
         // Then
         assertThat(result.size()).isEqualTo(postIdList.size());
         assertThat(result.get(0)).isEqualTo(postIdList.get(0));
+    }
+
+    @Test
+    @DisplayName("PostTag를 Post와 TagList로 저장하는 서비스 로직 성공 테스트")
+    void PostTag_Post_TagList_저장하는_서비스_성공_테스트() {
+        // Given
+        Post post = TEST_POST_1L;
+        List<Tag> tagList = List.of(TEST_1L_TAG);
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1);
+
+        // When
+        postTagService.savePostTagByPostAndTagList(post, tagList);
+
+        // Then
+        verify(postTagRepository, times(1)).saveAll(anyList());
     }
 }
