@@ -1,7 +1,9 @@
 package kr.sparta.rchive.domain.post.service;
 
+import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.entity.Tag;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.repository.TagRepository;
 import kr.sparta.rchive.test.TagTest;
 import org.junit.jupiter.api.DisplayName;
@@ -10,10 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -47,5 +51,45 @@ public class TagServiceTest implements TagTest {
         // Then
         assertThat(result.size()).isEqualTo(responseList.size());
         assertThat(result.get(0)).isEqualTo(responseList.get(0));
+    }
+
+    @Test
+    @DisplayName("태그 생성하는 서비스 로직 성공 테스트")
+    void 태그_생성_서비스_성공_테스트() {
+        // Given
+        String name = TEST_TAG_1L_NAME;
+        Tag tag = TEST_1L_TAG;
+        TagCreateRes response = TagCreateRes.builder()
+                .tagId(1L)
+                .tagName(name)
+                .build();
+
+        ReflectionTestUtils.setField(tag, "id", 1L);
+
+        given(tagRepository.findByTagNameNotOptional(any(String.class))).willReturn(null);
+        given(tagRepository.save(any(Tag.class))).willReturn(tag);
+
+        // When
+        TagCreateRes result = tagService.createTag(name);
+
+        // Then
+        assertThat(result.tagName()).isEqualTo(name);
+    }
+
+    @Test
+    @DisplayName("태그 생성하는 서비스 로직 중복된 태그로 인한 실패 테스트")
+    void 태그_생성_서비스_중복_태그로_인한_실패_테스트() {
+        // Given
+        Tag tag = TEST_1L_TAG;
+        String name = TEST_TAG_1L_NAME;
+
+        given(tagRepository.findByTagNameNotOptional(any(String.class))).willReturn(tag);
+        // When
+        PostCustomException exception = assertThrows(
+                PostCustomException.class, () -> tagService.createTag(name)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("POST-9001");
     }
 }
