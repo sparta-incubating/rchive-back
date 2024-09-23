@@ -9,7 +9,7 @@ public interface PostTagTest extends PostTest, TagTest{
             .build();
 
     PostTag TEST_POST_TAG_2 = PostTag.builder()
-            .post(TEST_POST_1L)
+            .post(TEST_POST_2L)
             .tag(TEST_1L_TAG)
             .build();
 }
