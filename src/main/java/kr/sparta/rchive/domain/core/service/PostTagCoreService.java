@@ -377,7 +377,7 @@ public class PostTagCoreService {
 
     private void savePostTagByPostAndTagNameList(Post post, List<String> tagNameList) {
         List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
-        postTagService.savePostTagByPostAndTagIdList(post, tagList);
+        postTagService.savePostTagByPostAndTagList(post, tagList);
     }
 
     private void updatePostTagByPostAndTagIdList(Post updatePost, List<String> tagNameList) {

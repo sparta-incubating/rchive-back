@@ -1,8 +1,7 @@
 package kr.sparta.rchive.domain.post.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
 import kr.sparta.rchive.domain.post.entity.Tag;
@@ -23,7 +22,7 @@ public class PostTagService {
         return postTagRepository.findPostTagListByTagIdAlive(tagId);
     }
 
-    public void savePostTagByPostAndTagIdList(Post post, List<Tag> tagList) {
+    public void savePostTagByPostAndTagList(Post post, List<Tag> tagList) {
         List<PostTag> postTagList = tagList.stream()
                 .map(
                         tag -> PostTag.builder()
@@ -39,7 +38,7 @@ public class PostTagService {
     public void updatePostTagByPostAndTag(Post updatePost, List<Tag> tagList) {
         List<PostTag> existingPostTag = findPostTagByPostId(updatePost.getId());
         postTagRepository.deleteAll(existingPostTag);
-        savePostTagByPostAndTagIdList(updatePost, tagList);
+        savePostTagByPostAndTagList(updatePost, tagList);
     }
 
     private List<PostTag> findPostTagByPostId(Long postId) {
