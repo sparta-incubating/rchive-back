@@ -109,4 +109,21 @@ public class TagServiceTest implements TagTest {
         // Then
         assertThat(result.getTagName()).isEqualTo(tag.getTagName());
     }
+
+    @Test
+    @DisplayName("태그ID로 태그를 찾아오는 서비스 로직 실패 테스트")
+    void 태그ID로_태그_찾아오는_서비스_실패_테스트() {
+        // Given
+        Long tagId = TEST_TAG_1L_ID;
+
+        given(tagRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+        // When
+        PostCustomException exception = assertThrows(
+                PostCustomException.class, () -> tagService.findTagById(tagId)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("POST-4002");
+    }
 }
