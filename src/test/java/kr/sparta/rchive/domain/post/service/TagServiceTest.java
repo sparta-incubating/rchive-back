@@ -126,4 +126,24 @@ public class TagServiceTest implements TagTest {
         // Then
         assertThat(exception.getErrorCode()).isEqualTo("POST-4002");
     }
+
+    @Test
+    @DisplayName("태그 내용 리스트로 태그 ID를 찾아오는 서비스 로직 성공 테스트")
+    void 태그내용_리스트_태그ID_찾아오는_서비스_성공_테스트() {
+        // Given
+        List<String> tagNameList = List.of(TEST_TAG_1L_NAME, TEST_TAG_2L_NAME, TEST_TAG_3L_NAME);
+        List<Tag> tagList = List.of(TEST_1L_TAG, TEST_2L_TAG);
+
+        given(tagRepository.findByTagName(tagNameList.get(0))).willReturn(Optional.of(TEST_1L_TAG));
+        given(tagRepository.findByTagName(tagNameList.get(1))).willReturn(Optional.of(TEST_2L_TAG));
+        given(tagRepository.findByTagName(tagNameList.get(2))).willReturn(Optional.empty());
+
+        // When
+        List<Tag> result = tagService.findTagIdListByTagNameList(tagNameList);
+
+        // Then
+        assertThat(result.size()).isEqualTo(tagList.size());
+        assertThat(result.get(0).getTagName()).isEqualTo(TEST_TAG_1L_NAME);
+        assertThat(result.get(1).getTagName()).isEqualTo(TEST_TAG_2L_NAME);
+    }
 }
