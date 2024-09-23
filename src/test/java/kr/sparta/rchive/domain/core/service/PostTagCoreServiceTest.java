@@ -1,10 +1,15 @@
 package kr.sparta.rchive.domain.core.service;
 
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
-import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
-import kr.sparta.rchive.domain.post.dto.response.PostSearchBackOfficeRes;
+import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
+import kr.sparta.rchive.domain.post.dto.request.DeleteThumbnailReq;
+import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
+import kr.sparta.rchive.domain.post.dto.response.*;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.PostTag;
+import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
@@ -17,6 +22,7 @@ import kr.sparta.rchive.domain.user.enums.AuthEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
 import kr.sparta.rchive.domain.user.enums.TrackRoleEnum;
 import kr.sparta.rchive.domain.user.exception.RoleCustomException;
+import kr.sparta.rchive.domain.user.exception.TrackCustomException;
 import kr.sparta.rchive.domain.user.service.RoleService;
 import kr.sparta.rchive.domain.user.service.TrackService;
 import kr.sparta.rchive.global.redis.RedisService;
@@ -24,12 +30,10 @@ import kr.sparta.rchive.test.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -285,5 +289,889 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         // Then
         assertThat(exception.getErrorCode()).isEqualTo("ROLE-3001");
         assertThat(exception.getMessage()).isEqualTo("해당 권한 접근 불가");
+    }
+
+    @Test
+    @DisplayName("PM이 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 다른 트랙 게시물 조회로 인한 실패 테스트")
+    void PM_태그_게시물_검색_기능_다른_트랙_게시물_조회로_인한_실패_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_AI_1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Role role = Role.builder()
+                .user(user)
+                .track(TEST_TRACK_ANDROID_PM)
+                .trackRole(TrackRoleEnum.PM)
+                .auth(AuthEnum.APPROVE)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(List.of(role));
+
+        // When
+        RoleCustomException exception = assertThrows(
+                RoleCustomException.class, () -> postTagCoreService.searchPostByTag(track.getTrackName(), track.getPeriod(), TEST_TAG_1L_ID,
+                        user, null, pageable)
+        );
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("ROLE-3001");
+        assertThat(exception.getMessage()).isEqualTo("해당 권한 접근 불가");
+    }
+
+    @Test
+    @DisplayName("APM이 태그를 이용해서 게시물 검색하는 기능 코어 서비스 로직 트랙이 허용되지 않음으로 인한 실패 테스트")
+    void APM_태그_게시물_검색_기능_트랙_허용되지_않음으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Track track = TEST_TRACK_ANDROID_1L_NOT_PERMISSION;
+        Role role = Role.builder()
+                .user(user)
+                .track(track)
+                .trackRole(TrackRoleEnum.APM)
+                .auth(AuthEnum.APPROVE)
+                .build();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(List.of(role));
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.searchPostByTag(track.getTrackName(), track.getPeriod(), TEST_TAG_1L_ID,
+                        user, null, pageable)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("TRACK-3001");
+        assertThat(exception.getMessage()).isEqualTo("트랙 열람권한 없음");
+    }
+
+    @Test
+    @DisplayName("PM이 게시물 생성 기능 코어 서비스 성공 테스트")
+    void PM_게시물_생성_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Tutor tutor = TEST_TUTOR;
+        Post post = TEST_POST_1L;
+
+        List<String> tagNameList = List.of(TEST_TAG_1L_NAME, TEST_TAG_2L_NAME);
+
+        PostCreateReq request = PostCreateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tagNameList(tagNameList)
+                .postPeriod(1)
+                .isOpened(true)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(tutor);
+        given(postService.createPost(any(PostCreateReq.class), any(Track.class), any(Tutor.class))).willReturn(post);
+
+        PostCreateRes response = PostCreateRes.builder()
+                .postId(TEST_POST_1L_ID)
+                .build();
+
+        // When
+        PostCreateRes result = postTagCoreService.createPost(user, track.getTrackName(), track.getPeriod(), request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물 생성 기능 코어 서비스 성공 테스트")
+    void APM_게시물_생성_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Track track = TEST_TRACK_ANDROID_1L;
+        Tutor tutor = TEST_TUTOR;
+        Post post = TEST_POST_1L;
+
+        PostCreateReq request = PostCreateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .postPeriod(1)
+                .isOpened(true)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(tutor);
+        given(postService.createPost(any(PostCreateReq.class), any(Track.class), any(Tutor.class))).willReturn(post);
+
+        PostCreateRes response = PostCreateRes.builder()
+                .postId(TEST_POST_1L_ID)
+                .build();
+
+        // When
+        PostCreateRes result = postTagCoreService.createPost(user, track.getTrackName(), track.getPeriod(), request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물을 업데이트하는 기능 코어 서비스 성공 테스트")
+    void APM_게시물_업데이트_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_1L_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+        List<String> tagName = List.of(TEST_TAG_1L_NAME, TEST_TAG_2L_NAME);
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .updatePeriod(period)
+                .isOpened(true)
+                .tagNameList(tagName)
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+        given(postService.updatePost(any(Post.class), any(PostUpdateReq.class), any(Track.class), any(Tutor.class))).willReturn(TEST_POST_1L);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(TEST_TUTOR);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(TEST_TRACK_ANDROID_1L, "id", 1L);
+        ReflectionTestUtils.setField(TEST_POST_1L, "id", 1L);
+
+        PostModifyRes response = PostModifyRes.builder()
+                .postId(1L)
+                .build();
+        // When
+        PostModifyRes result = postTagCoreService.updatePost(user, trackName, period, postId, request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("PM이 게시물을 업데이트하는 기능 코어 서비스 성공 테스트")
+    void PM_게시물_업데이트_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .isOpened(true)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(TEST_POST_1L, "id", 1L);
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_PM);
+        given(postService.updatePost(any(Post.class), any(PostUpdateReq.class), any(Track.class), isNull())).willReturn(TEST_POST_1L);
+
+        PostModifyRes response = PostModifyRes.builder()
+                .postId(1L)
+                .build();
+        // When
+        PostModifyRes result = postTagCoreService.updatePost(user, trackName, period, postId, request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물을 업데이트하는 기능 코어 서비스 성공 테스트2")
+    void APM_게시물_업데이트_기능_성공_테스트2() {
+        // Given
+        User user = TEST_APM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_1L_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+        List<String> tagName = List.of(TEST_TAG_1L_NAME, TEST_TAG_2L_NAME);
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .tutorId(TEST_TUTOR_ID)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .isOpened(true)
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+        given(postService.updatePost(any(Post.class), any(PostUpdateReq.class), any(Track.class), any(Tutor.class))).willReturn(TEST_POST_1L);
+        given(tutorService.checkTutor(any(Long.class), any(Track.class))).willReturn(TEST_TUTOR);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(TEST_TRACK_ANDROID_1L, "id", 1L);
+        ReflectionTestUtils.setField(TEST_POST_1L, "id", 1L);
+
+        PostModifyRes response = PostModifyRes.builder()
+                .postId(1L)
+                .build();
+        // When
+        PostModifyRes result = postTagCoreService.updatePost(user, trackName, period, postId, request);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+    }
+
+    @Test
+    @DisplayName("게시물 업데이트하는 기능 코어 서비스 다른 트랙으로 인한 실패 테스트")
+    void 게시물_업데이트_기능_다른_트랙으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_3L_ID;
+
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .isOpened(true)
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_3L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.updatePost(user, trackName, period, postId, request)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("TRACK-3002");
+        assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
+    }
+
+    @Test
+    @DisplayName("게시물 업데이트하는 기능 코어 서비스 다른 기수로 인한 실패 테스트")
+    void 게시물_업데이트_기능_다른_기수로_인한_실패_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_2L_ID;
+
+        PostUpdateReq request = PostUpdateReq.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .uploadedAt(LocalDate.now())
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .trackName(trackName)
+                .isOpened(true)
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_2L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_1L);
+
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.updatePost(user, trackName, period, postId, request)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo("TRACK-3002");
+        assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
+    }
+
+    @Test
+    @DisplayName("게시물 삭제하는 기능 코어 서비스 성공 테스트")
+    void 게시물_삭제_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        TrackNameEnum trackName = TEST_TRACK_NAME;
+        Integer period = TEST_TRACK_PM_PERIOD;
+        Long postId = TEST_POST_1L_ID;
+
+        given(postService.findPostById(any(Long.class))).willReturn(TEST_POST_1L);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(TEST_TRACK_ANDROID_PM);
+
+        // When
+        postTagCoreService.deletePost(user, trackName, period, postId);
+
+        // Then
+        verify(postService, times(1)).deletePost(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("게시물 단건 조회해오는 기능 코어 서비스 성공 테스트")
+    void 게시물_단건_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        Role role = TEST_PM_ROLE;
+        User user = TEST_PM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+        Boolean isBookmarked = true;
+
+        List<Role> roleList = List.of(role);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.findPostWithDetailByPostId(any(Long.class))).willReturn(testPost);
+        given(bookmarkService.existsBookmarkByUserIdAndPostId(any(Long.class), any(Long.class))).willReturn(isBookmarked);
+
+        PostGetSinglePostRes response = PostGetSinglePostRes.builder()
+                .postId(1L)
+                .title(testPost.getTitle())
+                .tutor(testPost.getTutor().getTutorName())
+                .videoLink(testPost.getVideoLink())
+                .build();
+        // When
+        PostGetSinglePostRes result = postTagCoreService.getPost(user, 1L, track.getTrackName(), 1);
+
+        // Then
+        assertThat(result.postId()).isEqualTo(response.postId());
+        assertThat(result.title()).isEqualTo(response.title());
+        assertThat(result.tutor()).isEqualTo(response.tutor());
+        assertThat(result.videoLink()).isEqualTo(response.videoLink());
+    }
+
+    @Test
+    @DisplayName("카테고리 별 게시물의 리스트를 조회하는 기능 코어 서비스 성공 테스트")
+    void 카테고리_게시물_리스트_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        Role role = TEST_PM_ROLE;
+        User user = TEST_PM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+        List<Role> roleList = List.of(role);
+        List<Post> postList = List.of(testPost);
+        List<Long> bookmarkedPostIdList = List.of(1L);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.findPostListByPostTypeAndTrackId(any(PostTypeEnum.class), any(Track.class), any(Long.class))).willReturn(postList);
+        given(bookmarkService.findPostIdListByUserId(any(Long.class))).willReturn(bookmarkedPostIdList);
+        // When
+        Page<PostGetRes> result = postTagCoreService.getPostListByCategory(user, track.getTrackName(), track.getPeriod(), testPost.getPostType(), TEST_TUTOR_ID, pageable);
+
+        // Then
+        assertThat(result.getContent().get(0).title()).isEqualTo(testPost.getTitle());
+        assertThat(result.getContent().get(0).postType()).isEqualTo(PostTypeInfo.of(testPost.getPostType()));
+    }
+
+    @Test
+    @DisplayName("PM이 게시물 열람할 수 있도록 변경하는 기능 코어 서비스 성공 테스트")
+    void PM_게시물_상태_열람으로_변경하는_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Post post = TEST_POST_1L;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Integer period = 0;
+        List<Long> postIdList = List.of(1L);
+        List<Post> postList = List.of(post);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(postService.findPostListByPostIdList(anyList())).willReturn(postList);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.openPost(user, track.getTrackName(), period, postIdList);
+
+        // Then
+        verify(postService, times(1)).openPost(anyList());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물 열람할 수 있도록 변경하는 기능 코어 서비스 성공 테스트")
+    void APM_게시물_상태_열람으로_변경하는_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Post post = TEST_POST_1L;
+        Track track = TEST_TRACK_ANDROID_1L;
+        Integer period = 1;
+        List<Long> postIdList = List.of(1L);
+        List<Post> postList = List.of(post);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(postService.findPostListByPostIdList(anyList())).willReturn(postList);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.openPost(user, track.getTrackName(), period, postIdList);
+
+        // Then
+        verify(postService, times(1)).openPost(anyList());
+    }
+
+    @Test
+    @DisplayName("PM이 게시물 열람할 수 없도록 변경하는 기능 코어 서비스 성공 테스트")
+    void PM_게시물_상태_열람불가로_변경하는_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Post post = TEST_POST_1L;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Integer period = 0;
+        List<Long> postIdList = List.of(1L);
+        List<Post> postList = List.of(post);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(postService.findPostListByPostIdList(anyList())).willReturn(postList);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.closePost(user, track.getTrackName(), period, postIdList);
+
+        // Then
+        verify(postService, times(1)).closePost(anyList());
+    }
+
+    @Test
+    @DisplayName("PM이 튜터를 검색하는 기능 코어 서비스 성공 테스트")
+    void PM_튜터_검색_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_PM;
+
+        TutorRes tutorRes = TutorRes.builder()
+                .tutorId(TEST_TUTOR_ID)
+                .tutorName(TEST_TUTOR.getTutorName())
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(tutorService.findTutorListByTutorNameAndTrackId(any(String.class), any(Long.class))).willReturn(List.of(tutorRes));
+
+        // When
+        List<TutorRes> result = postTagCoreService.searchTutor(user, track.getTrackName(), track.getPeriod(), 1, "test");
+
+        // Then
+        assertThat(result.get(0).tutorId()).isEqualTo(TEST_TUTOR_ID);
+        assertThat(result.get(0).tutorName()).isEqualTo(TEST_TUTOR.getTutorName());
+    }
+
+    @Test
+    @DisplayName("PM이 튜터를 검색하는 기능 코어 서비스 성공 테스트2")
+    void PM_튜터_검색_기능_성공_테스트2() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_1L;
+
+        TutorRes tutorRes = TutorRes.builder()
+                .tutorId(TEST_TUTOR_ID)
+                .tutorName(TEST_TUTOR.getTutorName())
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.checkIsPm(any(Long.class), any(TrackNameEnum.class))).willReturn(true);
+        given(tutorService.findTutorListByTutorNameAndTrackId(any(String.class), any(Long.class))).willReturn(List.of(tutorRes));
+
+        // When
+        List<TutorRes> result = postTagCoreService.searchTutor(user, track.getTrackName(), track.getPeriod(), 1, "test");
+
+        // Then
+        assertThat(result.get(0).tutorId()).isEqualTo(TEST_TUTOR_ID);
+        assertThat(result.get(0).tutorName()).isEqualTo(TEST_TUTOR.getTutorName());
+    }
+
+    @Test
+    @DisplayName("APM이 튜터를 검색하는 기능 코어 서비스 성공 테스트")
+    void APM_튜터_검색_기능_성공_테스트() {
+        // Given
+        User user = TEST_APM_USER;
+        Track track = TEST_TRACK_ANDROID_1L;
+
+        TutorRes tutorRes = TutorRes.builder()
+                .tutorId(TEST_TUTOR_ID)
+                .tutorName(TEST_TUTOR.getTutorName())
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.checkIsPm(any(Long.class), any(TrackNameEnum.class))).willReturn(false);
+        given(tutorService.findTutorListByTutorNameAndTrackId(any(String.class), any(Long.class))).willReturn(List.of(tutorRes));
+
+        // When
+        List<TutorRes> result = postTagCoreService.searchTutor(user, track.getTrackName(), track.getPeriod(), 1, "test");
+
+        // Then
+        assertThat(result.get(0).tutorId()).isEqualTo(TEST_TUTOR_ID);
+        assertThat(result.get(0).tutorName()).isEqualTo(TEST_TUTOR.getTutorName());
+    }
+
+    @Test
+    @DisplayName("최근에 검색한 검색어 저장하는 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_저장_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+        RecentSearchKeywordReq request = RecentSearchKeywordReq.builder()
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .keyword("test")
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        // When
+        postTagCoreService.saveRecentSearchKeyword(user, request);
+
+        // Then
+        verify(redisService, times(1)).saveRecentSearchKeyword(any(Long.class), any(Long.class), any(String.class));
+    }
+
+    @Test
+    @DisplayName("게시물 검색하는 기능 코어 서비스 성공 테스트")
+    void 게시물_검색_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        Role role = TEST_STUDENT_ROLE;
+        User user = TEST_STUDENT_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+        List<Role> roleList = List.of(role);
+        List<Post> postList = List.of(testPost);
+        List<Long> bookmarkedPostIdList = List.of(1L);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+        ReflectionTestUtils.setField(testPost, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
+        given(postService.searchPost(any(PostTypeEnum.class), any(String.class), any(Long.class), any(Long.class))).willReturn(postList);
+        given(bookmarkService.findPostIdListByUserId(any(Long.class))).willReturn(bookmarkedPostIdList);
+
+        // When
+        Page<PostGetRes> result = postTagCoreService.searchPosts(user, TEST_POST_1L.getPostType(), track.getTrackName(), track.getPeriod(), "test", 1L, pageable);
+
+        // Then
+        assertThat(result.getContent().get(0).title()).isEqualTo(testPost.getTitle());
+        assertThat(result.getContent().size()).isEqualTo(postList.size());
+    }
+
+    @Test
+    @DisplayName("최근 검색한 검색어 목록 조회 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        List<String> keywordList = List.of("test");
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(redisService.getRecentSearchKeyword(any(Long.class), any(Long.class))).willReturn(keywordList);
+
+        // When
+        List<PostGetRecentKeywordRes> result = postTagCoreService.getRecentSearchKeyword(user, track.getTrackName(), track.getPeriod());
+
+        // Then
+        assertThat(result.get(0).keyword()).isEqualTo(keywordList.get(0));
+    }
+
+    @Test
+    @DisplayName("최근 검색한 검색어 목록이 비었을 때 조회 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_목록_비어있을_때_조회_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        List<String> keywordList = new ArrayList<>();
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(redisService.getRecentSearchKeyword(any(Long.class), any(Long.class))).willReturn(keywordList);
+
+        // When
+        List<PostGetRecentKeywordRes> result = postTagCoreService.getRecentSearchKeyword(user, track.getTrackName(), track.getPeriod());
+
+        // Then
+        assertThat(result).isEqualTo(null);
+    }
+
+    @Test
+    @DisplayName("최근 검색한 기록 삭제하는 기능 코어 서비스 성공 테스트")
+    void 최근_검색어_삭제_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_STUDENT_USER;
+        RecentSearchKeywordReq request = RecentSearchKeywordReq.builder()
+                .keyword("test")
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.deleteRecentSearchKeyword(user, request);
+
+        // Then
+        verify(redisService, times(1)).deleteSearchKeyword(any(Long.class), any(Long.class), any(String.class));
+    }
+
+    @Test
+    @DisplayName("썸네일 삭제하는 기능 코어 서비스 성공 테스트")
+    void 썸네일_삭제_기능_성공_테스트() {
+        // Given
+        User user = TEST_PM_USER;
+        Track track = TEST_TRACK_ANDROID_PM;
+        Post post = TEST_POST_1L;
+        DeleteThumbnailReq request = DeleteThumbnailReq.builder()
+                .trackName(track.getTrackName())
+                .period(track.getPeriod())
+                .build();
+
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(postService.findPostById(any(Long.class))).willReturn(post);
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+
+        // When
+        postTagCoreService.deleteThumbnail(user, 1L, request);
+
+        // Then
+        verify(postService, times(1)).deleteThumbnail(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("PM이 게시물 수정하기 전에 이전 게시물의 내용 미리보는 기능 코어 서비스 성공 테스트")
+    void PM_게시물_이전_내용_미리보는_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_PM;
+        User user = TEST_PM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(postService.findPostDetail(any(Long.class))).willReturn(testPost);
+
+        // When
+        PostModifyPreviewRes result = postTagCoreService.getPostDetailInBackOffice(user, track.getTrackName(), track.getPeriod(), 1L);
+
+        // Then
+        assertThat(result.postType()).isEqualTo(PostTypeInfo.of(testPost.getPostType()));
+        assertThat(result.title()).isEqualTo(testPost.getTitle());
+        assertThat(result.thumbnailUrl()).isEqualTo(testPost.getThumbnailUrl());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물 수정하기 전에 이전 게시물의 내용 미리보는 기능 코어 서비스 성공 테스트")
+    void APM_게시물_이전_내용_미리보는_기능_성공_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_APM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(postService.findPostDetail(any(Long.class))).willReturn(testPost);
+
+        // When
+        PostModifyPreviewRes result = postTagCoreService.getPostDetailInBackOffice(user, track.getTrackName(), track.getPeriod(), 1L);
+
+        // Then
+        assertThat(result.postType()).isEqualTo(PostTypeInfo.of(testPost.getPostType()));
+        assertThat(result.title()).isEqualTo(testPost.getTitle());
+        assertThat(result.thumbnailUrl()).isEqualTo(testPost.getThumbnailUrl());
+    }
+
+    @Test
+    @DisplayName("APM이 게시물 수정하기 전에 이전 게시물의 내용 미리보는 기능 코어 서비스 다른 트랙 조회로 인한 실패 테스트")
+    void APM_게시물_이전_내용_미리보는_기능_다른_트랙_조회로_인한_실패_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_APM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_AI_1L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(postService.findPostDetail(any(Long.class))).willReturn(testPost);
+
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.getPostDetailInBackOffice(user, track.getTrackName(), track.getPeriod(), 1L));
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
+    }
+
+    @Test
+    @DisplayName("APM이 게시물 수정하기 전에 이전 게시물의 내용 미리보는 기능 코어 서비스 다른 기수 조회로 인한 실패 테스트")
+    void APM_게시물_이전_내용_미리보는_기능_다른_기수_조회로_인한_실패_테스트() {
+        // Given
+        Track track = TEST_TRACK_ANDROID_1L;
+        User user = TEST_APM_USER;
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1, TEST_POST_TAG_2);
+        Post testPost = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_2L)
+                .uploadedAt(LocalDate.now())
+                .postTagList(postTagList)
+                .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(track, "id", 1L);
+
+        given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
+        given(postService.findPostDetail(any(Long.class))).willReturn(testPost);
+
+        // When
+        TrackCustomException exception = assertThrows(
+                TrackCustomException.class, () -> postTagCoreService.getPostDetailInBackOffice(user, track.getTrackName(), track.getPeriod(), 1L));
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("트랙 접근권한 없음");
     }
 }

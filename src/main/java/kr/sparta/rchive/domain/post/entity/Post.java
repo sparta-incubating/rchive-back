@@ -38,7 +38,7 @@ public class Post extends BaseTimeEntity {
     @Column(name = "post_type", nullable = false)
     private PostTypeEnum postType;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 200)
     private String title;
 
     @Column(name = "uploaded_at", nullable = false)

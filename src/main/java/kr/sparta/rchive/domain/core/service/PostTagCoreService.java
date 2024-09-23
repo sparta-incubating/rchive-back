@@ -393,22 +393,22 @@ public class PostTagCoreService {
         return trackService.findTrackByTrackNameAndPeriod(trackName, period);
     }
 
-    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag,
-                                                                Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
-
-        List<Long> postIdList;
+//    private List<Long> findPostIdInRedisByRedisIdUseTagAndTrack(Tag tag,
+//                                                                Track userTrack) { //TODO: 추후에 성능 개선기로 레디스 캐싱 적용예정
+//
+//        List<Long> postIdList;
 //        postIdList = redisService.getPostIdListInRedis(tag.getTagName(), userTrack);
-
+//
 //        if(!postIdList.isEmpty()) {
 //            return postIdList;
 //        }
-
-        postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
-
+//
+//        postIdList = postTagService.findPostIdByTagIdAndIsDeletedFalse(tag.getId());
+//
 //        redisService.setPostIdListInRedis(tag.getTagName(), userTrack, postIdList);
-
-        return postIdList;
-    }
+//
+//        return postIdList;
+//    }
 
     // 유저가 속해있는 트랙의 열람권한을 체크하는 로직
     private void userCheckPermission(UserRoleEnum userRole, Track track, TrackRoleEnum trackRole) {
