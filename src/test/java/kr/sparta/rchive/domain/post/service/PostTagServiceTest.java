@@ -14,6 +14,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -57,6 +58,25 @@ public class PostTagServiceTest implements TagTest, PostTest, PostTagTest {
         postTagService.savePostTagByPostAndTagList(post, tagList);
 
         // Then
+        verify(postTagRepository, times(1)).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("PostTag를 Post와 Tag로 업데이트하는 서비스 로직 성공 테스트")
+    void PostTag_Post_Tag_업데이트_서비스_성공_테스트() {
+        // Given
+        List<PostTag> postTagList = List.of(TEST_POST_TAG_1);
+        Post post = TEST_POST_1L;
+        List<Tag> tagList = List.of(TEST_1L_TAG);
+
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(postTagRepository.findByPostId(any(Long.class))).willReturn(postTagList);
+        // When
+        postTagService.updatePostTagByPostAndTag(post, tagList);
+
+        // Then
+        verify(postTagRepository, times(1)).deleteAll(anyList());
         verify(postTagRepository, times(1)).saveAll(anyList());
     }
 }
