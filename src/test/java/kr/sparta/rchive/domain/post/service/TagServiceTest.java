@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,5 +92,21 @@ public class TagServiceTest implements TagTest {
 
         // Then
         assertThat(exception.getErrorCode()).isEqualTo("POST-9001");
+    }
+
+    @Test
+    @DisplayName("태그ID로 태그를 찾아오는 서비스 로직 성공 테스트")
+    void 태그ID로_태그_찾아오는_서비스_성공_테스트() {
+        // Given
+        Long tagId = TEST_TAG_1L_ID;
+        Tag tag = TEST_1L_TAG;
+
+        given(tagRepository.findById(any(Long.class))).willReturn(Optional.of(tag));
+
+        // When
+        Tag result = tagService.findTagById(tagId);
+
+        // Then
+        assertThat(result.getTagName()).isEqualTo(tag.getTagName());
     }
 }
