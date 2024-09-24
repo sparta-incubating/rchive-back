@@ -166,17 +166,21 @@ public class PostControllerTestForPM {
     @DisplayName("POST-010 태그 생성 테스트")
     public void 사용할_태그_생성() throws Exception {
         // Given
+        List<String> tagNameList = List.of("tagTest");
+
         TagCreateReq request = TagCreateReq.builder()
-                .tagName("tag test")
+                .tagNameList(tagNameList)
                 .build();
 
         TagCreateRes response = TagCreateRes.builder()
-                .tagId(1L)
+                .tagName("tagTest")
                 .build();
+
+        List<TagCreateRes> responseList = List.of(response);
 
         String json = obj.writeValueAsString(request);
 
-        given(tagService.createTag(request.tagName())).willReturn(response);
+        given(tagService.createTag(request)).willReturn(responseList);
 
         // When - Then
         mockMvc.perform(post("/apis/v1/posts/tags")
@@ -185,7 +189,7 @@ public class PostControllerTestForPM {
         ).andExpectAll(
                 status().isOk(),
                 jsonPath("$.message").value("태그 생성 성공"),
-                jsonPath("$.data.tagId").value(1L)
+                jsonPath("$.data[0].tagName").value("tagTest")
         );
     }
 
