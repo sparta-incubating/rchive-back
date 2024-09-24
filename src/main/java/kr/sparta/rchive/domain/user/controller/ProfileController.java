@@ -3,14 +3,15 @@ package kr.sparta.rchive.domain.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import kr.sparta.rchive.domain.bookmark.service.BookmarkService;
 import kr.sparta.rchive.domain.comment.dto.response.CommentProfileRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
 import kr.sparta.rchive.domain.core.service.UserTrackRoleCoreService;
-import kr.sparta.rchive.domain.post.dto.response.PostRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
+import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateNicknameReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePasswordReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdatePhoneReq;
-import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateNicknameReq;
 import kr.sparta.rchive.domain.user.dto.request.ProfileUpdateProfileImgReq;
 import kr.sparta.rchive.domain.user.dto.response.UserRes;
 import kr.sparta.rchive.domain.user.entity.User;
@@ -24,9 +25,12 @@ import kr.sparta.rchive.global.response.CommonResponseDto;
 import kr.sparta.rchive.global.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,7 +59,7 @@ public class ProfileController {
     public ResponseEntity<CommonResponseDto> getBookmark(
             @LoginUser User user
     ) {
-        List<PostRes> responseList = bookmarkService.getUserBookmark(user.getId());
+        List<PostGetRes> responseList = bookmarkService.getUserBookmark(user.getId());
 
         return ResponseEntity.status(ProfileResponseCode.OK_GET_BOOKMARK.getHttpStatus())
                 .body(CommonResponseDto.of(ProfileResponseCode.OK_GET_BOOKMARK, responseList));
@@ -126,7 +130,7 @@ public class ProfileController {
             @LoginUser User user,
             @RequestParam("keyword") String keyword
     ) {
-        List<PostRes> responseList = bookmarkService.searchBookmark(user, keyword);
+        List<PostGetRes> responseList = bookmarkService.searchBookmark(user, keyword);
 
         return ResponseEntity.status(ProfileResponseCode.OK_SEARCH_BOOKMARK.getHttpStatus())
                 .body(CommonResponseDto.of(ProfileResponseCode.OK_SEARCH_BOOKMARK, responseList));

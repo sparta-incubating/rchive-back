@@ -1,10 +1,12 @@
 package kr.sparta.rchive.domain.bookmark.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
 import kr.sparta.rchive.domain.bookmark.repository.BookmarkRepository;
 import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
 import kr.sparta.rchive.domain.post.dto.TagInfo;
-import kr.sparta.rchive.domain.post.dto.response.PostRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
@@ -12,9 +14,6 @@ import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +26,14 @@ public class BookmarkService {
 
         Boolean checkBookmark = bookmarkRepository.existsBookmarkByUserIdAndPostId(user.getId(), findPost.getId());
 
-        if(checkBookmark) {
+        if (checkBookmark) {
             throw new PostCustomException(PostExceptionCode.CONFLICT_BOOKMARK);
         }
 
         Bookmark bookmark = Bookmark.builder()
-                .post(findPost)
-                .user(user)
-                .build();
+            .post(findPost)
+            .user(user)
+            .build();
 
         bookmarkRepository.save(bookmark);
     }
@@ -52,7 +51,7 @@ public class BookmarkService {
     }
 
     // TODO: 페이징 적용
-    public List<PostRes> getUserBookmark(Long userId) {
+    public List<PostGetRes> getUserBookmark(Long userId) {
         List<Bookmark> bookmarkList = bookmarkRepository.findBookmarkListByUserId(userId);
 
         return getBookmarkPostRes(bookmarkList);
@@ -65,32 +64,33 @@ public class BookmarkService {
     public Boolean existsBookmarkByUserIdAndPostId(Long userId, Long postId) {
         return bookmarkRepository.existsBookmarkByUserIdAndPostId(userId, postId);
     }
-    
+
     // TODO: 페이징 적용
-    public List<PostRes> searchBookmark(User user, String keyword) {
+    public List<PostGetRes> searchBookmark(User user, String keyword) {
         List<Bookmark> bookmarkList = bookmarkRepository.findBookmarkListByUserIdAndKeyword(user.getId(), keyword);
 
         return getBookmarkPostRes(bookmarkList);
     }
 
-    private List<PostRes> getBookmarkPostRes(List<Bookmark> bookmarkList) {
+    private List<PostGetRes> getBookmarkPostRes(List<Bookmark> bookmarkList) {
         return bookmarkList.stream().map(
-                bookmark -> {
-                    List<TagInfo> tagInfoList = bookmark.getPost().getPostTagList().stream()
-                            .map(postTag -> TagInfo.builder()
-                                    .tagId(postTag.getTag().getId())
-                                    .tagName(postTag.getTag().getTagName())
-                                    .build()).collect(Collectors.toList());
+            bookmark -> {
+                List<TagInfo> tagInfoList = bookmark.getPost().getPostTagList().stream()
+                    .map(postTag -> TagInfo.builder()
+                        .tagId(postTag.getTag().getId())
+                        .tagName(postTag.getTag().getTagName())
+                        .build()).collect(Collectors.toList());
 
-                    return PostRes.builder()
-                            .postId(bookmark.getPost().getId())
-                            .title(bookmark.getPost().getTitle())
-                            .thumbnailUrl(bookmark.getPost().getThumbnailUrl())
-                            .postType(PostTypeInfo.of(bookmark.getPost().getPostType()))
-                            .tutor(bookmark.getPost().getTutor().getTutorName())
-                            .uploadedAt(bookmark.getPost().getUploadedAt())
-                            .tagList(tagInfoList).build();
-                }
+                return PostGetRes.builder()
+                    .postId(bookmark.getPost().getId())
+                    .title(bookmark.getPost().getTitle())
+                    .thumbnailUrl(bookmark.getPost().getThumbnailUrl())
+                    .postType(PostTypeInfo.of(bookmark.getPost().getPostType()))
+                    .tutor(bookmark.getPost().getTutor().getTutorName())
+                    .uploadedAt(bookmark.getPost().getUploadedAt())
+                    .isBookmarked(true)
+                    .tagList(tagInfoList).build();
+            }
         ).collect(Collectors.toList());
     }
 }
