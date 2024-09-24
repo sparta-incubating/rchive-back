@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.post.service;
 
+import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.entity.Tag;
@@ -24,6 +25,7 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 public class TagServiceTest implements TagTest {
+
     @InjectMocks
     private TagService tagService;
 
@@ -38,10 +40,10 @@ public class TagServiceTest implements TagTest {
         List<Tag> tagList = List.of(TEST_1L_TAG);
 
         List<TagSearchRes> responseList = tagList.stream().map(
-                tag -> TagSearchRes.builder()
-                        .tagName(tag.getTagName())
-                        .tagId(tag.getId())
-                        .build()
+            tag -> TagSearchRes.builder()
+                .tagName(tag.getTagName())
+                .tagId(tag.getId())
+                .build()
         ).toList();
 
         given(tagRepository.findByTagNameContains(any(String.class))).willReturn(tagList);
@@ -58,40 +60,22 @@ public class TagServiceTest implements TagTest {
     @DisplayName("태그 생성하는 서비스 로직 성공 테스트")
     void 태그_생성_서비스_성공_테스트() {
         // Given
-        String name = TEST_TAG_1L_NAME;
-        Tag tag = TEST_1L_TAG;
-        TagCreateRes response = TagCreateRes.builder()
-                .tagId(1L)
-                .tagName(name)
-                .build();
+        List<String> tagNameList = List.of("tagTest", "tagTest2");
 
-        ReflectionTestUtils.setField(tag, "id", 1L);
+        TagCreateReq request = TagCreateReq.builder()
+            .tagNameList(tagNameList)
+            .build();
 
-        given(tagRepository.findByTagNameNotOptional(any(String.class))).willReturn(null);
-        given(tagRepository.save(any(Tag.class))).willReturn(tag);
+        given(tagRepository.findByTagNameNotOptional(tagNameList.get(0).toLowerCase().trim())).willReturn(TEST_1L_TAG);
+        given(tagRepository.findByTagNameNotOptional(tagNameList.get(1).toLowerCase().trim())).willReturn(null);
+        given(tagRepository.save(any(Tag.class))).willReturn(TEST_2L_TAG);
 
         // When
-        TagCreateRes result = tagService.createTag(name);
+        List<TagCreateRes> result = tagService.createTag(request);
 
         // Then
-        assertThat(result.tagName()).isEqualTo(name);
-    }
-
-    @Test
-    @DisplayName("태그 생성하는 서비스 로직 중복된 태그로 인한 실패 테스트")
-    void 태그_생성_서비스_중복_태그로_인한_실패_테스트() {
-        // Given
-        Tag tag = TEST_1L_TAG;
-        String name = TEST_TAG_1L_NAME;
-
-        given(tagRepository.findByTagNameNotOptional(any(String.class))).willReturn(tag);
-        // When
-        PostCustomException exception = assertThrows(
-                PostCustomException.class, () -> tagService.createTag(name)
-        );
-
-        // Then
-        assertThat(exception.getErrorCode()).isEqualTo("POST-9001");
+        assertThat(result.get(0).tagName()).isEqualTo(TEST_1L_TAG.getTagName());
+        assertThat(result.get(1).tagName()).isEqualTo(TEST_2L_TAG.getTagName());
     }
 
     @Test
@@ -120,7 +104,7 @@ public class TagServiceTest implements TagTest {
 
         // When
         PostCustomException exception = assertThrows(
-                PostCustomException.class, () -> tagService.findTagById(tagId)
+            PostCustomException.class, () -> tagService.findTagById(tagId)
         );
 
         // Then
