@@ -3,6 +3,7 @@ package kr.sparta.rchive.domain.post.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
 import kr.sparta.rchive.domain.post.entity.Tag;
@@ -37,26 +38,29 @@ public class TagService {
 
     // 태그를 추가하는 로직
     @Transactional
-    public TagCreateRes createTag(String name) {
+    public List<TagCreateRes> createTag(TagCreateReq request) {
 
-        String lowerTagName = name.toLowerCase().trim();
+        List<String> tagNameList = request.tagNameList();
 
-        Tag findTag = tagRepository.findByTagNameNotOptional(lowerTagName);
+        return tagNameList.stream().map(
+            tagName -> {
+                String lowerTagName = tagName.toLowerCase().trim();
 
-        if(tagExist(findTag)) {
-            throw new PostCustomException(PostExceptionCode.CONFLICT_TAG);
-        }
+                Tag tag = tagRepository.findByTagNameNotOptional(lowerTagName);
 
-        Tag createTag = Tag.builder()
-                .tagName(lowerTagName)
-                .build();
+                if(!tagExist(tag)) {
+                    Tag createTag = Tag.builder()
+                        .tagName(tagName)
+                        .build();
 
-        Tag savedTag = tagRepository.save(createTag);
+                    tag = tagRepository.save(createTag);
+                }
 
-        return TagCreateRes.builder()
-                .tagId(savedTag.getId())
-                .tagName(savedTag.getTagName())
-                .build();
+                return TagCreateRes.builder()
+                    .tagName(tag.getTagName())
+                    .build();
+            }
+        ).collect(Collectors.toList());
     }
 
     // 태그가 존재하는지 체크하는 로직

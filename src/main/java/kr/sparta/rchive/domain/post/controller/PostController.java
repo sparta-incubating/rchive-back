@@ -187,10 +187,10 @@ public class PostController {
     public ResponseEntity<CommonResponseDto> createTag(
             @RequestBody TagCreateReq request
     ) {
-        TagCreateRes response = tagService.createTag(request.tagName());
+        List<TagCreateRes> responseList = tagService.createTag(request);
 
         return ResponseEntity.status(PostResponseCode.OK_CREATE_TAG.getHttpStatus())
-                .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_TAG, response));
+                .body(CommonResponseDto.of(PostResponseCode.OK_CREATE_TAG, responseList));
     }
 
     @GetMapping("/tags")
