@@ -12,7 +12,7 @@ public interface CommentTest extends UserTest, PostTest{
             .content(TEST_COMMENT_CONTENT)
             .isDeleted(false)
             .user(TEST_STUDENT_USER)
-            .post(TEST_POST_1L)
+            .post(TEST_POST)
             .build();
 
     Comment TEST_2L_COMMENT = Comment.builder()
@@ -20,13 +20,13 @@ public interface CommentTest extends UserTest, PostTest{
             .isDeleted(false)
             .parentComment(TEST_1L_COMMENT)
             .user(TEST_STUDENT_USER)
-            .post(TEST_POST_1L)
+            .post(TEST_POST)
             .build();
 
     Comment TEST_3L_COMMENT = Comment.builder()
             .content(TEST_COMMENT_CONTENT)
             .isDeleted(false)
             .user(TEST_STUDENT_USER)
-            .post(TEST_POST_1L)
+            .post(TEST_POST)
             .build();
 }

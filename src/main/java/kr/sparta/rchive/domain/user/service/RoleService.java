@@ -215,7 +215,4 @@ public class RoleService {
     }
 
 
-    public boolean checkIsPm(Long userId, TrackNameEnum trackName) {
-        return roleRepository.existsByUserIdAndTracNameAndAuthApproveByPm(userId, trackName);
-    }
 }

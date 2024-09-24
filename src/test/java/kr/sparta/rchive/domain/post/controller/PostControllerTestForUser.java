@@ -91,10 +91,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
-                    .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
-                    .postType(TEST_POST_1L.getPostType())
+                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
+                    .postType(TEST_POST.getPostType())
                     .tutor(TEST_TUTOR.getTutorName())
-                    .title(TEST_POST_1L.getTitle())
+                    .title(TEST_POST.getTitle())
                     .tagList(tagList)
                     .build();
 
@@ -140,10 +140,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
-                    .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
-                    .postType(TEST_POST_1L.getPostType())
+                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
+                    .postType(TEST_POST.getPostType())
                     .tutor(TEST_TUTOR.getTutorName())
-                    .title(TEST_POST_1L.getTitle())
+                    .title(TEST_POST.getTitle())
                     .tagList(tagList)
                     .build();
 
@@ -154,19 +154,18 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         Page<PostGetRes> response = new PageImpl<>(postGetResList, pageable, 2);
 
         given(postTagCoreService.getPostListByCategory(any(User.class), any(TrackNameEnum.class),
-                any(Integer.class), any(PostTypeEnum.class), any(Long.class), any())).willReturn(response);
+                any(Integer.class), any(PostTypeEnum.class), any())).willReturn(response);
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/category")
                         .param("trackName", "ANDROID")
                         .param("loginPeriod", "1")
                         .param("category", String.valueOf(PostTypeEnum.Sparta_Lecture))
-                        .param("tutorId", "1")
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 카테고리 별 조회 성공"),
-                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST_1L.getThumbnailUrl())
+                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
                 );
     }
 
@@ -174,7 +173,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
     @DisplayName("POST-006 유저 게시물 단건 조회 기능 테스트")
     public void 유저_게시물_단건_조회() throws Exception {
         // Given
-        Long postId = TEST_POST_1L_ID;
+        Long postId = TEST_POST_ID;
 
         List<TagInfo> tagInfoList = new ArrayList<>();
 
@@ -187,10 +186,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
 
         PostGetSinglePostRes response = PostGetSinglePostRes.builder()
                 .postId(postId)
-                .title(TEST_POST_1L.getTitle())
-                .tutor(TEST_POST_1L.getTutor().getTutorName())
-                .videoLink(TEST_POST_1L.getVideoLink())
-                .contentLink(TEST_POST_1L.getContentLink())
+                .title(TEST_POST.getTitle())
+                .tutor(TEST_POST.getTutor().getTutorName())
+                .videoLink(TEST_POST.getVideoLink())
+                .contentLink(TEST_POST.getContentLink())
                 .tagList(tagInfoList)
                 .isBookmarked(false)
                 .build();
@@ -205,7 +204,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("교육자료 단건 조회 성공"),
-                        jsonPath("$.data.title").value(TEST_POST_1L.getTitle())
+                        jsonPath("$.data.title").value(TEST_POST.getTitle())
                 );
     }
 
@@ -297,10 +296,10 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         for (int i = 0; i < 2; i++) {
             PostGetRes postGetRes = PostGetRes.builder()
                     .postId((long) i)
-                    .thumbnailUrl(TEST_POST_1L.getThumbnailUrl())
-                    .postType(TEST_POST_1L.getPostType())
+                    .thumbnailUrl(TEST_POST.getThumbnailUrl())
+                    .postType(TEST_POST.getPostType())
                     .tutor(TEST_TUTOR.getTutorName())
-                    .title(TEST_POST_1L.getTitle())
+                    .title(TEST_POST.getTitle())
                     .tagList(tagList)
                     .build();
 
@@ -311,19 +310,18 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         Page<PostGetRes> response = new PageImpl<>(postGetResList, pageable, 2);
 
         given(postTagCoreService.searchPostByTag(any(TrackNameEnum.class), any(Integer.class), any(Long.class),
-                any(User.class), any(PostTypeEnum.class), any(Pageable.class))).willReturn(response);
+                any(User.class), any(Pageable.class))).willReturn(response);
         // When - Then
         mockMvc.perform(get("/apis/v1/posts/tags/search")
                         .param("trackName", "ANDROID")
                         .param("loginPeriod", "1")
                         .param("tagId", "1")
-                        .param("postType", PostTypeEnum.Sparta_Lecture.name())
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("태그를 이용한 교육자료 검색 성공"),
-                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST_1L.getThumbnailUrl())
+                        jsonPath("$.data.content[0].thumbnailUrl").value(TEST_POST.getThumbnailUrl())
                 );
     }
 
@@ -334,7 +332,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         postBookmarkCoreService.createBookmark(any(User.class), any(Long.class));
 
         // Then
-        mockMvc.perform(post("/apis/v1/posts/{postId}/bookmark", TEST_POST_1L_ID))
+        mockMvc.perform(post("/apis/v1/posts/{postId}/bookmark", TEST_POST_ID))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("북마크 생성 성공")
@@ -348,7 +346,7 @@ public class PostControllerTestForUser implements PostTest, TutorTest, TagTest, 
         postBookmarkCoreService.deleteBookmark(any(User.class), any(Long.class));
 
         // Then
-        mockMvc.perform(delete("/apis/v1/posts/{postId}/bookmark", TEST_POST_1L_ID))
+        mockMvc.perform(delete("/apis/v1/posts/{postId}/bookmark", TEST_POST_ID))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("북마크 삭제 성공")

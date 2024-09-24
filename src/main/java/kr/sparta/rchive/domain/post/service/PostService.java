@@ -97,11 +97,11 @@ public class PostService {
     }
 
     public List<Post> findPostListByPostTypeAndTrackId(UserRoleEnum userRole, PostTypeEnum postType,
-                                                       Track track, Long tutorId) {
+                                                       Track track) {
         if (userRole.equals(UserRoleEnum.USER)) {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId(), tutorId);
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleUser(postType, track.getId());
         } else {
-            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId(), tutorId);
+            return postRepository.findAllByPostTypeAndTrackIdUserRoleManager(postType, track.getId());
         }
     }
 
@@ -109,8 +109,8 @@ public class PostService {
         return postRepository.findPostWithDetailByPostId(postId);
     }
 
-    public List<Post> findPostListByTagIdWithTagList(Long tagId, Long trackId, PostTypeEnum postType) {
-        return postRepository.findPostListByTagIdAndTrackIdWithTagList(tagId, trackId, postType);
+    public List<Post> findPostListByTagIdWithTagList(Long tagId, Long trackId) {
+        return postRepository.findPostListByTagIdAndTrackIdWithTagList(tagId, trackId);
     }
 
     public List<Post> findPostListByPostIdList(List<Long> postIdList) {
@@ -123,11 +123,5 @@ public class PostService {
 
     public Post findPostDetail(Long postId) {
         return postRepository.findPostDetail(postId);
-    }
-
-    public void deleteThumbnail(Post post) {
-        post.deleteThumbnail();
-
-        postRepository.save(post);
     }
 }

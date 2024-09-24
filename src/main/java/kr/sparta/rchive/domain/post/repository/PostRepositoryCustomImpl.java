@@ -6,10 +6,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.sparta.rchive.domain.post.entity.*;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.enums.TrackNameEnum;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 
 @RequiredArgsConstructor
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
@@ -82,11 +85,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
                         title != null ? post.title.contains(title) : null,
+                        postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         searchPeriod != null ? post.track.period.eq(searchPeriod) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.postType.eq(postType),
                         post.track.trackName.eq(trackName),
                         post.isDeleted.eq(false)
                 )
@@ -109,10 +112,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(postTag.tag, tag).fetchJoin()
                 .where(
                         title != null ? post.title.contains(title) : null,
+                        postType != null ? post.postType.eq(postType) : null,
                         startDate != null ? post.uploadedAt.between(startDate, endDate) : null,
                         isOpened != null ? post.isOpened.eq(isOpened) : null,
                         tutorId != null ? post.tutor.id.eq(tutorId) : null,
-                        post.postType.eq(postType),
                         post.track.id.eq(trackId),
                         post.isDeleted.eq(false)
                 )
@@ -121,25 +124,19 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId, Long tutorId) {
+    public List<Post> findAllByPostTypeAndTrackIdUserRoleUser(PostTypeEnum postType, Long trackId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
 
         BooleanBuilder builder = new BooleanBuilder();
 
         if (postType == PostTypeEnum.Level_All) {
             builder.and(post.postType.stringValue().contains("Level"));
-        } else if (postType != null) {
+        } else {
             builder.and(post.postType.eq(postType));
         }
-
-        if(tutorId != null) {
-            builder.and(post.tutor.id.eq(tutorId));
-        }
-
         builder.and(post.track.id.eq(trackId));
         builder.and(post.isOpened.eq(true));
 
@@ -148,32 +145,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .from(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
                 .where(builder)
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
     @Override
-    public List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId, Long tutorId) {
+    public List<Post> findAllByPostTypeAndTrackIdUserRoleManager(PostTypeEnum postType, Long trackId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
         QTag tag = QTag.tag;
-        QTutor tutor = QTutor.tutor;
 
         BooleanBuilder builder = new BooleanBuilder();
 
         if (postType == PostTypeEnum.Level_All) {
             builder.and(post.postType.stringValue().contains("Level"));
-        } else if (postType != null) {
+        } else {
             builder.and(post.postType.eq(postType));
         }
-
-        if(tutorId != null) {
-            builder.and(post.tutor.id.eq(tutorId));
-        }
-
         builder.and(post.track.id.eq(trackId));
 
         return queryFactory
@@ -181,14 +171,13 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .from(post)
                 .leftJoin(post.postTagList, postTag).fetchJoin()
                 .leftJoin(postTag.tag, tag).fetchJoin()
-                .leftJoin(post.tutor, tutor).fetchJoin()
                 .where(builder)
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();
     }
 
     @Override
-    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId, PostTypeEnum postType) {
+    public List<Post> findPostListByTagIdAndTrackIdWithTagList(Long tagId, Long trackId) {
 
         QPost post = QPost.post;
         QPostTag postTag = QPostTag.postTag;
@@ -206,7 +195,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                                         .join(post.postTagList, postTag)
                                         .where(postTag.tag.id.eq(tagId))
                         ),
-                        postType != null ? post.postType.eq(postType) : null,
                         post.track.id.eq(trackId))
                 .orderBy(post.uploadedAt.desc(), post.id.desc())
                 .fetch();

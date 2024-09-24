@@ -11,8 +11,7 @@ public interface TrackRepository extends JpaRepository<Track, Long> {
 
     @Query("select t from Track t "
             + "where t.trackName = :trackName "
-            + "and t.period != 0 "
-            + "order by t.period desc")
+            + "and t.period != 0")
     List<Track> findAllByTrackName(TrackNameEnum trackName);
 
     Optional<Track> findTrackByTrackNameAndPeriod(TrackNameEnum trackName, Integer period);
