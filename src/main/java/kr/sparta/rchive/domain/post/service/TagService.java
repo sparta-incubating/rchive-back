@@ -1,7 +1,9 @@
 package kr.sparta.rchive.domain.post.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
@@ -41,25 +43,26 @@ public class TagService {
     public List<TagCreateRes> createTag(TagCreateReq request) {
 
         List<String> tagNameList = request.tagNameList();
+        Set<String> tagNameSet = new HashSet<>(tagNameList);
 
-        return tagNameList.stream().map(
-            tagName -> {
-                String lowerTagName = tagName.toLowerCase().trim();
+        return tagNameSet.stream().map(
+                tagName -> {
+                    String lowerTagName = tagName.toLowerCase().trim();
 
-                Tag tag = tagRepository.findByTagNameNotOptional(lowerTagName);
+                    Tag tag = tagRepository.findByTagNameNotOptional(lowerTagName);
 
-                if(!tagExist(tag)) {
-                    Tag createTag = Tag.builder()
-                        .tagName(tagName)
-                        .build();
+                    if (!tagExist(tag)) {
+                        Tag createTag = Tag.builder()
+                                .tagName(tagName)
+                                .build();
 
-                    tag = tagRepository.save(createTag);
+                        tag = tagRepository.save(createTag);
+                    }
+
+                    return TagCreateRes.builder()
+                            .tagName(tag.getTagName())
+                            .build();
                 }
-
-                return TagCreateRes.builder()
-                    .tagName(tag.getTagName())
-                    .build();
-            }
         ).collect(Collectors.toList());
     }
 

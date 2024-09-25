@@ -77,7 +77,7 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         Track managerTrack = TEST_TRACK_ANDROID_PM;
         List<Post> postList = List.of(TEST_POST_1L, TEST_POST_2L);
 
-        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", TEST_PM_USER_ID);
         Pageable pageable = PageRequest.of(0, 10);
 
         given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(managerTrack);
@@ -99,7 +99,7 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
         Track managerTrack = TEST_TRACK_ANDROID_PM;
         List<Post> postList = List.of(TEST_POST_1L, TEST_POST_2L);
 
-        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", TEST_PM_USER_ID);
         Pageable pageable = PageRequest.of(0, 10);
 
         given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(managerTrack);
@@ -135,7 +135,7 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .build();
 
         List<Post> postList = List.of(testPost);
-        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", TEST_PM_USER_ID);
         Pageable pageable = PageRequest.of(0, 10);
 
         given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(managerTrack);
@@ -176,9 +176,9 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .build();
 
         List<Post> postList = List.of(testPost);
-        ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(track, "id", 1L);
-        ReflectionTestUtils.setField(testPost, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", TEST_STUDENT_ID);
+        ReflectionTestUtils.setField(track, "id", TEST_TRACK_ID);
+        ReflectionTestUtils.setField(testPost, "id", TEST_POST_1L_ID);
 
         given(trackService.findTrackByTrackNameAndPeriod(any(TrackNameEnum.class), any(Integer.class))).willReturn(track);
         given(roleService.findRoleListByUserIdAuthApprove(any(Long.class))).willReturn(roleList);
