@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -83,7 +84,9 @@ public class PostTagCoreService {
                             .map(postTag -> TagInfo.builder()
                                     .tagId(postTag.getTag().getId())
                                     .tagName(postTag.getTag().getTagName())
-                                    .build()).toList();
+                                    .build())
+                            .sorted(Comparator.comparing(TagInfo::tagName))
+                            .toList();
 
                     return PostSearchBackOfficeRes.builder()
                             .postId(post.getId())
@@ -122,7 +125,9 @@ public class PostTagCoreService {
                             .map(postTag -> TagInfo.builder()
                                     .tagId(postTag.getTag().getId())
                                     .tagName(postTag.getTag().getTagName())
-                                    .build()).collect(Collectors.toList());
+                                    .build())
+                            .sorted(Comparator.comparing(TagInfo::tagName))
+                            .collect(Collectors.toList());
 
                     return PostGetRes.builder()
                             .postId(post.getId())
@@ -216,7 +221,9 @@ public class PostTagCoreService {
                 .map(postTag -> TagInfo.builder()
                         .tagId(postTag.getTag().getId())
                         .tagName(postTag.getTag().getTagName())
-                        .build()).toList();
+                        .build())
+                .sorted(Comparator.comparing(TagInfo::tagName))
+                .toList();
 
         return PostGetSinglePostRes.builder()
                 .postId(post.getId())
@@ -249,7 +256,9 @@ public class PostTagCoreService {
                             .map(postTag -> TagInfo.builder()
                                     .tagId(postTag.getTag().getId())
                                     .tagName(postTag.getTag().getTagName())
-                                    .build()).toList();
+                                    .build())
+                            .sorted(Comparator.comparing(TagInfo::tagName))
+                            .toList();
 
                     return PostGetRes.builder()
                             .postId(post.getId())
@@ -313,7 +322,9 @@ public class PostTagCoreService {
                             .map(postTag -> TagInfo.builder()
                                     .tagId(postTag.getTag().getId())
                                     .tagName(postTag.getTag().getTagName())
-                                    .build()).toList();
+                                    .build())
+                            .sorted(Comparator.comparing(TagInfo::tagName))
+                            .toList();
 
                     return PostGetRes.builder()
                             .postId(post.getId())
@@ -376,16 +387,16 @@ public class PostTagCoreService {
     }
 
     private void savePostTagByPostAndTagNameList(Post post, List<String> tagNameList) {
-        List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
+        List<Tag> tagList = findTagListByTagNameList(tagNameList);
         postTagService.savePostTagByPostAndTagList(post, tagList);
     }
 
     private void updatePostTagByPostAndTagIdList(Post updatePost, List<String> tagNameList) {
-        List<Tag> tagList = findTagIdListByTagNameList(tagNameList);
+        List<Tag> tagList = findTagListByTagNameList(tagNameList);
         postTagService.updatePostTagByPostAndTag(updatePost, tagList);
     }
 
-    private List<Tag> findTagIdListByTagNameList(List<String> tagNameList) {
+    private List<Tag> findTagListByTagNameList(List<String> tagNameList) {
         return tagService.findTagIdListByTagNameList(tagNameList);
     }
 

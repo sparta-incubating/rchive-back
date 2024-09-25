@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.bookmark.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
@@ -79,7 +80,9 @@ public class BookmarkService {
                     .map(postTag -> TagInfo.builder()
                         .tagId(postTag.getTag().getId())
                         .tagName(postTag.getTag().getTagName())
-                        .build()).collect(Collectors.toList());
+                        .build())
+                        .sorted(Comparator.comparing(TagInfo::tagName))
+                        .collect(Collectors.toList());
 
                 return PostGetRes.builder()
                     .postId(bookmark.getPost().getId())
