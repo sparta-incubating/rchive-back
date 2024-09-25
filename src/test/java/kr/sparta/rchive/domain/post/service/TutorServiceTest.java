@@ -77,4 +77,24 @@ public class TutorServiceTest implements TutorTest, TrackTest {
         // Then
         assertThat(result.getTutorName()).isEqualTo(tutor.getTutorName());
     }
+
+    @Test
+    @DisplayName("튜터의 트랙을 체크하는 서비스 로직 트랙이 틀림으로 인한 실패 테스트")
+    void 튜터_트랙_체크하는_기능_트랙_틀림으로_인한_실패_테스트() {
+        // Given
+        Long tutorId = 1L;
+        Tutor tutor = TEST_TUTOR;
+        Track track = TEST_TRACK_AI_1L;
+
+        given(tutorRepository.findById(tutorId)).willReturn(Optional.of(tutor));
+
+        // When
+        PostCustomException exception = assertThrows(
+                PostCustomException.class, () -> tutorService.checkTutor(tutorId, track)
+        );
+
+        // Then
+        assertThat(exception.getErrorCode()).isEqualTo(PostExceptionCode.BAD_REQUEST_NOT_TRACK_TUTOR.getErrorCode());
+        assertThat(exception.getMessage()).isEqualTo(PostExceptionCode.BAD_REQUEST_NOT_TRACK_TUTOR.getMessage());
+    }
 }
