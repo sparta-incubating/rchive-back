@@ -1,5 +1,6 @@
 package kr.sparta.rchive.domain.post.service;
 
+import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
@@ -14,10 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,5 +99,24 @@ public class TutorServiceTest implements TutorTest, TrackTest {
         // Then
         assertThat(exception.getErrorCode()).isEqualTo(PostExceptionCode.BAD_REQUEST_NOT_TRACK_TUTOR.getErrorCode());
         assertThat(exception.getMessage()).isEqualTo(PostExceptionCode.BAD_REQUEST_NOT_TRACK_TUTOR.getMessage());
+    }
+
+    @Test
+    @DisplayName("튜터 이름과 트랙 id로 튜터 리스트를 찾아오는 서비스 로직 성공 테스트")
+    void 튜터이름_트랙ID_튜터리스트_찾아오는_기능_성공_테스트() {
+        // Given
+        String tutorName = TEST_TUTOR_NAME;
+        Long trackId = 1L;
+
+        List<Tutor> tutorList = List.of(TEST_TUTOR);
+
+        given(tutorRepository.findTutorList(any(String.class), any(Long.class))).willReturn(tutorList);
+
+        // When
+        List<TutorRes> result = tutorService.findTutorListByTutorNameAndTrackId(tutorName, trackId);
+
+        // Then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).tutorName()).isEqualTo(tutorName);
     }
 }
