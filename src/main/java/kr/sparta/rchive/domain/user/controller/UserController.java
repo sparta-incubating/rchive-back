@@ -85,13 +85,8 @@ public class UserController {
     public ResponseEntity<CommonResponseDto> overlapEmail(@RequestParam("email") String email) {
         boolean isOverlap = userService.overlapEmail(email);
 
-        if (isOverlap) {
-            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, true));
-        } else {
-            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, false));
-        }
+        return ResponseEntity.status(UserResponseCode.OK_OVERLAP_EMAIL.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_EMAIL, isOverlap));
     }
 
     @GetMapping("/overlap/nickname")
@@ -99,13 +94,9 @@ public class UserController {
     public ResponseEntity<CommonResponseDto> withdraw(@RequestParam("nickname") String nickname) {
         boolean isOverlap = userService.overlapNickname(nickname);
 
-        if (isOverlap) {
-            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, true));
-        } else {
-            return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
-                    .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, false));
-        }
+        return ResponseEntity.status(UserResponseCode.OK_OVERLAP_NICKNAME.getHttpStatus())
+                .body(CommonResponseDto.of(UserResponseCode.OK_OVERLAP_NICKNAME, isOverlap));
+
     }
 
     @GetMapping("/token/expired")
@@ -113,7 +104,7 @@ public class UserController {
     public ResponseEntity<CommonResponseDto> tokenExpired(
             HttpServletRequest req
     ) throws UnsupportedEncodingException, ParseException {
-        Boolean isExpired = userService.tokenExpired(req);
+        boolean isExpired = userService.tokenExpired(req);
 
         return ResponseEntity.status(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED.getHttpStatus())
                 .body(CommonResponseDto.of(UserResponseCode.OK_ACCESS_TOKEN_IS_EXPIRED, isExpired));

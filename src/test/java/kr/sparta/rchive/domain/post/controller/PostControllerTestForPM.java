@@ -94,7 +94,8 @@ public class PostControllerTestForPM {
                 .postId(1L)
                 .build();
 
-        given(postTagCoreService.createPost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any(PostCreateReq.class)))
+        given(postTagCoreService.createPost(any(User.class), any(TrackNameEnum.class),
+                any(Integer.class), any(PostCreateReq.class)))
                 .willReturn(response);
         // When - Then
         mockMvc.perform(post("/apis/v1/posts?trackName=ANDROID&loginPeriod=0")
@@ -131,7 +132,8 @@ public class PostControllerTestForPM {
                 .postId(1L)
                 .build();
 
-        given(postTagCoreService.updatePost(any(User.class), any(TrackNameEnum.class), any(Integer.class),
+        given(postTagCoreService.updatePost(any(User.class), any(TrackNameEnum.class),
+                any(Integer.class),
                 any(Long.class), any(PostUpdateReq.class))).willReturn(response);
 
         // When - Then
@@ -152,7 +154,8 @@ public class PostControllerTestForPM {
         Long postId = 1L;
 
         // When
-        postTagCoreService.deletePost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any(Long.class));
+        postTagCoreService.deletePost(any(User.class), any(TrackNameEnum.class), any(Integer.class),
+                any(Long.class));
 
         // Then
         mockMvc.perform(delete("/apis/v1/posts/{postId}?trackName=ANDROID&loginPeriod=0", postId))
@@ -231,7 +234,8 @@ public class PostControllerTestForPM {
         String json = obj.writeValueAsString(request);
 
         // When
-        postTagCoreService.openPost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any());
+        postTagCoreService.openPost(any(User.class), any(TrackNameEnum.class), any(Integer.class),
+                any());
 
         // Then
         mockMvc.perform(patch("/apis/v1/posts/open?trackName=ANDROID&loginPeriod=0")
@@ -242,10 +246,10 @@ public class PostControllerTestForPM {
                         jsonPath("$.message").value("게시물 공개 여부 공개로 변경")
                 );
     }
-    
+
     @Test
     @DisplayName("POST-016 게시물 비공개로 변경")
-    public void 게시물_공개_여부_비공개로_변경()  throws Exception {
+    public void 게시물_공개_여부_비공개로_변경() throws Exception {
         // Given
         List<Long> postIdList = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
@@ -259,7 +263,8 @@ public class PostControllerTestForPM {
         String json = obj.writeValueAsString(request);
 
         // When
-        postTagCoreService.closePost(any(User.class), any(TrackNameEnum.class), any(Integer.class), any());
+        postTagCoreService.closePost(any(User.class), any(TrackNameEnum.class), any(Integer.class),
+                any());
 
         // Then
         mockMvc.perform(patch("/apis/v1/posts/close?trackName=ANDROID&loginPeriod=0")
@@ -285,11 +290,13 @@ public class PostControllerTestForPM {
             responseList.add(tutorRes);
         }
 
-        given(postTagCoreService.searchTutor(any(User.class), any(TrackNameEnum.class), any(Integer.class),
+        given(postTagCoreService.searchTutor(any(User.class), any(TrackNameEnum.class),
+                any(Integer.class),
                 any(Integer.class), any(String.class))).willReturn(responseList);
 
         // When - Then
-        mockMvc.perform(get("/apis/v1/posts/tutors?trackName=ANDROID&loginPeriod=0&inputPeriod=1&tutorName=test"))
+        mockMvc.perform(
+                        get("/apis/v1/posts/tutors?trackName=ANDROID&loginPeriod=0&inputPeriod=1&tutorName=test"))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.message").value("튜터 검색 성공"),
@@ -310,7 +317,8 @@ public class PostControllerTestForPM {
         String json = obj.writeValueAsString(request);
 
         // When
-        postController.deleteThumbnail(any(User.class), any(Long.class), any(DeleteThumbnailReq.class));
+        postController.deleteThumbnail(any(User.class), any(Long.class),
+                any(DeleteThumbnailReq.class));
 
         // Then
         mockMvc.perform(delete("/apis/v1/posts/{postId}/thumbnail", postId)
