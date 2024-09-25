@@ -3,7 +3,9 @@ package kr.sparta.rchive.domain.user.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 
+@Builder
 public record UserFindPasswordUpdateReq(
         @Schema(description = "이메일", example = "email@email.com")
         @Email(message = "올바르지 않은 이메일 형식")
