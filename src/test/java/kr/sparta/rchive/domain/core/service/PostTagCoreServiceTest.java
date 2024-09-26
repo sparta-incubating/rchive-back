@@ -451,7 +451,6 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .videoLink(TEST_POST_VIDEO_LINK)
                 .contentLink(TEST_POST_CONTENT_LINK)
                 .content(TEST_POST_CONTENT)
-                .trackName(trackName)
                 .updatePeriod(period)
                 .isOpened(true)
                 .tagNameList(tagName)
@@ -493,7 +492,6 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .videoLink(TEST_POST_VIDEO_LINK)
                 .contentLink(TEST_POST_CONTENT_LINK)
                 .content(TEST_POST_CONTENT)
-                .trackName(trackName)
                 .isOpened(true)
                 .build();
 
@@ -532,7 +530,6 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .videoLink(TEST_POST_VIDEO_LINK)
                 .contentLink(TEST_POST_CONTENT_LINK)
                 .content(TEST_POST_CONTENT)
-                .trackName(trackName)
                 .isOpened(true)
                 .build();
 
@@ -572,7 +569,6 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .videoLink(TEST_POST_VIDEO_LINK)
                 .contentLink(TEST_POST_CONTENT_LINK)
                 .content(TEST_POST_CONTENT)
-                .trackName(trackName)
                 .isOpened(true)
                 .build();
 
@@ -606,7 +602,6 @@ public class PostTagCoreServiceTest implements UserTest, PostTest, TrackTest, Tu
                 .videoLink(TEST_POST_VIDEO_LINK)
                 .contentLink(TEST_POST_CONTENT_LINK)
                 .content(TEST_POST_CONTENT)
-                .trackName(trackName)
                 .isOpened(true)
                 .build();
 
