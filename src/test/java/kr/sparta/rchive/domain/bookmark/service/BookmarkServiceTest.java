@@ -2,11 +2,13 @@ package kr.sparta.rchive.domain.bookmark.service;
 
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
 import kr.sparta.rchive.domain.bookmark.repository.BookmarkRepository;
+import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.test.BookmarkTest;
+import kr.sparta.rchive.test.PostTagTest;
 import kr.sparta.rchive.test.PostTest;
 import kr.sparta.rchive.test.UserTest;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.sql.Ref;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest {
+public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest, PostTagTest {
 
     @InjectMocks
     private BookmarkService bookmarkService;
@@ -110,5 +115,45 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest {
         // Then
         assertThat(exception.getMessage()).isEqualTo(PostExceptionCode.NOT_FOUND_BOOKMARK.getMessage());
         assertThat(exception.getErrorCode()).isEqualTo(PostExceptionCode.NOT_FOUND_BOOKMARK.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("유저의 북마크 리스트를 조회하는 서비스 로직 성공 테스트")
+    void 유저_북마크_리스트_조회_서비스_성공_테스트() {
+        // Given
+        Long userId = TEST_STUDENT_ID;
+
+        Post post = Post.builder()
+                .postType(TEST_POST_TYPE)
+                .title(TEST_POST_TITLE)
+                .thumbnailUrl(TEST_POST_THUMBNAIL)
+                .videoLink(TEST_POST_VIDEO_LINK)
+                .contentLink(TEST_POST_CONTENT_LINK)
+                .content(TEST_POST_CONTENT)
+                .tutor(TEST_TUTOR)
+                .track(TEST_TRACK_ANDROID_1L)
+                .postTagList(List.of(TEST_POST_TAG_1, TEST_POST_TAG_2))
+                .uploadedAt(LocalDate.now())
+                .build();
+
+        Bookmark bookmark = Bookmark.builder()
+                .user(TEST_STUDENT_USER)
+                .post(post)
+                .build();
+
+        List<Bookmark> bookmarkList = List.of(bookmark);
+
+        ReflectionTestUtils.setField(bookmark.getPost().getPostTagList().get(0).getTag(), "id", 1L);
+        ReflectionTestUtils.setField(bookmark.getPost().getPostTagList().get(1).getTag(), "id", 2L);
+        ReflectionTestUtils.setField(bookmark.getPost(), "id", 1L);
+
+        given(bookmarkRepository.findBookmarkListByUserId(any(Long.class))).willReturn(bookmarkList);
+        // When
+        List<PostGetRes> result = bookmarkService.getUserBookmark(userId);
+
+        // Then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).title()).isEqualTo(post.getTitle());
+        assertThat(result.get(0).thumbnailUrl()).isEqualTo(post.getThumbnailUrl());
     }
 }
