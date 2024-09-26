@@ -88,7 +88,6 @@ public class PostServiceTest implements PostTest, TrackTest, TutorTest, UserTest
                 .videoLink("Test")
                 .content("Test")
                 .contentLink("Test")
-                .trackName(TrackNameEnum.ANDROID)
                 .updatePeriod(1)
                 .isOpened(true)
                 .build();
