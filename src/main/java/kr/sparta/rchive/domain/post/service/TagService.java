@@ -47,7 +47,11 @@ public class TagService {
 
         return tagNameSet.stream().map(
                 tagName -> {
-                    String lowerTagName = tagName.toLowerCase().trim();
+                    String lowerTagName = tagName.toLowerCase().strip();
+
+                    if(lowerTagName.isEmpty()) {
+                        throw new PostCustomException(PostExceptionCode.BAD_REQUEST_TAG_EMPTY);
+                    }
 
                     Tag tag = tagRepository.findByTagNameNotOptional(lowerTagName);
 

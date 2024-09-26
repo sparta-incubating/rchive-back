@@ -13,6 +13,8 @@ import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.entity.Tag;
 import kr.sparta.rchive.domain.post.entity.Tutor;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
+import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.PostTagService;
 import kr.sparta.rchive.domain.post.service.TagService;
@@ -150,6 +152,12 @@ public class PostTagCoreService {
     @Transactional
     public PostCreateRes createPost(User user, TrackNameEnum trackName, Integer period, PostCreateReq request) {
 
+        String checkTitle = request.title().strip();
+
+        if(checkTitle.isEmpty()) {
+            throw new PostCustomException(PostExceptionCode.BAD_REQUEST_TITLE_EMPTY);
+        }
+
         Track managerTrack = trackService.findTrackByTrackNameAndPeriod(trackName, request.postPeriod());
 
         if (period == 0) {
@@ -172,6 +180,12 @@ public class PostTagCoreService {
     @Transactional
     public PostModifyRes updatePost(User user, TrackNameEnum trackName, Integer period, Long postId,
                                     PostUpdateReq request) {
+
+        String checkTitle = request.title().strip();
+
+        if(checkTitle.isEmpty()) {
+            throw new PostCustomException(PostExceptionCode.BAD_REQUEST_TITLE_EMPTY);
+        }
 
         PostTrackInfo postTrackInfo = checkPostAndTrack(user, trackName, period, postId);
         Post findPost = postTrackInfo.post();
