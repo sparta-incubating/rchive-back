@@ -1,8 +1,5 @@
 package kr.sparta.rchive.domain.bookmark.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
 import kr.sparta.rchive.domain.bookmark.repository.BookmarkRepository;
 import kr.sparta.rchive.domain.post.dto.PostTypeInfo;
@@ -11,17 +8,19 @@ import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
 import kr.sparta.rchive.domain.post.entity.Post;
 import kr.sparta.rchive.domain.post.exception.PostCustomException;
 import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
-import kr.sparta.rchive.domain.post.repository.PostRepository;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
-    private final PostRepository postRepository;
 
     public void createBookmark(User user, Post findPost) {
 
