@@ -3,6 +3,8 @@ package kr.sparta.rchive.domain.bookmark.service;
 import kr.sparta.rchive.domain.bookmark.entity.Bookmark;
 import kr.sparta.rchive.domain.bookmark.repository.BookmarkRepository;
 import kr.sparta.rchive.domain.post.entity.Post;
+import kr.sparta.rchive.domain.post.exception.PostCustomException;
+import kr.sparta.rchive.domain.post.exception.PostExceptionCode;
 import kr.sparta.rchive.domain.user.entity.User;
 import kr.sparta.rchive.test.BookmarkTest;
 import kr.sparta.rchive.test.PostTest;
@@ -16,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,5 +49,28 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest {
 
         // Then
         verify(bookmarkRepository, times(1)).save(any(Bookmark.class));
+    }
+
+    @Test
+    @DisplayName("북마크 생성 서비스 로직 중복된 북마크로 인한 실패 테스트")
+    void 북마크_생성_서비스_북마크_중복으로_인한_실패_테스트() {
+        // Given
+        User user = TEST_STUDENT_USER;
+        Post post = TEST_POST_1L;
+        Boolean checkBookmark = true;
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(bookmarkRepository.existsBookmarkByUserIdAndPostId(any(Long.class), any(Long.class))).willReturn(checkBookmark);
+
+        // When
+        PostCustomException exception = assertThrows(
+                PostCustomException.class, () -> bookmarkService.createBookmark(user, post)
+        );
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo(PostExceptionCode.CONFLICT_BOOKMARK.getMessage());
+        assertThat(exception.getErrorCode()).isEqualTo(PostExceptionCode.CONFLICT_BOOKMARK.getErrorCode());
     }
 }
