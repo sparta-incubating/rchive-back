@@ -328,7 +328,7 @@ public class UserService {
         return userRepository.findTrackIdByUserEmail(userEmail);
     }
 
-    public Boolean tokenExpired(HttpServletRequest req) {
+    public boolean tokenExpired(HttpServletRequest req) {
         String accessToken = req.getHeader("Authorization");
 
         String token = accessToken.split(" ")[1];

@@ -178,7 +178,7 @@ public class PostTagCoreService {
         Track managerTrack = postTrackInfo.track();
 
         if (request.updatePeriod() != null) {
-            managerTrack = findTrackByTrackNameAndPeriod(request.trackName(), request.updatePeriod());
+            managerTrack = findTrackByTrackNameAndPeriod(trackName, request.updatePeriod());
         } else if (managerTrack.getPeriod() == 0) {
             managerTrack = findPost.getTrack();
         }
