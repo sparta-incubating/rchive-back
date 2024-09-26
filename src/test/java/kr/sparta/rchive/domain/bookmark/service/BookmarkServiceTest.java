@@ -18,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
@@ -72,5 +74,24 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest {
         // Then
         assertThat(exception.getMessage()).isEqualTo(PostExceptionCode.CONFLICT_BOOKMARK.getMessage());
         assertThat(exception.getErrorCode()).isEqualTo(PostExceptionCode.CONFLICT_BOOKMARK.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("북마크 삭제 서비스 로직 성공 테스트")
+    void 북마크_삭제_서비스_성공_테스트() {
+        // Given
+        Long userId = TEST_STUDENT_ID;
+        Long postId = TEST_POST_1L_ID;
+        Bookmark bookmark = TEST_BOOKMAKR_1L;
+
+
+
+        given(bookmarkRepository.findBookmarkByUserIdAndPostId(any(Long.class), any(Long.class))).willReturn(Optional.of(bookmark));
+
+        // When
+        bookmarkService.deleteBookmark(userId, postId);
+
+        // Then
+        verify(bookmarkRepository, times(1)).delete(any(Bookmark.class));
     }
 }
