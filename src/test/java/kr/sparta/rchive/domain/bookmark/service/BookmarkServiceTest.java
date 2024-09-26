@@ -191,4 +191,25 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest, Po
         // Then
         assertThat(result).isEqualTo(checkBookmark);
     }
+
+    @Test
+    @DisplayName("북마크에 등록해 둔 게시물 리스트에서 검색하는 서비스 로직 성공 테스트")
+    void 북마크_게시물_리스트_검색_서비스_성공_테스트() {
+        // Given
+        User user = TEST_STUDENT_USER;
+        String keyword = "test";
+        List<Bookmark> bookmarkList = List.of(TEST_BOOKMAKR_1L, TEST_BOOKMAKR_2L);
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        given(bookmarkRepository.findBookmarkListByUserIdAndKeyword(any(Long.class), any(String.class))).willReturn(bookmarkList);
+
+        // When
+        List<PostGetRes> result = bookmarkService.searchBookmark(user, keyword);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).title()).isEqualTo(TEST_BOOKMAKR_1L.getPost().getTitle());
+        assertThat(result.get(1).title()).isEqualTo(TEST_BOOKMAKR_2L.getPost().getTitle());
+    }
 }
