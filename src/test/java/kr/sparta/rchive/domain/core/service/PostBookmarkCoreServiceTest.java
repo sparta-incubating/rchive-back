@@ -13,6 +13,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.mockito.BDDMockito.*;
 
@@ -40,5 +41,21 @@ public class PostBookmarkCoreServiceTest implements BookmarkTest, PostTest {
 
         // Then
         verify(bookmarkService, times(1)).createBookmark(any(User.class), any(Post.class));
+    }
+
+    @Test
+    @DisplayName("북마크 삭제하는 코어 서비스 로직 성공 테스트")
+    void 북마크_삭제_성공_테스트() {
+        // Given
+        User user = TEST_STUDENT_USER;
+        Long postId = TEST_POST_1L_ID;
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        // When
+        postBookmarkCoreService.deleteBookmark(TEST_STUDENT_USER, postId);
+
+        // Then
+        verify(bookmarkService, times(1)).deleteBookmark(any(Long.class), any(Long.class));
     }
 }
