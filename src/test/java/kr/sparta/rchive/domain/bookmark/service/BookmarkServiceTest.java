@@ -156,4 +156,22 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest, Po
         assertThat(result.get(0).title()).isEqualTo(post.getTitle());
         assertThat(result.get(0).thumbnailUrl()).isEqualTo(post.getThumbnailUrl());
     }
+
+    @Test
+    @DisplayName("유저가 북마크에 등록해 둔 게시물 ID 리스트를 조회해오는 서비스 로직 성공 테스트")
+    void 유저_북마크_게시물_ID_리스트_조회_서비스_성공_테스트() {
+        // Given
+        Long userId = TEST_STUDENT_ID;
+        List<Long> postIdList = List.of(1L, 2L);
+
+        given(bookmarkRepository.findPostIdListByUserId(any(Long.class))).willReturn(postIdList);
+
+        // When
+        List<Long> result = bookmarkService.findPostIdListByUserId(userId);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0)).isEqualTo(1L);
+        assertThat(result.get(1)).isEqualTo(2L);
+    }
 }
