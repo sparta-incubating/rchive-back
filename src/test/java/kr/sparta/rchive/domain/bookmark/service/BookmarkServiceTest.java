@@ -84,8 +84,6 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest {
         Long postId = TEST_POST_1L_ID;
         Bookmark bookmark = TEST_BOOKMAKR_1L;
 
-
-
         given(bookmarkRepository.findBookmarkByUserIdAndPostId(any(Long.class), any(Long.class))).willReturn(Optional.of(bookmark));
 
         // When
@@ -93,5 +91,24 @@ public class BookmarkServiceTest implements UserTest, BookmarkTest, PostTest {
 
         // Then
         verify(bookmarkRepository, times(1)).delete(any(Bookmark.class));
+    }
+
+    @Test
+    @DisplayName("북마크 삭제 서비스 로직 북마크 존재하지 않음으로 인한 실패 테스트")
+    void 북마크_삭제_서비스_존재하지_않는_북마크로_인한_실패_테스트() {
+        // Given
+        Long userId = TEST_STUDENT_ID;
+        Long postId = TEST_POST_1L_ID;
+
+        given(bookmarkRepository.findBookmarkByUserIdAndPostId(any(Long.class), any(Long.class))).willReturn(Optional.empty());
+
+        // When
+        PostCustomException exception = assertThrows(
+                PostCustomException.class, () -> bookmarkService.deleteBookmark(userId, postId)
+        );
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo(PostExceptionCode.NOT_FOUND_BOOKMARK.getMessage());
+        assertThat(exception.getErrorCode()).isEqualTo(PostExceptionCode.NOT_FOUND_BOOKMARK.getErrorCode());
     }
 }
