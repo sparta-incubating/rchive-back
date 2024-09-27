@@ -68,4 +68,20 @@ public class TutorRepositoryCustomImplTest implements TrackTest, TutorTest {
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getTutorName()).isEqualTo(tutorName);
     }
+
+    @Test
+    @DisplayName("트랙 id로 튜터 리스트를 찾아오는 로직 테스트")
+    @Order(2)
+    void 트랙_ID로_튜터_리스트_조회_테스트() {
+        // Given
+        Long trackId = track.getId();
+
+        // When
+        List<Tutor> result = tutorRepositoryCustom.findTutorList(null, trackId);
+
+        // Then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getTutorName()).isEqualTo("test");
+        assertThat(result.get(1).getTutorName()).isEqualTo("tutor");
+    }
 }
