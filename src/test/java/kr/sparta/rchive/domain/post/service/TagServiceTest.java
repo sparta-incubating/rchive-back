@@ -60,7 +60,7 @@ public class TagServiceTest implements TagTest {
     @DisplayName("태그 생성하는 서비스 로직 성공 테스트")
     void 태그_생성_서비스_성공_테스트() {
         // Given
-        List<String> tagNameList = List.of("tagTest", "tagTest2");
+        List<String> tagNameList = List.of("tagTest", "tagTest2", " ");
 
         TagCreateReq request = TagCreateReq.builder()
             .tagNameList(tagNameList)
