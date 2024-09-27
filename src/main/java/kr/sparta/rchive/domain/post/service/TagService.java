@@ -1,10 +1,5 @@
 package kr.sparta.rchive.domain.post.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
 import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
 import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
@@ -15,6 +10,12 @@ import kr.sparta.rchive.domain.post.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +48,7 @@ public class TagService {
 
         return tagNameSet.stream().map(
                 tagName -> {
-                    String lowerTagName = tagName.toLowerCase().strip();
+                    String lowerTagName = tagName.toLowerCase().strip().replaceAll(" ", "");
 
                     if(lowerTagName.isEmpty()) {
                         throw new PostCustomException(PostExceptionCode.BAD_REQUEST_TAG_EMPTY);
