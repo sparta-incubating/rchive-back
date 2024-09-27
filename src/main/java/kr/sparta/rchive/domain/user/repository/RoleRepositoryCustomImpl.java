@@ -69,11 +69,12 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                         track.trackName.eq(trackName),
                         searchPeriod != null ? track.period.eq(searchPeriod) : null,
                         track.period.ne(0),
-                        (keyword != null) ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        (keyword != null) ? user.email.contains(keyword)
+                                .or(user.username.contains(keyword)) : null,
                         trackRole != null ? role.trackRole.eq(trackRole) : null,
                         role.auth.ne(AuthEnum.REJECT)
                 )
-                .orderBy(roleListOrderSpecifier(sort, role))
+                .orderBy(roleListOrderSpecifier(sort, role, track))
                 .fetch();
     }
 
@@ -93,12 +94,13 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                 .where(
                         track.trackName.eq(trackName),
                         track.period.eq(period),
-                        keyword != null ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        keyword != null ? user.email.contains(keyword)
+                                .or(user.username.contains(keyword)) : null,
                         trackRole != null ? role.trackRole.eq(trackRole) : null,
                         role.trackRole.ne(TrackRoleEnum.APM),
                         role.auth.ne(AuthEnum.REJECT)
                 )
-                .orderBy(roleListOrderSpecifier(sort, role))
+                .orderBy(roleListOrderSpecifier(sort, role, track))
                 .fetch();
     }
 
@@ -119,11 +121,12 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                         track.trackName.eq(trackName),
                         searchPeriod != null ? track.period.eq(searchPeriod) : null,
                         track.period.ne(0),
-                        keyword != null ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        keyword != null ? user.email.contains(keyword)
+                                .or(user.username.contains(keyword)) : null,
                         trackRole != null ? role.trackRole.eq(trackRole) : null,
                         auth != null ? role.auth.eq(auth) : null
                 )
-                .orderBy(roleListOrderSpecifier(sort, role))
+                .orderBy(roleListOrderSpecifier(sort, role, track))
                 .fetch();
     }
 
@@ -143,19 +146,26 @@ public class RoleRepositoryCustomImpl implements RoleRepositoryCustom {
                 .where(
                         track.trackName.eq(trackName),
                         track.period.eq(period),
-                        keyword != null ? user.email.contains(keyword).or(user.username.contains(keyword)) : null,
+                        keyword != null ? user.email.contains(keyword)
+                                .or(user.username.contains(keyword)) : null,
                         trackRole != null ? role.trackRole.eq(trackRole) : null,
                         role.trackRole.ne(TrackRoleEnum.APM),
                         auth != null ? role.auth.eq(auth) : null
                 )
-                .orderBy(roleListOrderSpecifier(sort, role))
+                .orderBy(roleListOrderSpecifier(sort, role, track))
                 .fetch();
     }
 
-    private OrderSpecifier<?>[] roleListOrderSpecifier(OrderRoleListEnum sort, QRole role) {
+    private OrderSpecifier<?>[] roleListOrderSpecifier(OrderRoleListEnum sort, QRole role,
+            QTrack track) {
         if (sort.equals(OrderRoleListEnum.NAME_ALPHABETICALLY)) {
-            return new OrderSpecifier[]{role.user.username.asc(), role.createdAt.desc()};
+            return new OrderSpecifier[]{
+                    role.user.username.asc(),
+                    role.createdAt.desc(),
+                    track.period.desc()};
         }
-        return new OrderSpecifier[]{role.createdAt.desc()};
+        return new OrderSpecifier[]{
+                role.createdAt.desc(),
+                track.period.desc()};
     }
 }
