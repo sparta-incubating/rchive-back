@@ -50,8 +50,8 @@ public class TagService {
                 tagName -> {
                     String lowerTagName = tagName.toLowerCase().strip().replaceAll(" ", "");
 
-                    if(lowerTagName.isEmpty()) {
-                        throw new PostCustomException(PostExceptionCode.BAD_REQUEST_TAG_EMPTY);
+                    if (lowerTagName.isEmpty()) {
+                        return TagCreateRes.builder().build();
                     }
 
                     Tag tag = tagRepository.findByTagNameNotOptional(lowerTagName);
@@ -68,7 +68,7 @@ public class TagService {
                             .tagName(tag.getTagName())
                             .build();
                 }
-        ).collect(Collectors.toList());
+        ).filter(tag -> tag.tagName() != null).collect(Collectors.toList());
     }
 
     // 태그가 존재하는지 체크하는 로직
