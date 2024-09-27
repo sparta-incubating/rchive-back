@@ -44,13 +44,13 @@ public class Post extends BaseTimeEntity {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDate uploadedAt;
 
-    @Column
+    @Column(length = 512)
     private String thumbnailUrl;
 
-    @Column(name = "video_link")
+    @Column(name = "video_link", length = 512)
     private String videoLink;
 
-    @Column(name = "content_link")
+    @Column(name = "content_link", length = 512)
     private String contentLink;
 
     @Column(length = 65535)
@@ -96,12 +96,13 @@ public class Post extends BaseTimeEntity {
         this.postType = request.postType() == null ? this.postType : request.postType();
         this.title = request.title() == null ? this.title : request.title();
         this.uploadedAt = request.uploadedAt() == null ? this.uploadedAt : request.uploadedAt();
-        this.thumbnailUrl = request.thumbnailUrl() == null ? this.thumbnailUrl : request.thumbnailUrl();
+        this.thumbnailUrl =
+                request.thumbnailUrl() == null ? this.thumbnailUrl : request.thumbnailUrl();
         this.videoLink = request.videoLink() == null ? this.videoLink : request.videoLink();
         this.contentLink = request.contentLink() == null ? this.contentLink : request.contentLink();
         this.content = request.content() == null ? this.content : request.content();
         this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();
-        this.tutor = tutor == null? this.tutor : tutor;
+        this.tutor = tutor == null ? this.tutor : tutor;
         this.track = track == null ? this.track : track;
     }
 
