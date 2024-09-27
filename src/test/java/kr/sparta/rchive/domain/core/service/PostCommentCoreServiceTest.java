@@ -54,4 +54,25 @@ public class PostCommentCoreServiceTest implements PostTest, CommentTest, UserTe
         // Then
         verify(commentService, times(1)).createComment(any(User.class), any(Post.class), isNull(), any(CommentCreateReq.class));
     }
+
+    @Test
+    @DisplayName("자식 댓글 생성 코어 서비스 로직 성공 테스트")
+    void 자식_댓글_생성_기능_성공_테스트() {
+        // Given
+        User user = TEST_STUDENT_USER;
+        Post post = TEST_POST_1L;
+        Comment comment = TEST_1L_COMMENT;
+        CommentCreateReq request = CommentCreateReq.builder()
+                .content("test")
+                .build();
+
+        given(postService.findPostById(any(Long.class))).willReturn(post);
+        given(commentService.findCommentByCommentId(any(Long.class))).willReturn(comment);
+
+        // When
+        postCommentCoreService.createComment(user, 1L, 1L, request);
+
+        // Then
+        verify(commentService, times(1)).createComment(any(User.class), any(Post.class), any(Comment.class), any(CommentCreateReq.class));
+    }
 }
