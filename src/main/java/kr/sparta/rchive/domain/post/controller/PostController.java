@@ -406,7 +406,7 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/content")
-    @Operation(operationId = "POST=024", summary = "게시물 내용 업데이트")
+    @Operation(operationId = "POST-024", summary = "게시물 내용 업데이트")
     public ResponseEntity<CommonResponseDto> updateContent(
         @PathVariable Long postId,
         @RequestBody PostUpdateContentReq request
