@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import kr.sparta.rchive.domain.comment.entity.Comment;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateContentReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
 import kr.sparta.rchive.domain.user.entity.Track;
@@ -104,6 +105,11 @@ public class Post extends BaseTimeEntity {
         this.isOpened = request.isOpened() == null ? this.isOpened : request.isOpened();
         this.tutor = tutor == null ? this.tutor : tutor;
         this.track = track == null ? this.track : track;
+    }
+
+    public void updateContent(PostUpdateContentReq request) {
+        this.contentLink = request.contentLink();
+        this.content = request.content();
     }
 
     public void openPost() {

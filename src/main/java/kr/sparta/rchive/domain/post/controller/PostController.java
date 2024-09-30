@@ -2,16 +2,47 @@ package kr.sparta.rchive.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import kr.sparta.rchive.domain.comment.dto.request.CommentCreateReq;
 import kr.sparta.rchive.domain.comment.dto.response.CommentGetRes;
 import kr.sparta.rchive.domain.comment.service.CommentService;
-import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostBookmarkCoreService;
+import kr.sparta.rchive.domain.core.service.PostCommentCoreService;
 import kr.sparta.rchive.domain.core.service.PostTagCoreService;
-import kr.sparta.rchive.domain.post.dto.request.*;
-import kr.sparta.rchive.domain.post.dto.response.*;
+import kr.sparta.rchive.domain.post.dto.request.DeleteThumbnailReq;
+import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostOpenCloseReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateContentReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
+import kr.sparta.rchive.domain.post.dto.request.RecentSearchKeywordReq;
+import kr.sparta.rchive.domain.post.dto.request.TagCreateReq;
+import kr.sparta.rchive.domain.post.dto.response.PostCreateRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetPostTypeRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetRecentKeywordRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetRes;
+import kr.sparta.rchive.domain.post.dto.response.PostGetSinglePostRes;
+import kr.sparta.rchive.domain.post.dto.response.PostModifyRes;
+import kr.sparta.rchive.domain.post.dto.response.TagCreateRes;
+import kr.sparta.rchive.domain.post.dto.response.TagSearchRes;
+import kr.sparta.rchive.domain.post.dto.response.TutorRes;
 import kr.sparta.rchive.domain.post.enums.PostTypeEnum;
-import kr.sparta.rchive.domain.post.exception.statement.*;
+import kr.sparta.rchive.domain.post.exception.statement.ClosePostException;
+import kr.sparta.rchive.domain.post.exception.statement.CreateBookmarkException;
+import kr.sparta.rchive.domain.post.exception.statement.CreateCommentException;
+import kr.sparta.rchive.domain.post.exception.statement.CreatePostException;
+import kr.sparta.rchive.domain.post.exception.statement.CreateTagException;
+import kr.sparta.rchive.domain.post.exception.statement.DeleteBookmarkException;
+import kr.sparta.rchive.domain.post.exception.statement.DeletePostException;
+import kr.sparta.rchive.domain.post.exception.statement.DeleteRecentSearchKeywordException;
+import kr.sparta.rchive.domain.post.exception.statement.GetPostCategoryException;
+import kr.sparta.rchive.domain.post.exception.statement.GetPostException;
+import kr.sparta.rchive.domain.post.exception.statement.GetRecentSearchKeywordException;
+import kr.sparta.rchive.domain.post.exception.statement.OpenPostException;
+import kr.sparta.rchive.domain.post.exception.statement.SaveRecentSearchKeywordException;
+import kr.sparta.rchive.domain.post.exception.statement.SearchPostByTagException;
+import kr.sparta.rchive.domain.post.exception.statement.SearchPostException;
+import kr.sparta.rchive.domain.post.exception.statement.SearchTutorException;
+import kr.sparta.rchive.domain.post.exception.statement.UpdatePostException;
 import kr.sparta.rchive.domain.post.response.PostResponseCode;
 import kr.sparta.rchive.domain.post.service.PostService;
 import kr.sparta.rchive.domain.post.service.TagService;
@@ -26,9 +57,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -366,5 +403,17 @@ public class PostController {
 
         return ResponseEntity.status(PostResponseCode.OK_GET_POST_TYPE_LIST.getHttpStatus())
                 .body(CommonResponseDto.of(PostResponseCode.OK_GET_POST_TYPE_LIST, responseList));
+    }
+
+    @PatchMapping("/{postId}/content")
+    @Operation(operationId = "POST-024", summary = "게시물 내용 업데이트")
+    public ResponseEntity<CommonResponseDto> updateContent(
+        @PathVariable Long postId,
+        @RequestBody PostUpdateContentReq request
+    ) {
+        postService.updateContent(postId, request);
+
+        return ResponseEntity.status(PostResponseCode.OK_UPDATE_CONTENT.getHttpStatus())
+            .body(CommonResponseDto.of(PostResponseCode.OK_UPDATE_CONTENT, null));
     }
 }

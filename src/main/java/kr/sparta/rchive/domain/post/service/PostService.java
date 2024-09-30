@@ -1,6 +1,7 @@
 package kr.sparta.rchive.domain.post.service;
 
 import kr.sparta.rchive.domain.post.dto.request.PostCreateReq;
+import kr.sparta.rchive.domain.post.dto.request.PostUpdateContentReq;
 import kr.sparta.rchive.domain.post.dto.request.PostUpdateReq;
 import kr.sparta.rchive.domain.post.dto.response.PostGetPostTypeRes;
 import kr.sparta.rchive.domain.post.entity.Post;
@@ -138,5 +139,14 @@ public class PostService {
         }
 
         return postGetPostTypeList;
+    }
+
+    @Transactional
+    public void updateContent(Long postId, PostUpdateContentReq request) {
+        Post findPost = findPostById(postId);
+
+        findPost.updateContent(request);
+
+        postRepository.save(findPost);
     }
 }
