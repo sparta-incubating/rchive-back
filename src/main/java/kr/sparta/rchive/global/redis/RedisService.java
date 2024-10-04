@@ -4,13 +4,15 @@ import java.util.List;
 import kr.sparta.rchive.domain.user.entity.Track;
 import kr.sparta.rchive.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class RedisService {
 
-    private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
+    @Value("${token.time.refresh}")
+    private long REFRESH_TOKEN_TIME;
     private static final long SELECT_ROLE_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
     private static final long AUTH_PHONE_TIME = 10 * 60 * 1000L; // 10분
 
