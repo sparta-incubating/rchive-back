@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RedisService {
 
-    private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
+    //    private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
+    private static final long REFRESH_TOKEN_TIME = 5 * 60 * 1000L; // 5분
     private static final long SELECT_ROLE_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
     private static final long AUTH_PHONE_TIME = 10 * 60 * 1000L; // 10분
 
