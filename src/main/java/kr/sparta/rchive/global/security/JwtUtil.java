@@ -35,8 +35,8 @@ public class JwtUtil {
     public static final String BEARER_PREFIX = "Bearer ";
     //    private static final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L;  // 1시간
     //    private static final long REFRESH_TOKEN_TIME = 30 * 24 * 60 * 60 * 1000L; // 30일
-    private static final long ACCESS_TOKEN_TIME = 2 * 60 * 1000L;  // 2분
-    private static final long REFRESH_TOKEN_TIME = 5 * 60 * 1000L; // 5분
+    private static final long ACCESS_TOKEN_TIME = 1 * 60 * 1000L;  // 1분
+    private static final long REFRESH_TOKEN_TIME = 60 * 60 * 1000L; // 60분
 
     @Value("${jwt.secret.key}")
     private String jwtKey;
